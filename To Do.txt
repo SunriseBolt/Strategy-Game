@@ -1,0 +1,18 @@
+*************TO DO LIST*************
+Overall:
+Dijkstra
+Provinces (nodes)
+Map Loader
+Simple Sprites (to load in)
+Movement
+Army building
+Combat
+Simple AI
+
+Current Tasks (As of Oct 4, 2013):
+
+Christian:
+Get Dijkstra working; Work on simple sprites (if time permits)
+
+Justin:
+Get Provinces and map loading working.
