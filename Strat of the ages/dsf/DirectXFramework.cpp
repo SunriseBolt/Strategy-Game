@@ -425,37 +425,6 @@ void CDirectXFramework::Update(float dt)
 		m_Mousex = CursorPosa.x - recta.left;
 		m_Mousey = CursorPosa.y - recta.top;
 
-		Buttons[0]->Y = (D3Dpp.BackBufferHeight/2);
-		Buttons[0]->X = (D3Dpp.BackBufferWidth/2)-160;
-		Buttons[0]->Height = 32;
-		Buttons[0]->Width = 320;
-		Buttons[0]->CalcRECT();
-		Buttons[1]->Y = (D3Dpp.BackBufferHeight/2)+48;
-		Buttons[1]->X = (D3Dpp.BackBufferWidth/2)-160;
-		Buttons[1]->Height = 32;
-		Buttons[1]->Width = 320;
-		Buttons[1]->CalcRECT();
-		Buttons[2]->Y = (D3Dpp.BackBufferHeight/2)+88;
-		Buttons[2]->X = (D3Dpp.BackBufferWidth/2)-160;
-		Buttons[2]->Height = 32;
-		Buttons[2]->Width = 320;
-		Buttons[2]->CalcRECT();
-
-		if(Buttons[0]->IsCursorOnMe(m_Mousex,m_Mousey)){
-			options[0] = true;
-			options[1] = false;
-			options[2] = false;
-		}
-		if(Buttons[1]->IsCursorOnMe(m_Mousex,m_Mousey)){
-			options[0] = false;
-			options[1] = true;
-			options[2] = false;
-		}
-		if(Buttons[2]->IsCursorOnMe(m_Mousex,m_Mousey)){
-			options[0] = false;
-			options[1] = false;
-			options[2] = true;
-		}
 
 		
 		break;
@@ -771,7 +740,7 @@ void CDirectXFramework::Shutdown()
 	//Sound
 	
 	for(int i =0; i < 6; i++)
-		result = Sounds[i]->release();
+		Sounds[i]->release();
     result = system->close();
     result = system->release();
 }

@@ -24,7 +24,7 @@ public:
 		data[a_index] = a_value;
 	}
 	int getSize() const {	return size;	}//Size func
-	void add(const int a_value) {//Add a new item
+	void add(TYPE a_value) {//Add a new item
 		if(size >= allocated) {
 			setAllocatedSize(2*allocated);//double size
 		}

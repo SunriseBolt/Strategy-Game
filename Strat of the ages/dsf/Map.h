@@ -3,8 +3,8 @@
 #include "Vector.h"
 
 class WorldMap{
-	Vector<Province> Provinces;
+	Vector<Province*> Provinces;
 
 public:
-	WorldMap()
+	WorldMap();
 };
