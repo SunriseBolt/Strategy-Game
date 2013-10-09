@@ -1,18 +1,24 @@
 *************TO DO LIST*************
 Overall:
-Dijkstra
-Provinces (nodes)
-Map Loader
-Simple Sprites (to load in)
-Movement
-Army building
-Combat
-Simple AI
+Dijkstra - Done, needs implementing
+Provinces (nodes) - Working on this week
+Map Loader - Changed into random generation
+Simple Sprites (to load in) - Working on this week
+Movement - Working on after the map can be moved around
+Army building - Changed to static army creation
+Combat - May not make it as complex as it was thought up
+Simple AI - Working on now
 
-Current Tasks (As of Oct 4, 2013):
+Current Tasks (As of Oct 9, 2013):
 
 Christian:
-Get Dijkstra working; Work on simple sprites (if time permits)
+Get Dijkstra implemented into the code base.
+Get armies working
+AI that implements armies
+AI utilizing Combat.
+Cheap sprites (borrow from internet to start)
 
 Justin:
-Get Provinces and map loading working.
+Get Provinces and map drawing working.
+Make Nations
+Combat
