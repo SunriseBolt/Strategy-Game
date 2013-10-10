@@ -22,6 +22,9 @@ struct pallette
 	Button m_Button[10];
 	ID3DXFont* m_Font;
 
+	double DeltaX;
+	double DeltaY;
+
 	D3DXMATRIX m_Matrix;
 	D3DXMATRIX m_MatrixRot;
 	D3DXMATRIX m_MatrixTran;
@@ -45,21 +48,32 @@ struct pallette
 		 m_MatrixScale = D3DXMATRIX();
 	}
 
-	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures){
+	bool IsCursorOnMe(long aX, long aY){
+		if(aX > Me.left && aX < Me.right && aY > Me.top && aY < Me.bottom){
+			return true;
+		}
+		return false;
+	}
 
-		for(int i =0; i < LocCount;i++){
-			Loc loc = Locs[i];
-			lerp(loc.mx,loc.drwmx,loc.my,loc.drwmy,0.005f);
-			Locs[i] = loc;
+	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures, float Rot = 0,float Scale = 1){
 
+		static unsigned int i = 0;
+		Loc loc = Locs[i];
+		lerp(loc.mx+DeltaX,loc.drwmx,loc.my+DeltaY,loc.drwmy,0.005f);
+		Locs[i] = loc;
+		if(this->IsCursorOnMe(loc.drwmx,loc.drwmy)){
 			D3DXMatrixTranslation(&m_MatrixTran2,loc.drwmx ,loc.drwmy ,0);
 			D3DXMatrixRotationZ(&m_MatrixRot, Rot);
 			D3DXMatrixScaling(&m_MatrixScale, Scale, Scale, 0);
 			m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
 
 			m_pD3DSprite->SetTransform(&m_Matrix);
-			m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR(D3DCOLOR_ARGB(255,255,122,122)));
+			m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR(D3DCOLOR_ARGB(255,255,255,255)));
 		}
+		
+		i++;
+		if(i >= 10000)
+			i = 0;
 	}
 
 };

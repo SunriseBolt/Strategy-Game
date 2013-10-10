@@ -15,5 +15,8 @@ Province WorldMap::getProv(int i){
 
 WorldMap::~WorldMap(){
 	for(int i = 0; i < 10000; i++)
-		delete Provinces[i];
+		if(Provinces[i]){
+			delete Provinces[i];
+			Provinces[i] = 0;
+		}
 }

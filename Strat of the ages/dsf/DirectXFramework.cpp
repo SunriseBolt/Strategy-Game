@@ -179,13 +179,15 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 
 	for(int i = 0; i < 3; i++){
 		Pallette[i] = new pallette;
+		Pallette[i]->DeltaX = 0;
+		Pallette[i]->DeltaY = 0;
 	}
 
 	RECT rect2;
-	rect2.top = 0;
-	rect2.left = 0;
-	rect2.bottom = 400;
-	rect2.right= 400;
+	rect2.top = -33;
+	rect2.left = -33;
+	rect2.bottom = 640;
+	rect2.right= 640;
 	Pallette[0]->Me = rect2;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -219,11 +221,11 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	Loc locs;
 	for(int i = 0; i < 100;i++)
 		for(int j = 0; j < 100;j++){
-			locs.drwmx = j*64;
-			locs.drwmy = i*64;
-			locs.mx = j*64;
-			locs.my = i*64;
-			Pallette[0]->Locs[i] = locs;
+			locs.drwmx = j*SpriteSize;
+			locs.drwmy = i*SpriteSize;
+			locs.mx = j*SpriteSize;
+			locs.my = i*SpriteSize;
+			Pallette[0]->Locs[j+i*100] = locs;
 		}
 	//*************************************************************************
 	DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDIObject, NULL);
@@ -477,27 +479,51 @@ void CDirectXFramework::Update(float dt)
 		else
 		{
 			m_BoolBuf[DIK_SPACE] = false;
+		}	
+		if(Buffer[DIK_W] & 0x80){
+		//	if(!m_BoolBuf[DIK_W] ){
+				m_BoolBuf[DIK_W] = true;
+				//DO STUFF HERE
+				Pallette[0]->DeltaY += (32.0f*6)/mFPS;
+		//	}
 		}
+		//else
+		//{
+		//	m_BoolBuf[DIK_W] = false;
+		//}	
+		if(Buffer[DIK_S] & 0x80){
+		//	if(!m_BoolBuf[DIK_S] ){
+		//		m_BoolBuf[DIK_S] = true;
+				//DO STUFF HERE
+				Pallette[0]->DeltaY -= (32.0f*6)/mFPS;
+		//	}
+		}
+		//else
+		//{
+		//	m_BoolBuf[DIK_S] = false;
+		//}
 		if(Buffer[DIK_A] & 0x80){
-			if(!m_BoolBuf[DIK_A] ){
-				m_BoolBuf[DIK_A] = true;
+		//	if(!m_BoolBuf[DIK_A] ){
+		//		m_BoolBuf[DIK_A] = true;
 				//DO STUFF HERE
-			}
+				Pallette[0]->DeltaX += (32.0f*6)/mFPS;
+		//	}
 		}
-		else
-		{
-			m_BoolBuf[DIK_A] = false;
-		}
+		//else
+		//{
+		//	m_BoolBuf[DIK_A] = false;
+		//}
 		if(Buffer[DIK_D] & 0x80 ){
-			if(!m_BoolBuf[DIK_D]){
-				m_BoolBuf[DIK_D] = true;
+		//	if(!m_BoolBuf[DIK_D]){
+		//		m_BoolBuf[DIK_D] = true;
 				//DO STUFF HERE
-			}
+				Pallette[0]->DeltaX -= (32.0f*6)/mFPS;
+		//	}
 		}
-		else
-		{
-			m_BoolBuf[DIK_D] = false;
-		}
+		//else
+		//{
+		//	m_BoolBuf[DIK_D] = false;
+		//}
 		if(Buffer[DIK_RETURN] & 0x80){
 			if(!m_BoolBuf[DIK_RETURN]){
 				m_BoolBuf[DIK_RETURN] = true;
@@ -550,7 +576,7 @@ void CDirectXFramework::Update(float dt)
 		}
 
 		break;
-	case 2://Between turns #############################################
+	case 2://Between turns (which this game doesn't have)#############################################
 		if(Buffer[DIK_SPACE] & 0x80 || mouseState.rgbButtons[0]){
 			if(!m_BoolBuf[DIK_SPACE]){
 				m_BoolBuf[DIK_SPACE] = true;
@@ -687,7 +713,7 @@ void CDirectXFramework::Render()//RENDER
 		rect.left = 0;
 		rect.right = D3Dpp.BackBufferWidth;
 		rect.bottom = D3Dpp.BackBufferHeight;
-		ltoa(m_Mousex, fps, 10);
+		ltoa(mFPS, fps, 10);
 		ltoa(m_Mousey, Spe, 10);
 
 		m_pD3DFont->DrawTextA(0, fps, -1, &rect,
@@ -772,12 +798,15 @@ void CDirectXFramework::Shutdown()
 	for(int i = 0; i < 3; i++)
 		if(Pallette[i]){
 			delete Pallette[i];
-			m_pD3DObject=0;}
+			Pallette[i]=0;}
 	//*************************************************************************
 	//Sound
 	World.~WorldMap();
 	for(int i =0; i < 6; i++)
-		result = Sounds[i]->release();
+		if(Sounds[i]){
+			result = Sounds[i]->release();
+			Sounds[i] = 0;
+		}
     result = system->close();
     result = system->release();
 }
