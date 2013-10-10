@@ -1,10 +1,11 @@
 #pragma once
 #include "province.h"
-#include "Vector.h"
 
 class WorldMap{
-	Vector<Province*> Provinces;
+	Province* Provinces[10000];
 
 public:
+	Province getProv(int i);
 	WorldMap();
+	~WorldMap();
 };

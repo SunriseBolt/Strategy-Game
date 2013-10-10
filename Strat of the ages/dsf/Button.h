@@ -15,6 +15,16 @@ struct Button
 	RECT Me;
 	void* Function;
 
+	Button(){
+		X = 0;
+		Y = 0;
+		Width = 0;
+		Height = 0;
+		Me.top = Y;
+		Me.bottom = Y + Height;
+		Me.left = X;
+		Me.right = X + Width;
+	}
 	Button(int aX, int aY, int aWidth, int aHeight){
 		X = aX;
 		Y = aY;

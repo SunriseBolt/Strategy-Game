@@ -177,7 +177,16 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		&m_pD3DFontLarge);
 	// Load D3DXFont, each font style you want to support will need an ID3DXFont
 
+	for(int i = 0; i < 3; i++){
+		Pallette[i] = new pallette;
+	}
 
+	RECT rect2;
+	rect2.top = 0;
+	rect2.left = 0;
+	rect2.bottom = 400;
+	rect2.right= 400;
+	Pallette[0]->Me = rect2;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Create Sprite Object and Textures
@@ -191,12 +200,31 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// will need a new texture object.  If drawing the same sprite texture
 	// multiple times, just call that sprite's Draw() with different 
 	// transformation values.
-	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"test.tga", 0, 0, 0, 0,
+	Pallette[0]->m_Textures = new IDirect3DTexture9*[3];
+	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfo, 0, &m_pTexture);
-
-
+	Pallette[0]->m_Textures[0] = m_pTexture;
+	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
+		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
+		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
+		&m_imageInfo, 0, &m_pTexture);
+	Pallette[0]->m_Textures[1] = m_pTexture;
+	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
+		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
+		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
+		&m_imageInfo, 0, &m_pTexture);
+	Pallette[0]->m_Textures[2] = m_pTexture;
+	Loc locs;
+	for(int i = 0; i < 100;i++)
+		for(int j = 0; j < 100;j++){
+			locs.drwmx = j*64;
+			locs.drwmy = i*64;
+			locs.mx = j*64;
+			locs.my = i*64;
+			Pallette[0]->Locs[i] = locs;
+		}
 	//*************************************************************************
 	DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDIObject, NULL);
 
@@ -426,6 +454,8 @@ void CDirectXFramework::Update(float dt)
 		m_Mousey = CursorPosa.y - recta.top;
 
 
+
+
 		
 		break;
 	case 1://#################################################################################################
@@ -549,7 +579,7 @@ void CDirectXFramework::Update(float dt)
 	}
 }
 
-void CDirectXFramework::Render()
+void CDirectXFramework::Render()//RENDER
 {
 	// If the device was not created successfully, return
 	if(!m_pD3DDevice)
@@ -626,9 +656,12 @@ void CDirectXFramework::Render()
 		// Set these matrices for each object you want to render to the screen
 		//////////////////////////////////////////////////////////////////////////
 		//m_pD3DSprite->GetTransform(
+		//0 - Ocean, 1-Coast, 2-land
+		for(int i =0; i < 10000;i++){
+			
+			Pallette[0]->Draw(m_pD3DSprite,m_imageInfo,Pallette[0]->m_Textures[World.getProv(i).mtype]);
 
-
-
+		}
 
 		// Scaling
 		// Rotation on Z axis, value in radians, converting from degrees
@@ -736,11 +769,15 @@ void CDirectXFramework::Shutdown()
 	if(m_pD3DObject){
 		m_pD3DObject->Release();
 		m_pD3DObject=0;}
+	for(int i = 0; i < 3; i++)
+		if(Pallette[i]){
+			delete Pallette[i];
+			m_pD3DObject=0;}
 	//*************************************************************************
 	//Sound
-	
+	World.~WorldMap();
 	for(int i =0; i < 6; i++)
-		Sounds[i]->release();
+		result = Sounds[i]->release();
     result = system->close();
     result = system->release();
 }

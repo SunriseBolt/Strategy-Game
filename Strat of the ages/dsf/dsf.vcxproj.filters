@@ -44,7 +44,7 @@
     <ClInclude Include="Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AI.h">
+    <ClInclude Include="Loc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

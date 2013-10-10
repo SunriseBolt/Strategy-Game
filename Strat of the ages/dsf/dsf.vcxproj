@@ -83,8 +83,8 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AI.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="Loc.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="pallette.h" />
     <ClInclude Include="DirectXFramework.h" />

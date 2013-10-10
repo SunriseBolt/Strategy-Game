@@ -8,19 +8,16 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 #include "Button.h"
-
+#include "Vector.h"
+#include "Loc.h"
 struct pallette
 {
-	IDirect3DTexture9* m_Texture;
+	static const long LocCount = 10000;
+	IDirect3DTexture9** m_Textures;
 	float Rot;
 	float Scale;
-	float mXloc;
-	float mYloc;
-	float mX;
-	float mY;
+	Loc Locs[LocCount];
 	bool Visable;
-	float m_FontLocX[10];
-	float m_FontLocY[10];
 	RECT Me;
 	Button m_Button[10];
 	ID3DXFont* m_Font;
@@ -36,19 +33,33 @@ struct pallette
 		yloc = yloc + inter*(y-yloc);
 	}
 
-	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo){
-		lerp(mX,mXloc,mY,mYloc,0.005f);
+	pallette(){
+		float Rot = 0;
+		float Scale = 1;
+		bool Visable = 1;
 
+		 m_Matrix = D3DXMATRIX();
+		 m_MatrixRot = D3DXMATRIX();
+		 m_MatrixTran = D3DXMATRIX();
+		 m_MatrixTran2 = D3DXMATRIX();
+		 m_MatrixScale = D3DXMATRIX();
+	}
 
-		D3DXMatrixTranslation(&m_MatrixTran2,mXloc ,mYloc ,0);
-		D3DXMatrixRotationZ(&m_MatrixRot, Rot);
-		D3DXMatrixScaling(&m_MatrixScale, Scale, Scale, 0);
-		m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
+	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures){
 
+		for(int i =0; i < LocCount;i++){
+			Loc loc = Locs[i];
+			lerp(loc.mx,loc.drwmx,loc.my,loc.drwmy,0.005f);
+			Locs[i] = loc;
 
-		m_pD3DSprite->SetTransform(&m_Matrix);
-		
+			D3DXMatrixTranslation(&m_MatrixTran2,loc.drwmx ,loc.drwmy ,0);
+			D3DXMatrixRotationZ(&m_MatrixRot, Rot);
+			D3DXMatrixScaling(&m_MatrixScale, Scale, Scale, 0);
+			m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
 
+			m_pD3DSprite->SetTransform(&m_Matrix);
+			m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR(D3DCOLOR_ARGB(255,255,122,122)));
+		}
 	}
 
 };
