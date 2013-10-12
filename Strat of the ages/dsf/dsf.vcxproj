@@ -86,10 +86,15 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="Loc.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Nation.h" />
     <ClInclude Include="pallette.h" />
     <ClInclude Include="DirectXFramework.h" />
     <ClInclude Include="province.h" />
     <ClInclude Include="Vector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Land.png" />
+    <None Include="Nation.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

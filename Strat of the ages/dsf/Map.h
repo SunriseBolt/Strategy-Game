@@ -5,7 +5,7 @@ class WorldMap{
 	Province* Provinces[10000];
 
 public:
-	Province getProv(int i);
+	Province& getProv(int i);
 	WorldMap();
 	~WorldMap();
 };

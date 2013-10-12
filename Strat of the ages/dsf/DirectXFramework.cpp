@@ -190,6 +190,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	rect2.right= 640;
 	Pallette[0]->Me = rect2;
 
+
 	//////////////////////////////////////////////////////////////////////////
 	// Create Sprite Object and Textures
 	//////////////////////////////////////////////////////////////////////////
@@ -227,6 +228,17 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 			locs.my = i*SpriteSize;
 			Pallette[0]->Locs[j+i*100] = locs;
 		}
+
+	for(int i = 0; i < 100; i++){//TODO get names and such from files.
+		Nations[i] = new Nation;
+	}
+	for(int i = 0; i < 100; i++){
+		for(int j = 0; j < 100;j++){
+			World.getProv(j+i*100).m_Nation = Nations[i];
+		}
+	}
+	
+
 	//*************************************************************************
 	DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDIObject, NULL);
 
@@ -685,7 +697,7 @@ void CDirectXFramework::Render()//RENDER
 		//0 - Ocean, 1-Coast, 2-land
 		for(int i =0; i < 10000;i++){
 			
-			Pallette[0]->Draw(m_pD3DSprite,m_imageInfo,Pallette[0]->m_Textures[World.getProv(i).mtype]);
+			Pallette[0]->Draw(m_pD3DSprite,m_imageInfo,Pallette[0]->m_Textures[World.getProv(i).mtype],World.getProv(i).m_Nation->m_Flag);
 
 		}
 

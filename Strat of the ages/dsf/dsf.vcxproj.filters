@@ -47,5 +47,16 @@
     <ClInclude Include="Loc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Nation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Nation.txt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Land.png">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

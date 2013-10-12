@@ -9,7 +9,7 @@ WorldMap::WorldMap(){
 			Provinces[j+i*100] = Prov;}
 }
 
-Province WorldMap::getProv(int i){
+Province& WorldMap::getProv(int i){
 	return* Provinces[i];
 }
 

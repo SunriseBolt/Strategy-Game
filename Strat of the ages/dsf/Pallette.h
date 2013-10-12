@@ -55,7 +55,7 @@ struct pallette
 		return false;
 	}
 
-	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures, float Rot = 0,float Scale = 1){
+	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures,D3DCOLOR a_color = D3DCOLOR_ARGB(255,255,255,255), float Rot = 0,float Scale = 1){
 
 		static unsigned int i = 0;
 		Loc loc = Locs[i];
@@ -68,7 +68,7 @@ struct pallette
 			m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
 
 			m_pD3DSprite->SetTransform(&m_Matrix);
-			m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR(D3DCOLOR_ARGB(255,255,255,255)));
+			m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),a_color);
 		}
 		
 		i++;

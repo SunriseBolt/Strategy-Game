@@ -1,38 +1,41 @@
-﻿Build started 10/10/2013 12:46:22 PM.
+﻿Build started 10/12/2013 12:24:23 PM.
      1>Project "C:\Users\Justin\Documents\GitHub\Strategy-Game\Strat of the ages\dsf\dsf.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\Graphics.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt DirectXFramework.cpp
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt DirectXFramework.cpp WinMain.cpp
          DirectXFramework.cpp
          c:\program files (x86)\microsoft directx sdk (june 2010)\include\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\pallette.h(62): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\pallette.h(62): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\pallette.h(64): warning C4244: 'argument' : conversion from 'float' to 'long', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\pallette.h(64): warning C4244: 'argument' : conversion from 'float' to 'long', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(11): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(12): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(12): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(12): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(12): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(13): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(14): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(14): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(14): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(14): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(15): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(16): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(16): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(16): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\province.h(16): warning C4244: '=' : conversion from '__int64' to 'int', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(98): warning C4244: 'argument' : conversion from 'LONGLONG' to 'unsigned int', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(224): warning C4244: '=' : conversion from 'const int' to 'float', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(225): warning C4244: '=' : conversion from 'const int' to 'float', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(226): warning C4244: '=' : conversion from 'const int' to 'float', possible loss of data
      1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(227): warning C4244: '=' : conversion from 'const int' to 'float', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(322): warning C4244: '=' : conversion from 'float' to 'unsigned __int64', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(325): warning C4244: '=' : conversion from 'float' to '__int64', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(441): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(716): warning C4244: 'argument' : conversion from 'unsigned __int64' to 'long', possible loss of data
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(716): warning C4996: 'ltoa': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _ltoa. See online help for details.
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(228): warning C4244: '=' : conversion from 'const int' to 'float', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(334): warning C4244: '=' : conversion from 'float' to 'unsigned __int64', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(337): warning C4244: '=' : conversion from 'float' to '__int64', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(453): warning C4800: 'BOOL' : forcing value to bool 'true' or 'false' (performance warning)
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(728): warning C4244: 'argument' : conversion from 'unsigned __int64' to 'long', possible loss of data
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(728): warning C4996: 'ltoa': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _ltoa. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdlib.h(868) : see declaration of 'ltoa'
-     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(717): warning C4996: 'ltoa': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _ltoa. See online help for details.
+     1>c:\users\justin\documents\github\strategy-game\strat of the ages\dsf\directxframework.cpp(729): warning C4996: 'ltoa': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _ltoa. See online help for details.
                  c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdlib.h(868) : see declaration of 'ltoa'
+         Generating Code...
+         Skipping... (no relevant changes detected)
+         WinMain.cpp
        ManifestResourceCompile:
          All outputs are up-to-date.
        Link:
@@ -58,4 +61,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.54
+Time Elapsed 00:00:02.41
