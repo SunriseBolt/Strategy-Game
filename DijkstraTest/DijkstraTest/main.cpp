@@ -87,7 +87,7 @@ void main()
 	// 3 = d
 	Graph[3].push_back(node(1, 15));
 	Graph[3].push_back(node(2, 11));
-	Graph[3].push_back(node(4, 6));
+	Graph[3].push_back(node(4, 50));
 	// 4 = e
 	Graph[4].push_back(node(3, 6));
 	Graph[4].push_back(node(5, 9));
@@ -98,8 +98,8 @@ void main()
 
 	vector<double> min_distance;
 	vector<int> previous;
-	ComputePaths(0, Graph, min_distance, previous);
-	cout << "Distance from 0 to 4: " << min_distance[4] << std::endl;
+	ComputePaths(3, Graph, min_distance, previous);
+	cout << "Distance from 3 to 4: " << min_distance[4] << std::endl;
 	list<int> path = GetShortest(4, previous);
 	cout << "Path : ";
 	copy(path.begin(), path.end(), ostream_iterator<int>(std::cout, " "));
