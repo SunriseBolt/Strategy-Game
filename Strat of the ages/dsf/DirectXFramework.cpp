@@ -309,7 +309,24 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 
 	system->playSound(FMOD_CHANNEL_FREE, Sounds[5], false, &SChannel[1]);
 
+	for(int i = 0; i < 3; i++)
+		Buttons[i] = new Button;
 
+	Buttons[0]->Y = (D3Dpp.BackBufferHeight/2);
+	Buttons[0]->X = (D3Dpp.BackBufferWidth/2)-160;
+	Buttons[0]->Height = 32;
+	Buttons[0]->Width = 320;
+	Buttons[0]->CalcRECT();
+	Buttons[1]->Y = (D3Dpp.BackBufferHeight/2)+48;
+	Buttons[1]->X = (D3Dpp.BackBufferWidth/2)-160;
+	Buttons[1]->Height = 32;
+	Buttons[1]->Width = 320;
+	Buttons[1]->CalcRECT();
+	Buttons[2]->Y = (D3Dpp.BackBufferHeight/2)+88;
+	Buttons[2]->X = (D3Dpp.BackBufferWidth/2)-160;
+	Buttons[2]->Height = 32;
+	Buttons[2]->Width = 320;
+	Buttons[2]->CalcRECT();
 }
 
 void CDirectXFramework::Update(float dt)
@@ -469,6 +486,22 @@ void CDirectXFramework::Update(float dt)
 
 
 
+
+		if(Buttons[0]->IsCursorOnMe(m_Mousex,m_Mousey)){
+			options[0] = true;
+			options[1] = false;
+			options[2] = false;
+		}
+		if(Buttons[1]->IsCursorOnMe(m_Mousex,m_Mousey)){
+			options[0] = false;
+			options[1] = true;
+			options[2] = false;
+		}
+		if(Buttons[2]->IsCursorOnMe(m_Mousex,m_Mousey)){
+			options[0] = false;
+			options[1] = false;
+			options[2] = true;
+		}
 
 		
 		break;
