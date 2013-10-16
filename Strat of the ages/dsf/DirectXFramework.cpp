@@ -361,11 +361,11 @@ void CDirectXFramework::Update(float dt)
 	//KEYBOARD
 	HRESULT hr;
 	hr = m_pDIKeyboard->GetDeviceState(sizeof(Buffer), &Buffer);
-	if(hr == -2147024884){
+	if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED){
 		hr = m_pDIKeyboard->Acquire();
 		hr = m_pDIKeyboard->GetDeviceState(sizeof(Buffer), &Buffer);}
 	hr = m_pDIMouse->GetDeviceState(sizeof(mouseState),&mouseState);
-	if(hr == -2147024884){
+	if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED){
 		hr = m_pDIMouse->Acquire();
 		hr = m_pDIMouse->GetDeviceState(sizeof(mouseState),&mouseState);}
 	switch(State){
