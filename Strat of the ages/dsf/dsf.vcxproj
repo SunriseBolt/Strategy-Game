@@ -78,12 +78,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Army.cpp" />
     <ClCompile Include="DirectXFramework.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Pathfinding.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AI.h" />
+    <ClInclude Include="Army.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Loc.h" />
     <ClInclude Include="Map.h" />

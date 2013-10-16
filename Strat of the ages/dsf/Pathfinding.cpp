@@ -42,7 +42,7 @@ void Graph::ComputePaths(int source, const vect &Graph, vector<double> &min_dist
 
 list<int> Graph::GetShortest(int vertex, const vector<int> &previous)
 {
-	std::list<int> path;
+	list<int> path;
 	for ( ; vertex != -1; vertex = previous[vertex])
 		path.push_front(vertex);
 	return path;
