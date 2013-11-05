@@ -189,6 +189,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	rect2.bottom = 640;
 	rect2.right= 640;
 	Pallette[0]->Me = rect2;
+	vect graph(10000);
 
 
 	//////////////////////////////////////////////////////////////////////////

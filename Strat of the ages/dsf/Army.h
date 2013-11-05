@@ -7,7 +7,8 @@ const int INFANTRY = 0, CAVALIER = 1, ARTILLERY = 2;
 struct Soldier
 {
 	int m_type;
-	int ATK, DEF;
+	int ATK, DEF, m_ATK, m_DEF;
+	float maxMorale;
 	void setCombatVals(int m_type)
 	{
 		//Mostly placeholder values
