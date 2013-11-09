@@ -21,6 +21,7 @@ struct pallette
 	RECT Me;
 	Button m_Button[10];
 	ID3DXFont* m_Font;
+	int NumDraw;
 
 	double DeltaX;
 	double DeltaY;
@@ -40,6 +41,7 @@ struct pallette
 		float Rot = 0;
 		float Scale = 1;
 		bool Visable = 1;
+		NumDraw = 0;
 
 		 m_Matrix = D3DXMATRIX();
 		 m_MatrixRot = D3DXMATRIX();
@@ -55,7 +57,8 @@ struct pallette
 		return false;
 	}
 
-	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures,D3DCOLOR a_color = D3DCOLOR_ARGB(255,255,255,255), float Rot = 0,float Scale = 1){
+
+	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures,D3DCOLOR a_color = D3DCOLOR_ARGB(255,255,255,255), float Rot = 0,float Scalex = 1,float Scaley = 1){
 
 		static unsigned int i = 0;
 		Loc loc = Locs[i];
@@ -64,7 +67,7 @@ struct pallette
 		if(this->IsCursorOnMe(loc.drwmx,loc.drwmy)){
 			D3DXMatrixTranslation(&m_MatrixTran2,loc.drwmx ,loc.drwmy ,0);
 			D3DXMatrixRotationZ(&m_MatrixRot, Rot);
-			D3DXMatrixScaling(&m_MatrixScale, Scale, Scale, 0);
+			D3DXMatrixScaling(&m_MatrixScale, Scalex, Scaley, 0);
 			m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
 
 			m_pD3DSprite->SetTransform(&m_Matrix);
@@ -72,7 +75,7 @@ struct pallette
 		}
 		
 		i++;
-		if(i >= 10000)
+		if(i >= NumDraw)
 			i = 0;
 	}
 

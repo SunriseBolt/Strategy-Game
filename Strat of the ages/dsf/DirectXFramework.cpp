@@ -189,7 +189,13 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	rect2.bottom = 640;
 	rect2.right= 640;
 	Pallette[0]->Me = rect2;
-	vect graph(10000);
+	Pallette[0]->NumDraw = 10000;
+	rect2.top = -1;
+	rect2.left = 639;
+	rect2.bottom = 640;
+	rect2.right= 800;
+	Pallette[1]->Me = rect2;
+	Pallette[1]->NumDraw = 1;
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -205,22 +211,33 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// multiple times, just call that sprite's Draw() with different 
 	// transformation values.
 	Pallette[0]->m_Textures = new IDirect3DTexture9*[3];
+	Pallette[1]->m_Textures = new IDirect3DTexture9*[1];
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
-		&m_imageInfo, 0, &m_pTexture);
+		&m_imageInfoSmall, 0, &m_pTexture);
 	Pallette[0]->m_Textures[0] = m_pTexture;
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
-		&m_imageInfo, 0, &m_pTexture);
+		&m_imageInfoSmall, 0, &m_pTexture);
 	Pallette[0]->m_Textures[1] = m_pTexture;
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
-		&m_imageInfo, 0, &m_pTexture);
+		&m_imageInfoSmall, 0, &m_pTexture);
 	Pallette[0]->m_Textures[2] = m_pTexture;
+	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"RighthandUI.png", 0, 0, 0, 0,
+		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
+		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
+		&m_imageInfoUI, 0, &m_pTexture);
+	Pallette[1]->m_Textures[0] = m_pTexture;
 	Loc locs;
+	locs.drwmx = 640;
+	locs.drwmy = 0;
+	locs.mx = 640;
+	locs.my = 0;
+	Pallette[1]->Locs[0] = locs;
 	for(int i = 0; i < 100;i++)
 		for(int j = 0; j < 100;j++){
 			locs.drwmx = j*SpriteSize;
@@ -229,6 +246,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 			locs.my = i*SpriteSize;
 			Pallette[0]->Locs[j+i*100] = locs;
 		}
+
 
 	for(int i = 0; i < 100; i++){//TODO get names and such from files.
 		Nations[i] = new Nation;
@@ -239,6 +257,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		}
 	}
 	
+
 
 	//*************************************************************************
 	DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDIObject, NULL);
@@ -731,9 +750,11 @@ void CDirectXFramework::Render()//RENDER
 		//0 - Ocean, 1-Coast, 2-land
 		for(int i =0; i < 10000;i++){
 			
-			Pallette[0]->Draw(m_pD3DSprite,m_imageInfo,Pallette[0]->m_Textures[World.getProv(i).mtype],World.getProv(i).m_Nation->m_Flag);
+			Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype],World.getProv(i).m_Nation->m_Flag);
 
 		}
+
+		Pallette[1]->Draw(m_pD3DSprite,m_imageInfoUI,Pallette[1]->m_Textures[0],D3DCOLOR_ARGB(255,255,255,255),0.0,0.63,0.5855);
 
 		// Scaling
 		// Rotation on Z axis, value in radians, converting from degrees

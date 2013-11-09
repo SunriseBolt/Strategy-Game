@@ -73,5 +73,8 @@
     <None Include="Land.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="RighthandUI.png">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

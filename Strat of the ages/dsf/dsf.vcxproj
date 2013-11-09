@@ -100,6 +100,7 @@
   <ItemGroup>
     <None Include="Land.png" />
     <None Include="Nation.txt" />
+    <None Include="RighthandUI.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
