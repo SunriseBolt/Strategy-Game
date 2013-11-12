@@ -227,7 +227,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
 	Pallette[0]->m_Textures[2] = m_pTexture;
-	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"RighthandUI.png", 0, 0, 0, 0,
+	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"RighthandUI.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoUI, 0, &m_pTexture);
@@ -754,7 +754,7 @@ void CDirectXFramework::Render()//RENDER
 
 		}
 
-		Pallette[1]->Draw(m_pD3DSprite,m_imageInfoUI,Pallette[1]->m_Textures[0],D3DCOLOR_ARGB(255,255,255,255),0.0,0.63,0.5855);
+		Pallette[1]->Draw(m_pD3DSprite,m_imageInfoUI,Pallette[1]->m_Textures[0],D3DCOLOR_ARGB(255,255,255,255),0.0,0.85,0.94);
 
 		// Scaling
 		// Rotation on Z axis, value in radians, converting from degrees
