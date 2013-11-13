@@ -2,8 +2,8 @@
 *.slo
 *.lo
 *.o
-*.ipch
 *.sdf
+*.suo
 
 # Compiled Dynamic libraries
 *.so
@@ -13,3 +13,4 @@
 *.lai
 *.la
 *.a
+Debug
