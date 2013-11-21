@@ -83,6 +83,7 @@ void CDirectXFramework::EnableFullscreen(bool FullScrn){
 	}
 	// Reset the device with the changes.
 	m_pD3DSprite->OnLostDevice();
+	m_pD3DFontSmall->OnLostDevice();
 	m_pD3DFont->OnLostDevice();
 	m_pD3DFontLarge->OnLostDevice();
 	m_pD3DDevice->Reset(&D3Dpp);
@@ -167,6 +168,10 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	//////////////////////////////////////////////////////////////////////////
 
 	// Load a font for private use for this process
+	D3DXCreateFont(m_pD3DDevice, 16, 0, FW_BOLD, 0, false,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE, TEXT("Arial"),
+		&m_pD3DFontSmall);
 	D3DXCreateFont(m_pD3DDevice, 30, 0, FW_BOLD, 0, false,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_DONTCARE, TEXT("Arial"),
@@ -686,6 +691,8 @@ void CDirectXFramework::Render()//RENDER
 	m_pD3DDevice->Clear(0,0,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,D3DCOLOR_ARGB(0,0,0,0), 1,0);
 	// Clear the back buffer, call BeginScene()
 	m_pD3DDevice->BeginScene();
+	std::string UI;
+	char c_hlder[256];
 	switch(State){
 	case 0:
 		RECT start;
@@ -795,6 +802,50 @@ void CDirectXFramework::Render()//RENDER
 		m_pD3DFont->DrawTextA(0, y, -1, &rect,
 			DT_TOP | DT_RIGHT | DT_NOCLIP, 
 			D3DCOLOR_ARGB(255, 255, 255, 255));
+
+		rect = Pallette[1]->Me;
+		rect.bottom -= 16;
+		rect.top += 16;
+		rect.left += 16;
+		rect.right -= 16;
+		m_pD3DFont->DrawTextA(0, Nations[0]->m_Name.c_str(), -1, &rect,
+			DT_TOP | DT_LEFT | DT_NOCLIP, 
+			Nations[0]->m_Flag);
+		UI.append("\n\n\n\nTECHNOLOGY:\n");
+		UI.append("Land Tech: ");
+		ltoa(Nations[0]->m_LandTech,c_hlder,10);
+		UI.append(c_hlder);
+		UI.append(" \nSea Tech: ");
+		ltoa(Nations[0]->m_SeaTech,c_hlder,10);
+		UI.append(c_hlder);
+		UI.append(" \nEconomy Tech: ");
+		ltoa(Nations[0]->m_EconomyTech,c_hlder,10);
+		UI.append(c_hlder);
+		UI.append("\n\n\n\n");
+		UI.append("ARMY:\n");
+		UI.append(" \nAttack: ");
+		ltoa(Nations[0]->ArmyAtk,c_hlder,10);
+		UI.append(c_hlder);
+		UI.append(" \nDefence: ");
+		ltoa(Nations[0]->ArmyDef,c_hlder,10);
+		UI.append(c_hlder);
+		UI.append(" \nMorale Attack: ");
+		ltoa(Nations[0]->ArmyMAtk,c_hlder,10);
+		UI.append(c_hlder);
+		UI.append(" \nMorale Defence: ");
+		ltoa(Nations[0]->ArmyMDef,c_hlder,10);
+		UI.append(c_hlder);
+		UI.append(" \nMax Morale: ");
+		ltoa(Nations[0]->ArmyMaxMorale,c_hlder,10);
+		UI.append(c_hlder);
+
+		m_pD3DFontSmall->DrawTextA(0, UI.c_str(), -1, &rect,
+			DT_TOP | DT_LEFT | DT_NOCLIP, 
+			D3DCOLOR_ARGB(255, 200, 255, 255));
+
+
+
+
 		break;
 	case 2:
 		GetWindowRect(m_hWnd, &rect);
@@ -848,6 +899,9 @@ void CDirectXFramework::Shutdown()
 		m_pD3DSprite->Release();
 		m_pD3DSprite=0;}
 	// Font
+	if(m_pD3DFontSmall){
+		m_pD3DFontSmall->Release();
+		m_pD3DFontSmall=0;}
 	if(m_pD3DFont){
 		m_pD3DFont->Release();
 		m_pD3DFont=0;}
