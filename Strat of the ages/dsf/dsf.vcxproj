@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AI.cpp" />
     <ClCompile Include="Army.cpp" />
     <ClCompile Include="DirectXFramework.cpp" />
     <ClCompile Include="Map.cpp" />

@@ -253,22 +253,23 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	locs.mx = 640;
 	locs.my = 0;
 	Pallette[1]->Locs[0] = locs;
-	for(int i = 0; i < 100;i++)
-		for(int j = 0; j < 100;j++){
+	for(int i = 0; i < MapSize;i++)
+		for(int j = 0; j < MapSize;j++){
 			locs.drwmx = j*SpriteSize;
 			locs.drwmy = i*SpriteSize;
 			locs.mx = j*SpriteSize;
 			locs.my = i*SpriteSize;
-			Pallette[0]->Locs[j+i*100] = locs;
+			Pallette[0]->Locs[j+i*MapSize] = locs;
 		}
 
+	//MapSize defined in Map.h
 
-	for(int i = 0; i < 100; i++){//TODO get names and such from files.
+	for(int i = 0; i < MapSize; i++){//TODO get names and such from files.
 		Nations[i] = new Nation;
 	}
-	for(int i = 0; i < 100; i++){
-		for(int j = 0; j < 100;j++){
-			World.getProv(j+i*100).m_Nation = Nations[i];
+	for(int i = 0; i < MapSize; i++){
+		for(int j = 0; j < MapSize;j++){
+			World.getProv(j+i*MapSize).m_Nation = Nations[i];
 		}
 	}
 	
