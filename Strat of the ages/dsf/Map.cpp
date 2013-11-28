@@ -2,23 +2,13 @@
 #include <fstream>
 #include <queue>
 using namespace std;
-
-struct MapGenTile{
-	int ProvID;
-	int Type;
-	MapGenTile(){
-		ProvID = 0;
-		Type = 0;
-	}
-	MapGenTile(int a_prov,int a_type){
-		ProvID = a_prov;
-		Type = a_type;
-	}
-};
+#include <time.h>
+#include "MapGen.h"
 
 
 
 WorldMap::WorldMap(){
+	srand(time(NULL));
 	Province * Prov;
 	for(int i = 0; i < 100; i++)\
 		for(int j = 0; j < 100; j++){
@@ -40,18 +30,21 @@ WorldMap::WorldMap(){
 	while(!Mapgen.empty())//while map generator not done
 	{
 		if(!Provinces[Mapgen.front().ProvID]->Set){//just incase some stuff gets put on other stuff
-		Provinces[Mapgen.front().ProvID]->mtype = Mapgen.front().Type;
-		Provinces[Mapgen.front().ProvID]->Set = true;}
-		for(int i = 0; i < 6; i++)//push neighbors
-		{
-			if(Provinces[Mapgen.front().ProvID]->connections[i])
-				if(!Provinces[Provinces[Mapgen.front().ProvID]->connections[i]]->Set)
-				{
-					Mapgen.push(MapGenTile(Provinces[Mapgen.front().ProvID]->connections[i],Mapgen.front().Type));
-				}
+			Provinces[Mapgen.front().ProvID]->mtype = Mapgen.front().Type;
+			Provinces[Mapgen.front().ProvID]->Set = true;
+			for(int i = 0; i < 6; i++)//push neighbors
+			{
+				if(Provinces[Mapgen.front().ProvID]->connections[i] != -1)
+					if(!Provinces[Provinces[Mapgen.front().ProvID]->connections[i]]->Set)
+					{
+						Mapgen.push(MapGenTile(Provinces[Mapgen.front().ProvID]->connections[i],Mapgen.front().Type));
+					}
+			}
 		}
 		Mapgen.pop();
 	}
+	
+
 
 }
 

@@ -13,6 +13,9 @@
 //			prior consent of DeVry Educational Development Corporation.
 //////////////////////////////////////////////////////////////////////////
 #include "DirectXFramework.h"
+#include <queue>
+#include "MapGen.h"
+#include <time.h>
 
 CDirectXFramework::CDirectXFramework(void)
 {
@@ -94,6 +97,7 @@ void CDirectXFramework::EnableFullscreen(bool FullScrn){
 
 void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 {
+	srand(time(NULL));
 	LARGE_INTEGER Timer;
 	QueryPerformanceCounter(&Timer);
 	srand(Timer.QuadPart);
@@ -253,25 +257,66 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	locs.mx = 640;
 	locs.my = 0;
 	Pallette[1]->Locs[0] = locs;
-	for(int i = 0; i < MapSize;i++)
-		for(int j = 0; j < MapSize;j++){
+	for(int i = 0; i < 100;i++)
+		for(int j = 0; j < 100;j++){
+			if(i%2){
 			locs.drwmx = j*SpriteSize;
 			locs.drwmy = i*SpriteSize;
 			locs.mx = j*SpriteSize;
 			locs.my = i*SpriteSize;
-			Pallette[0]->Locs[j+i*MapSize] = locs;
+			Pallette[0]->Locs[j+i*100] = locs;}
+			else{
+			locs.drwmx = (j*SpriteSize)-16;
+			locs.drwmy = (i*SpriteSize);
+			locs.mx = (j*SpriteSize)-16;
+			locs.my = (i*SpriteSize);
+			Pallette[0]->Locs[j+i*100] = locs;}
+
 		}
 
 	//MapSize defined in Map.h
 
-	for(int i = 0; i < MapSize; i++){//TODO get names and such from files.
+	for(int i = 0; i < 100; i++){//TODO get names and such from files.
 		Nations[i] = new Nation;
+	}	
+	
+	queue<MapGenTile,deque<MapGenTile>> Mapgen;
+	for(int i = 0; i < 10000; i++){
+		World.getProv(i).Set = false;
 	}
-	for(int i = 0; i < MapSize; i++){
-		for(int j = 0; j < MapSize;j++){
-			World.getProv(j+i*MapSize).m_Nation = Nations[i];
+
+	
+	for(int i = 0; i < Num_Nations; i++){//push Nation Seeds
+		bool done = false;
+		int ProvID = 0;
+		while(!done){
+			ProvID = rand()%10000;
+			if(World.getProv(ProvID).mtype != Water)
+				done = true;
 		}
+		Mapgen.push(MapGenTile(ProvID,i));
 	}
+
+
+	while(!Mapgen.empty())//while map generator not done
+	{
+		if(!World.getProv(Mapgen.front().ProvID).Set){//just incase some stuff gets put on other stuff
+			World.getProv(Mapgen.front().ProvID).m_Nation = Nations[Mapgen.front().Type];
+			World.getProv(Mapgen.front().ProvID).Set = true;
+			for(int i = 0; i < 6; i++)//push neighbors
+			{
+				if(World.getProv(Mapgen.front().ProvID).connections[i] != -1)
+					if( World.getProv(World.getProv(Mapgen.front().ProvID).connections[i]).Set == false
+						&& 
+						World.getProv(World.getProv(Mapgen.front().ProvID).connections[i]).mtype != Water)
+					{
+						Mapgen.push(MapGenTile(World.getProv(Mapgen.front().ProvID).connections[i],Mapgen.front().Type));
+					}
+			}
+		}
+		Mapgen.pop();
+	}
+
 	
 
 
@@ -764,12 +809,15 @@ void CDirectXFramework::Render()//RENDER
 		// Matrix Transformations to control sprite position, scale, and rotate
 		// Set these matrices for each object you want to render to the screen
 		//////////////////////////////////////////////////////////////////////////
-		//m_pD3DSprite->GetTransform(
-		//0 - Ocean, 1-Coast, 2-land
-		for(int i =0; i < 10000;i++){
-			
-			Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype],World.getProv(i).m_Nation->m_Flag);
+		
 
+
+
+		for(int i =0; i < 10000;i++){
+			if(World.getProv(i).m_Nation)
+				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype],World.getProv(i).m_Nation->m_Flag);
+			else
+				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype]);
 		}
 
 		Pallette[1]->Draw(m_pD3DSprite,m_imageInfoUI,Pallette[1]->m_Textures[0],D3DCOLOR_ARGB(255,255,255,255),0.0,0.85,0.94);

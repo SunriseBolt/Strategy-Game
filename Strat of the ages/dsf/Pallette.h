@@ -58,7 +58,7 @@ struct pallette
 	}
 
 
-	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures,D3DCOLOR a_color = D3DCOLOR_ARGB(255,255,255,255), float Rot = 0,float Scalex = 1,float Scaley = 1){
+	void Draw(ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures,D3DCOLOR a_color = D3DCOLOR_ARGB(255,100,120,220), float Rot = 0,float Scalex = 1,float Scaley = 1){
 
 		static unsigned int i = 0;
 		Loc loc = Locs[i];

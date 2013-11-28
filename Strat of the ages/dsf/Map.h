@@ -6,7 +6,7 @@
 #define Num_Desertseed 25
 #define Num_Moutainseed 3
 #define Num_Waterseed 15
-#define MapSize 100
+#define Num_Nations 100
 
 
 class WorldMap{
