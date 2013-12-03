@@ -9,11 +9,12 @@
 #define Num_Nations 100
 
 //Complete placeholder values
-#define LandWeight 1
-#define ForestWeight 2
-#define DesertWeight 4
-#define MountainWeight 6
-#define WaterWeight 3
+#define LandWeight 15
+#define ForestWeight 20
+#define DesertWeight 25
+#define MountainWeight 60
+#define WaterWeight 5
+#define WaterLandWeight 60
 
 class WorldMap{
 	Province* Provinces[10000];
