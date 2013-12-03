@@ -1,5 +1,22 @@
 #include "Pathfinding.h"
 
+Graph::Graph()
+{
+	vect graph(10000);
+}
+
+void Graph::setWeights(WorldMap &W, vect &graph)
+{
+	for(int i = 0; i < 10000; i++)
+	{
+		//Check the node right of current
+		//if(W.getProvince(i+1)."Province Type" == W::Land)
+		//graph[i].push_back(node(i+1, LandWeight));
+		//Do the same for each province type
+		//Then check each other node (left, above left, above right, below left, below right)
+	}
+}
+
 void Graph::ComputePaths(int source, const vect &Graph, vector<double> &min_distance, vector<int> &previous)
 {
 	int n = Graph.size();

@@ -4,6 +4,7 @@
 #include <list>
 #include <set>
 #include <queue>
+#include "Map.h"
 
 using namespace std;
 
@@ -23,9 +24,14 @@ class Graph
 {
 private:
 public:
+	Graph();
+	/*
+	Sets all of the weights to be used for the dijkstra computation
+	*/
+	void setWeights(WorldMap&, vect&);
 	/*
 	Computes all possible paths using
-	@param int to begin from (0)
+	@param int to begin from
 	@param vect - the Graph being used for pathfinding
 	@param vector<double> - minimum distance Graph traveled
 	@param vector<int> - Graph traveled beforehand
