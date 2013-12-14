@@ -38,6 +38,7 @@ CDirectXFramework::CDirectXFramework(void)
 	LeftMouseDown = false;
 	RightMouseDown = false;
 
+	Test = -1;
 
 
 }
@@ -219,44 +220,44 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// will need a new texture object.  If drawing the same sprite texture
 	// multiple times, just call that sprite's Draw() with different 
 	// transformation values.
-	Pallette[0]->m_Textures = new IDirect3DTexture9*[3];
-	Pallette[1]->m_Textures = new IDirect3DTexture9*[1];
+	Pallette[Map]->m_Textures = new IDirect3DTexture9*[3];
+	Pallette[RightHand]->m_Textures = new IDirect3DTexture9*[1];
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
-	Pallette[0]->m_Textures[0] = m_pTexture;
+	Pallette[Map]->m_Textures[0] = m_pTexture;
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Forest.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
-	Pallette[0]->m_Textures[1] = m_pTexture;
+	Pallette[Map]->m_Textures[1] = m_pTexture;
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Desert.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
-	Pallette[0]->m_Textures[2] = m_pTexture;
+	Pallette[Map]->m_Textures[2] = m_pTexture;
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Mountain.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
-	Pallette[0]->m_Textures[3] = m_pTexture;
+	Pallette[Map]->m_Textures[3] = m_pTexture;
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Water.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
-	Pallette[0]->m_Textures[4] = m_pTexture;
+	Pallette[Map]->m_Textures[4] = m_pTexture;
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"RighthandUI.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoUI, 0, &m_pTexture);
-	Pallette[1]->m_Textures[0] = m_pTexture;
+	Pallette[RightHand]->m_Textures[0] = m_pTexture;
 	Loc locs;
 	locs.drwmx = 640;
 	locs.drwmy = 0;
 	locs.mx = 640;
 	locs.my = 0;
-	Pallette[1]->Locs[0] = locs;
+	Pallette[RightHand]->Locs[0] = locs;
 	for(int i = 0; i < 100;i++)
 		for(int j = 0; j < 100;j++){
 			if(i%2){
@@ -264,13 +265,13 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 			locs.drwmy = i*SpriteSize;
 			locs.mx = j*SpriteSize;
 			locs.my = i*SpriteSize;
-			Pallette[0]->Locs[j+i*100] = locs;}
+			Pallette[Map]->Locs[j+i*100] = locs;}
 			else{
 			locs.drwmx = (j*SpriteSize)-16;
 			locs.drwmy = (i*SpriteSize);
 			locs.mx = (j*SpriteSize)-16;
 			locs.my = (i*SpriteSize);
-			Pallette[0]->Locs[j+i*100] = locs;}
+			Pallette[Map]->Locs[j+i*100] = locs;}
 
 		}
 
@@ -445,6 +446,7 @@ void CDirectXFramework::Update(float dt)
 	if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED){
 		hr = m_pDIKeyboard->Acquire();
 		hr = m_pDIKeyboard->GetDeviceState(sizeof(Buffer), &Buffer);}
+	//mouse
 	hr = m_pDIMouse->GetDeviceState(sizeof(mouseState),&mouseState);
 	if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED){
 		hr = m_pDIMouse->Acquire();
@@ -594,8 +596,8 @@ void CDirectXFramework::Update(float dt)
 
 		POINT CursorPos;
 		GetCursorPos(&CursorPos);
-		m_Mousex = CursorPos.x - rect.left;
-		m_Mousey = CursorPos.y - rect.top;
+		m_Mousex = CursorPos.x - rect.left - GetSystemMetrics(SM_CXSIZEFRAME);
+		m_Mousey = CursorPos.y - rect.top - GetSystemMetrics(SM_CYCAPTION);
 		if(Buffer[DIK_SPACE] & 0x80){
 			if(!m_BoolBuf[DIK_SPACE]){
 				m_BoolBuf[DIK_SPACE] = true;
@@ -686,6 +688,7 @@ void CDirectXFramework::Update(float dt)
 			if(!LeftMouseDown){
 				LeftMouseDown = true;
 				//DO STUFF HERE
+				Test = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
 			}
 		}
 		else{
@@ -847,7 +850,7 @@ void CDirectXFramework::Render()//RENDER
 		rect.right = D3Dpp.BackBufferWidth;
 		rect.bottom = D3Dpp.BackBufferHeight;
 		ltoa(mFPS, fps, 10);
-		ltoa(m_Mousey, Spe, 10);
+		ltoa(Test, Spe, 10);
 
 		m_pD3DFont->DrawTextA(0, fps, -1, &rect,
 			DT_BOTTOM | DT_LEFT | DT_NOCLIP, 

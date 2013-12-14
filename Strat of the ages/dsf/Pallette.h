@@ -19,7 +19,7 @@ struct pallette
 	Loc Locs[LocCount];
 	bool Visable;
 	RECT Me;
-	Button m_Button[10];
+	Button m_Button[LocCount];
 	ID3DXFont* m_Font;
 	int NumDraw;
 
@@ -43,6 +43,7 @@ struct pallette
 		bool Visable = 1;
 		NumDraw = 0;
 
+
 		 m_Matrix = D3DXMATRIX();
 		 m_MatrixRot = D3DXMATRIX();
 		 m_MatrixTran = D3DXMATRIX();
@@ -55,6 +56,20 @@ struct pallette
 			return true;
 		}
 		return false;
+	}
+
+	int IsCursorOnWho(long aX, long aY){
+		for(int i = 0; i < LocCount; i++){
+			m_Button[i].X = Locs[i].drwmx;
+			m_Button[i].Y = Locs[i].drwmy;
+			m_Button[i].Width = 33;
+			m_Button[i].Height = 33;
+			m_Button[i].CalcRECT();
+			if(m_Button[i].IsCursorOnMe(aX,aY))
+				return i;
+		}
+		return -1;
+
 	}
 
 
