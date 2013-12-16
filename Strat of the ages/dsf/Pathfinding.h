@@ -18,7 +18,6 @@ struct node
 
 typedef vector<vector<node> > vect;
 const double max_weight = 1000000;
-const double weight = 1;
 
 class Graph
 {

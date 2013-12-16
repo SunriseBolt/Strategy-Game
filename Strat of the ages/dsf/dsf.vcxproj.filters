@@ -79,5 +79,20 @@
     <None Include="RighthandUI.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Forest.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Mountain.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Unit.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Water.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Desert.png">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

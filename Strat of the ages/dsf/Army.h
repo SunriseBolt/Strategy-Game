@@ -39,13 +39,15 @@ class Army
 private:
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
 	float m_morale;
-	Nation n;
+	Nation* n;
 	Loc l;
 	Soldier s[1000];
 public:
-	Army():m_techLvl(0),m_numInf(0), m_numCav(0), m_numArt(0),m_morale(1.0)
+	Army():m_techLvl(0),m_numInf(3), m_numCav(2), m_numArt(1),m_morale(1.0)
 	{
-		n.m_Name = "NULL";
+		n[0].m_Name = "NULL";
 	}
-	Army(Nation &nation, Loc &location, int a_numCav, int a_numInf, int a_numArt);
+	Army(Nation* nation, int a_numCav, int a_numInf, int a_numArt);
+	void setNation(Nation*);
+	Nation* getNation(Army&){return n;}
 };

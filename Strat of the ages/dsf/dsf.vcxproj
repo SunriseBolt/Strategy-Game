@@ -99,9 +99,14 @@
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Desert.png" />
+    <None Include="Forest.png" />
     <None Include="Land.png" />
+    <None Include="Mountain.png" />
     <None Include="Nation.txt" />
     <None Include="RighthandUI.png" />
+    <None Include="Unit.png" />
+    <None Include="Water.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

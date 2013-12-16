@@ -297,6 +297,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		}
 		Mapgen.push(MapGenTile(ProvID,i));
 	}
+	
 
 
 	while(!Mapgen.empty())//while map generator not done
@@ -318,7 +319,24 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		Mapgen.pop();
 	}
 
-	
+	//Quick test for pathfinding using Justin's Map.
+	//It works.  Variables in DirectXFramework.h
+	//Nothing needs to be created.  Use what's already there.
+	source = 0;
+	vect graph(10000);
+	g.setWeights(World, graph);
+
+	g.ComputePaths(source, graph, min_dist, previous);
+	path = g.GetShortest(1000, previous);
+	pathSize = path.size();
+
+	// Test Army for setting nations.
+	// Use setNation as needed to have it equal whatever nation you need.  Should hopefully work.
+	// If not, I need to understand how to get and set Justin's nations better
+	// -------> Christian
+	// TODO + Side note:  Constructor won't work for whatever reason.  Look into it later
+	Army Tester;
+	Tester.setNation(Nations[5]);
 
 
 	//*************************************************************************

@@ -1,6 +1,8 @@
 #pragma once
 #include "province.h"
 
+enum {Land,Forest,Desert,Mountain,Water};
+
 #define Num_Landseed 50
 #define Num_Forestseed 25
 #define Num_Desertseed 25
