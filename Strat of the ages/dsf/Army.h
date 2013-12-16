@@ -1,6 +1,7 @@
 #pragma once
 #include "Nation.h"
 #include "Loc.h"
+#include "Pallette.h"
 
 const int INFANTRY = 0, CAVALIER = 1, ARTILLERY = 2;
 
@@ -43,11 +44,8 @@ private:
 	Loc l;
 	Soldier s[1000];
 public:
-	Army():m_techLvl(0),m_numInf(3), m_numCav(2), m_numArt(1),m_morale(1.0)
-	{
-		n[0].m_Name = "NULL";
-	}
-	Army(Nation* nation, int a_numCav, int a_numInf, int a_numArt);
+	Army();
 	void setNation(Nation*);
 	Nation* getNation(Army&){return n;}
+	void moveTo(pallette*, int);
 };

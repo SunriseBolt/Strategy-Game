@@ -1,22 +1,28 @@
 #include "Army.h"
 
-Army::Army(Nation* nation, int a_numInf, int a_numCav, int a_numArt)
+
+Army::Army():m_techLvl(0),m_numInf(3), m_numCav(2), m_numArt(1),m_morale(1.0)
 {
-	setNation(nation);
-	m_techLvl = 0, m_numInf = a_numInf, m_numCav = a_numCav, m_numArt = a_numArt, m_morale = 1.0;
-	// Ugly way of setting the first 5 army units
-	for(int i = 0; i < 5; i++)
-	{
-		if(i < a_numInf)
-			s[i].setType(INFANTRY);
-		else if(i-a_numInf < a_numCav)
-			s[i].setType(CAVALIER);
-		else if(i-(a_numInf+a_numArt) < a_numArt)
-			s[i].setType(ARTILLERY);
+	{	
+		for(int i = 0; i < 7; i++)
+		{
+			if(i < m_numInf)
+				s[i].setType(INFANTRY);
+			else if(i-m_numInf < m_numCav)
+				s[i].setType(CAVALIER);
+			else if(i-(m_numInf+m_numCav) < m_numArt)
+				s[i].setType(ARTILLERY);
+			s[i].setCombatVals(s[i].m_type);
+		}
 	}
 }
 
 void Army::setNation(Nation* n)
 {
 	this->n = n;
+}
+
+void Army::moveTo(pallette* p, int prov)
+{
+	l = p->Locs[prov];
 }

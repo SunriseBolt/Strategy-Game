@@ -297,7 +297,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		}
 		Mapgen.push(MapGenTile(ProvID,i));
 	}
-	
+
 
 
 	while(!Mapgen.empty())//while map generator not done
@@ -334,9 +334,12 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// Use setNation as needed to have it equal whatever nation you need.  Should hopefully work.
 	// If not, I need to understand how to get and set Justin's nations better
 	// -------> Christian
-	// TODO + Side note:  Constructor won't work for whatever reason.  Look into it later
-	Army Tester;
-	Tester.setNation(Nations[5]);
+	PH[0].setNation(Nations[0]);
+	PH[0].moveTo(Pallette[0], World.getProv(10).mID);
+	for(int i = 0; i < 100; ++i)
+	{
+		PH[i].setNation(Nations[i]);
+	}
 
 
 	//*************************************************************************
