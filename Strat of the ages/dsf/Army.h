@@ -40,7 +40,6 @@ private:
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
 	float m_morale;
 	Nation* n;
-	Loc l;
 	Soldier s[1000];
 	int ProvID;
 public:
