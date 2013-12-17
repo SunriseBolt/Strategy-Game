@@ -220,7 +220,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// will need a new texture object.  If drawing the same sprite texture
 	// multiple times, just call that sprite's Draw() with different 
 	// transformation values.
-	Pallette[Map]->m_Textures = new IDirect3DTexture9*[3];
+	Pallette[Map]->m_Textures = new IDirect3DTexture9*[6];
 	Pallette[RightHand]->m_Textures = new IDirect3DTexture9*[1];
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
@@ -247,6 +247,11 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
 	Pallette[Map]->m_Textures[4] = m_pTexture;
+	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Unit.png", 0, 0, 0, 0,
+		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
+		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
+		&m_imageInfoSmall, 0, &m_pTexture);
+	Pallette[Map]->m_Textures[5] = m_pTexture;
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"RighthandUI.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
@@ -286,7 +291,12 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		World.getProv(i).Set = false;
 	}
 
-	
+	// Test Army for setting nations.
+	// Use setNation as needed to have it equal whatever nation you need.  Should hopefully work.
+	// If not, I need to understand how to get and set Justin's nations better
+	// -------> Christian
+	// ->Justin, moved to map gen to place armies on capital
+
 	for(int i = 0; i < Num_Nations; i++){//push Nation Seeds
 		bool done = false;
 		int ProvID = 0;
@@ -296,6 +306,8 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 				done = true;
 		}
 		Mapgen.push(MapGenTile(ProvID,i));
+		PH[i].setNation(Nations[i]);
+		PH[i].moveTo(ProvID);
 	}
 
 
@@ -332,16 +344,8 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// This is just a test
 	pathSize = path.size();
 
-	// Test Army for setting nations.
-	// Use setNation as needed to have it equal whatever nation you need.  Should hopefully work.
-	// If not, I need to understand how to get and set Justin's nations better
-	// -------> Christian
-	PH[0].setNation(Nations[0]);
-	PH[0].moveTo(Pallette[0], World.getProv(10).mID);
-	for(int i = 0; i < 100; ++i)
-	{
-		PH[i].setNation(Nations[i]);
-	}
+
+
 
 
 	//*************************************************************************
@@ -573,11 +577,13 @@ void CDirectXFramework::Update(float dt)
 			if((Buffer[DIK_RETURN] & 0x80) || mouseState.rgbButtons[0]){
 				if(!m_BoolBuf[DIK_RETURN]){
 					m_BoolBuf[DIK_RETURN] = true;
+					LeftMouseDown = true;
 					EnableFullscreen(D3Dpp.Windowed);
 				}
 			}
 			else{
 				m_BoolBuf[DIK_RETURN] = false;
+				LeftMouseDown = false;
 			}
 		}
 		RECT recta;
@@ -608,7 +614,7 @@ void CDirectXFramework::Update(float dt)
 			options[1] = false;
 			options[2] = true;
 		}
-
+		LeftMouseDown = true;
 		
 		break;
 	case 1://#################################################################################################
@@ -712,6 +718,9 @@ void CDirectXFramework::Update(float dt)
 				LeftMouseDown = true;
 				//DO STUFF HERE
 				Test = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
+				if(!m_Player){
+					m_Player = World.getProv(Test).m_Nation;
+				}
 			}
 		}
 		else{
@@ -846,8 +855,9 @@ void CDirectXFramework::Render()//RENDER
 				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype]);
 		}
 
-		Pallette[1]->Draw(m_pD3DSprite,m_imageInfoUI,Pallette[1]->m_Textures[0],D3DCOLOR_ARGB(255,255,255,255),0.0,0.85,0.94);
+		Pallette[0]->DrawArmy(PH,m_pD3DSprite,m_imageInfoUI,Pallette[0]->m_Textures[5]);
 
+		Pallette[1]->Draw(m_pD3DSprite,m_imageInfoUI,Pallette[1]->m_Textures[0],D3DCOLOR_ARGB(255,255,255,255),0.0,0.85,0.94);
 		// Scaling
 		// Rotation on Z axis, value in radians, converting from degrees
 		// Translation
@@ -893,41 +903,42 @@ void CDirectXFramework::Render()//RENDER
 		rect.top += 16;
 		rect.left += 16;
 		rect.right -= 16;
-		m_pD3DFont->DrawTextA(0, Nations[0]->m_Name.c_str(), -1, &rect,
-			DT_TOP | DT_LEFT | DT_NOCLIP, 
-			Nations[0]->m_Flag);
-		UI.append("\n\n\n\nTECHNOLOGY:\n");
-		UI.append("Land Tech: ");
-		ltoa(Nations[0]->m_LandTech,c_hlder,10);
-		UI.append(c_hlder);
-		UI.append(" \nSea Tech: ");
-		ltoa(Nations[0]->m_SeaTech,c_hlder,10);
-		UI.append(c_hlder);
-		UI.append(" \nEconomy Tech: ");
-		ltoa(Nations[0]->m_EconomyTech,c_hlder,10);
-		UI.append(c_hlder);
-		UI.append("\n\n\n\n");
-		UI.append("ARMY:\n");
-		UI.append(" \nAttack: ");
-		ltoa(Nations[0]->ArmyAtk,c_hlder,10);
-		UI.append(c_hlder);
-		UI.append(" \nDefence: ");
-		ltoa(Nations[0]->ArmyDef,c_hlder,10);
-		UI.append(c_hlder);
-		UI.append(" \nMorale Attack: ");
-		ltoa(Nations[0]->ArmyMAtk,c_hlder,10);
-		UI.append(c_hlder);
-		UI.append(" \nMorale Defence: ");
-		ltoa(Nations[0]->ArmyMDef,c_hlder,10);
-		UI.append(c_hlder);
-		UI.append(" \nMax Morale: ");
-		ltoa(Nations[0]->ArmyMaxMorale,c_hlder,10);
-		UI.append(c_hlder);
+		if(m_Player){
+			m_pD3DFont->DrawTextA(0, Nations[0]->m_Name.c_str(), -1, &rect,
+				DT_TOP | DT_LEFT | DT_NOCLIP, 
+				m_Player->m_Flag);
+			UI.append("\n\n\n\nTECHNOLOGY:\n");
+			UI.append("Land Tech: ");
+			ltoa(m_Player->m_LandTech,c_hlder,10);
+			UI.append(c_hlder);
+			UI.append(" \nSea Tech: ");
+			ltoa(m_Player->m_SeaTech,c_hlder,10);
+			UI.append(c_hlder);
+			UI.append(" \nEconomy Tech: ");
+			ltoa(m_Player->m_EconomyTech,c_hlder,10);
+			UI.append(c_hlder);
+			UI.append("\n\n\n\n");
+			UI.append("ARMY:\n");
+			UI.append(" \nAttack: ");
+			ltoa(m_Player->ArmyAtk,c_hlder,10);
+			UI.append(c_hlder);
+			UI.append(" \nDefence: ");
+			ltoa(m_Player->ArmyDef,c_hlder,10);
+			UI.append(c_hlder);
+			UI.append(" \nMorale Attack: ");
+			ltoa(m_Player->ArmyMAtk,c_hlder,10);
+			UI.append(c_hlder);
+			UI.append(" \nMorale Defence: ");
+			ltoa(m_Player->ArmyMDef,c_hlder,10);
+			UI.append(c_hlder);
+			UI.append(" \nMax Morale: ");
+			ltoa(m_Player->ArmyMaxMorale,c_hlder,10);
+			UI.append(c_hlder);
 
-		m_pD3DFontSmall->DrawTextA(0, UI.c_str(), -1, &rect,
-			DT_TOP | DT_LEFT | DT_NOCLIP, 
-			D3DCOLOR_ARGB(255, 200, 255, 255));
-
+			m_pD3DFontSmall->DrawTextA(0, UI.c_str(), -1, &rect,
+				DT_TOP | DT_LEFT | DT_NOCLIP, 
+				D3DCOLOR_ARGB(255, 200, 255, 255));
+		}
 
 
 

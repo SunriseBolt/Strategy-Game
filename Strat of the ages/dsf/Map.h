@@ -1,5 +1,6 @@
 #pragma once
 #include "province.h"
+#include "Army.h"
 
 enum {Land,Forest,Desert,Mountain,Water};
 
@@ -25,5 +26,6 @@ public:
 	enum {Land,Forest,Desert,Mountain,Water};
 	Province& getProv(int i);
 	WorldMap();
+	void Init(Army[]);
 	~WorldMap();
 };

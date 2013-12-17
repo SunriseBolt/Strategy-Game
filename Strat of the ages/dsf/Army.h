@@ -1,7 +1,6 @@
 #pragma once
 #include "Nation.h"
 #include "Loc.h"
-#include "Pallette.h"
 
 const int INFANTRY = 0, CAVALIER = 1, ARTILLERY = 2;
 
@@ -15,18 +14,18 @@ struct Soldier
 		//Mostly placeholder values
 		if(m_type == INFANTRY)
 		{
-			ATK = 1;
-			DEF = 1;
+			ATK = 2;
+			DEF = 2;
 		}
 		else if(m_type == CAVALIER)
 		{
 			ATK = 3;
-			DEF = 4;
+			DEF = 1;
 		}
 		else if(m_type == ARTILLERY)
 		{
-			ATK = 2;
-			DEF = 2;
+			ATK = 1;
+			DEF = 3;
 		}
 	}
 	void setType(int a_type)
@@ -43,9 +42,11 @@ private:
 	Nation* n;
 	Loc l;
 	Soldier s[1000];
+	int ProvID;
 public:
 	Army();
 	void setNation(Nation*);
-	Nation* getNation(Army&){return n;}
-	void moveTo(pallette*, int);
+	Nation* getNation(){return n;}
+	void moveTo(int);
+	int getProvID(){return ProvID;};
 };
