@@ -319,15 +319,17 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		Mapgen.pop();
 	}
 
-	//Quick test for pathfinding using Justin's Map.
-	//It works.  Variables in DirectXFramework.h
-	//Nothing needs to be created.  Use what's already there.
+	// Quick test for pathfinding using Justin's Map.
+	// It works.  Variables in DirectXFramework.h
+	// Nothing needs to be created.  Use what's already there.
 	source = 0;
 	vect graph(10000);
 	g.setWeights(World, graph);
 
 	g.ComputePaths(source, graph, min_dist, previous);
 	path = g.GetShortest(1000, previous);
+	// Call this line when wanting to create an array for the path.
+	// This is just a test
 	pathSize = path.size();
 
 	// Test Army for setting nations.
