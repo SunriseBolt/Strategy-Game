@@ -90,6 +90,7 @@
     <ClInclude Include="Army.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Loc.h" />
+    <ClInclude Include="Manager.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Nation.h" />
     <ClInclude Include="pallette.h" />

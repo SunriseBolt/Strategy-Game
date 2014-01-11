@@ -40,12 +40,13 @@ private:
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
 	float m_morale;
 	Nation* n;
-	Soldier s[1000];
 	int ProvID;
 public:
 	Army();
 	void setNation(Nation*);
-	Nation* getNation(){return n;}
+	Nation* getNation(){
+		return n;
+	}
 	void moveTo(int);
 	int getProvID(){return ProvID;};
 };

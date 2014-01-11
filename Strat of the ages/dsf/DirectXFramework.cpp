@@ -306,8 +306,10 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 				done = true;
 		}
 		Mapgen.push(MapGenTile(ProvID,i));
-		PH[i].setNation(Nations[i]);
-		PH[i].moveTo(ProvID);
+		Army* t_Army = new Army;
+		t_Army->setNation(Nations[i]);
+		t_Army->moveTo(ProvID);
+		ArmyManager.Add(t_Army);
 	}
 
 
@@ -855,7 +857,7 @@ void CDirectXFramework::Render()//RENDER
 				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype]);
 		}
 
-		Pallette[0]->DrawArmy(PH,m_pD3DSprite,m_imageInfoUI,Pallette[0]->m_Textures[5]);
+		Pallette[0]->DrawArmy(ArmyManager.m_Array,ArmyManager.NumHeld,m_pD3DSprite,m_imageInfoUI,Pallette[0]->m_Textures[5]);
 
 		Pallette[1]->Draw(m_pD3DSprite,m_imageInfoUI,Pallette[1]->m_Textures[0],D3DCOLOR_ARGB(255,255,255,255),0.0,0.85,0.94);
 		// Scaling

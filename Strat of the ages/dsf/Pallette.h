@@ -74,17 +74,17 @@ struct pallette
 
 	}
 
-	void DrawArmy(Army PH[],ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures, float Rot = 0,float Scalex = 1,float Scaley = 1){
+	void DrawArmy(Army* PH[],int NumArmies,ID3DXSprite* m_pD3DSprite,D3DXIMAGE_INFO m_imageInfo,IDirect3DTexture9* a_Textures, float Rot = 0,float Scalex = 1,float Scaley = 1){
 		for(int i = 0; i < 100; i++){
-			if(this->IsCursorOnMe(Locs[PH[i].getProvID()].drwmx,Locs[PH[i].getProvID()].drwmy)){
-				D3DXMatrixTranslation(&m_MatrixTran2,Locs[PH[i].getProvID()].drwmx ,Locs[PH[i].getProvID()].drwmy ,0);
+			if(this->IsCursorOnMe(Locs[PH[i]->getProvID()].drwmx,Locs[PH[i]->getProvID()].drwmy)){
+				D3DXMatrixTranslation(&m_MatrixTran2,Locs[PH[i]->getProvID()].drwmx ,Locs[PH[i]->getProvID()].drwmy ,0);
 				D3DXMatrixRotationZ(&m_MatrixRot, Rot);
 				D3DXMatrixScaling(&m_MatrixScale, Scalex, Scaley, 0);
 				m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
 
 				m_pD3DSprite->SetTransform(&m_Matrix);
-				if(PH[i].getNation())
-					m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),PH[i].getNation()->m_Flag);
+				if(PH[i]->getNation())
+					m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),PH[i]->getNation()->m_Flag);
 				else
 					m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR_ARGB(125,255,255,255));
 			}
