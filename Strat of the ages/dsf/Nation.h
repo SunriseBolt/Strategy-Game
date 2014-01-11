@@ -8,6 +8,7 @@
 #pragma comment(lib, "dxguid.lib")
 #include <string>
 using namespace std;
+#include "Army.h"
 
 struct Nation{
 	string m_Name;
@@ -23,7 +24,11 @@ struct Nation{
 	int ArmyMDef;
 	float ArmyMaxMorale;
 
-	Nation():m_LandTech(0),m_SeaTech(0),m_EconomyTech(0){
+	//Army array
+	Army* m_ArmyList[10];
+	short NumMaxArmies;
+
+	Nation():m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1){
 
 		m_Name = "NULL";
 		m_Flag = D3DCOLOR_ARGB(255,(rand()%155)+50,(rand()%155)+50,(rand()%155)+50);
@@ -36,7 +41,7 @@ struct Nation{
 
 	}
 	
-	Nation(string a_Name,int A, int R, int G,int B):m_LandTech(0),m_SeaTech(0),m_EconomyTech(0){
+	Nation(string a_Name,int A, int R, int G,int B):m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1){
 
 		m_Name = a_Name;
 		m_Flag = D3DCOLOR_ARGB(A,R,G,B);

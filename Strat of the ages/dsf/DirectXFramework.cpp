@@ -307,8 +307,10 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		}
 		Mapgen.push(MapGenTile(ProvID,i));
 		Army* t_Army = new Army;
-		t_Army->setNation(Nations[i]);
+		t_Army->setNation(Nations[i]->m_Flag);
+		t_Army->SetCombatVal(Nations[i]->ArmyAtk,Nations[i]->ArmyDef,Nations[i]->ArmyMAtk,Nations[i]->ArmyMDef,Nations[i]->ArmyMaxMorale);
 		t_Army->moveTo(ProvID);
+		Nations[i]->m_ArmyList[0] = t_Army;
 		ArmyManager.Add(t_Army);
 	}
 
@@ -447,6 +449,7 @@ void CDirectXFramework::Update(float dt)
 	static float numFrames     = 0.0f;
 	static float timeElapsed = 0.0f;
 	static float Timer = 0.0f;
+	bool Turn = true;
 	// Increment the frame count.
 	numFrames += 1.0f;
 	// Accumulate how much time has passed.
@@ -467,6 +470,7 @@ void CDirectXFramework::Update(float dt)
 		// for computing the average stats over the next second.
 		timeElapsed = 0.0f;
 		numFrames     = 0.0f;
+		Turn = true;
 	}
 	int width, height;
 	//KEYBOARD
@@ -737,6 +741,32 @@ void CDirectXFramework::Update(float dt)
 		else{
 			RightMouseDown = false;
 		}
+
+		//GAME LOGIC
+		if(Turn){
+			Turn = false;
+
+			for(int i = 0; i < ArmyManager.NumHeld; i++){
+				if(ArmyManager.get(i)->getTarget()){
+					if(!ArmyManager.get(i)->getTarget()->getTarget())
+						ArmyManager.get(i)->getTarget()->setTarget(ArmyManager.get(i));
+				}
+			}
+
+			for(int i = 0; i < ArmyManager.NumHeld; i++){
+				if(ArmyManager.get(i)->getTarget()){
+					ArmyManager.get(i)->CombatRound(ArmyManager.get(i)->getTarget());
+				}
+			}
+
+
+
+
+
+
+		}
+		
+
 
 		break;
 	case 2://Between turns (which this game doesn't have)#############################################

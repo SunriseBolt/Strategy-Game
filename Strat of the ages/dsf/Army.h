@@ -1,6 +1,8 @@
 #pragma once
-#include "Nation.h"
 #include "Loc.h"
+
+#include <d3d9.h>
+#include <d3dx9.h>
 
 const int INFANTRY = 0, CAVALIER = 1, ARTILLERY = 2;
 
@@ -39,14 +41,28 @@ class Army
 private:
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
 	float m_morale;
-	Nation* n;
+	DWORD Nation;
+	unsigned int NumTroops;
+	unsigned int NumMaxTroops;
 	int ProvID;
+	
+	int ATK, DEF, MATK, MDEF;
+	float maxMorale;	
+
+	int PreviousDie;
+	Army* Target;
 public:
 	Army();
-	void setNation(Nation*);
-	Nation* getNation(){
-		return n;
+	void setNation(DWORD);
+	DWORD getNation(){
+		return Nation;
 	}
 	void moveTo(int);
 	int getProvID(){return ProvID;};
+	//COMBAT
+	//performs a single round of combat against an army
+	void CombatRound(Army*);
+	Army* getTarget();
+	void setTarget(Army*);
+	void SetCombatVal(int ATK,int DEF,int MATK,int MDEF,float maxMorale);
 };

@@ -40,9 +40,9 @@ struct Manager{
 
 	t_Item* get(int Num){
 		if(Num > NumMax)
-			return;
+			return NULL;
 		if(m_Array[Num] == NULL)
-			return;
+			return NULL;
 		return m_Array[Num];
 	}
 
