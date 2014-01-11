@@ -38,4 +38,4 @@ struct Manager{
 			return;
 		return m_Array[Num];
 	}
-}
+};
