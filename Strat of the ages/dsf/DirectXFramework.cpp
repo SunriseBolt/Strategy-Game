@@ -247,7 +247,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
 	Pallette[Map]->m_Textures[4] = m_pTexture;
-	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Unit.png", 0, 0, 0, 0,
+	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"UnitTest.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoSmall, 0, &m_pTexture);
@@ -446,12 +446,15 @@ void CDirectXFramework::Update(float dt)
 {
 	// Make static so that their values persist across
 	// function calls.
-	static float numFrames     = 0.0f;
+	static float gameTime = 0.0f;
+	static float turnTime = 6.0f;
+	static float numFrames = 0.0f;
 	static float timeElapsed = 0.0f;
 	static float Timer = 0.0f;
 	bool Turn = true;
 	// Increment the frame count.
 	numFrames += 1.0f;
+	gameTime += dt;
 	// Accumulate how much time has passed.
 	timeElapsed += dt;
 	// Has one second passed?--we compute the frame statistics once
@@ -743,9 +746,30 @@ void CDirectXFramework::Update(float dt)
 		}
 
 		//GAME LOGIC
-		if(Turn){
+		if(gameTime > turnTime){
 			Turn = false;
-
+			gameTime = 0.0f;
+			for(int i = 0; i < 100; ++i)
+			{
+				Roll = rand()%6;
+				if(Roll == 0)
+				{	Mover = -1;	}
+				else if(Roll == 1)
+				{	Mover = -100;	}
+				else if(Roll == 2)
+				{	Mover = -99;	}
+				else if(Roll == 3)
+				{	Mover = 1;	}
+				else if(Roll == 4)
+				{	Mover = 101;	}
+				else if(Roll == 5)
+				{	Mover = 100;	}
+				Test = ArmyManager.get(i)->getProvID();
+				if(Test+Mover > 0 && Test+Mover < Pallette[0]->LocCount)
+				{
+					ArmyManager.get(i)->moveTo(Test+Mover);
+				}
+			}
 			for(int i = 0; i < ArmyManager.NumHeld; i++){
 				if(ArmyManager.get(i)->getTarget()){
 					if(!ArmyManager.get(i)->getTarget()->getTarget())
