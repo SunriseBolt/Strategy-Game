@@ -39,7 +39,7 @@ CDirectXFramework::CDirectXFramework(void)
 	RightMouseDown = false;
 
 	Test = -1;
-
+	m_PlayerArmyView = 0;
 
 }
 CDirectXFramework::~CDirectXFramework(void)
@@ -440,6 +440,14 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	Buttons[2]->Height = 32;
 	Buttons[2]->Width = 320;
 	Buttons[2]->CalcRECT();
+
+
+	TurnTimers[0] = 6.0f;
+	TurnTimers[1] = 3.0f;
+	TurnTimers[2] = 1.0f;
+	TurnTimers[3] = 0.5f;
+	TurnTimers[4] = 0.1f;
+	TurnTimerSelect = 0;
 }
 
 void CDirectXFramework::Update(float dt)
@@ -710,7 +718,6 @@ void CDirectXFramework::Update(float dt)
 		{
 			m_BoolBuf[DIK_BACKSPACE] = false;
 		}
-		//####################################DEBUG##############################
 		if(Buffer[DIK_P] & 0x80){
 			if(!m_BoolBuf[DIK_P]){
 				m_BoolBuf[DIK_P] = true;
@@ -721,6 +728,42 @@ void CDirectXFramework::Update(float dt)
 		{
 			m_BoolBuf[DIK_P] = false;
 		}
+		//####################Keys to change turn progression###########################
+		if(Buffer[DIK_ADD] & 0x80){
+			if(!m_BoolBuf[DIK_ADD]){
+				m_BoolBuf[DIK_ADD] = true;
+				//DO STUFF HERE
+				if(TurnTimerSelect != 4){
+					TurnTimerSelect++;
+					turnTime = TurnTimers[TurnTimerSelect];
+				}
+			}
+		}
+		else
+		{
+			m_BoolBuf[DIK_ADD] = false;
+		}
+		if(Buffer[DIK_SUBTRACT] & 0x80){
+			if(!m_BoolBuf[DIK_SUBTRACT]){
+				m_BoolBuf[DIK_SUBTRACT] = true;
+				//DO STUFF HERE
+				if(TurnTimerSelect != 0){
+					TurnTimerSelect--;
+					turnTime = TurnTimers[TurnTimerSelect];
+				}
+			}
+		}
+		else
+		{
+			m_BoolBuf[DIK_SUBTRACT] = false;
+		}
+
+
+
+
+
+
+
 		system->update();	
 		if(mouseState.rgbButtons[0] ){
 			if(!LeftMouseDown){
@@ -746,8 +789,14 @@ void CDirectXFramework::Update(float dt)
 		}
 
 		//GAME LOGIC
-		if(gameTime > turnTime){
-			Turn = false;
+		if((gameTime > turnTime)&&m_Player){
+
+			if(!m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()){
+				m_Player->m_ArmyList[m_PlayerArmyView]->setTarget(Nations[0]->m_ArmyList[0]);
+			}
+
+
+
 			gameTime = 0.0f;
 			for(int i = 0; i < 100; ++i)
 			{
@@ -963,7 +1012,11 @@ void CDirectXFramework::Render()//RENDER
 			m_pD3DFont->DrawTextA(0, Nations[0]->m_Name.c_str(), -1, &rect,
 				DT_TOP | DT_LEFT | DT_NOCLIP, 
 				m_Player->m_Flag);
-			UI.append("\n\n\n\nTECHNOLOGY:\n");
+			UI.append("\n\n\n");
+			for(int i = 0; i < TurnTimerSelect+1;i++){
+				UI.append("+");
+			}
+			UI.append("\n\nTECHNOLOGY:\n");
 			UI.append("Land Tech: ");
 			ltoa(m_Player->m_LandTech,c_hlder,10);
 			UI.append(c_hlder);
@@ -990,6 +1043,31 @@ void CDirectXFramework::Render()//RENDER
 			UI.append(" \nMax Morale: ");
 			ltoa(m_Player->ArmyMaxMorale,c_hlder,10);
 			UI.append(c_hlder);
+			UI.append(" \n\nARMIES: ");
+			UI.append(" \nArmy #: ");
+			ltoa(m_PlayerArmyView,c_hlder,10);
+			UI.append(c_hlder);
+			UI.append(" \nTroop Count: ");
+			ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTroops(),c_hlder,10);
+			UI.append(c_hlder);
+			UI.append(" \nMorale: ");
+			ltoa((long)(m_Player->m_ArmyList[m_PlayerArmyView]->getMorale()*100),c_hlder,10);
+			UI.append(c_hlder);
+			if(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()){
+				UI.append(" \nIN COMBAT");
+				UI.append(" \nRoll: ");
+				ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getDie(),c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \nEnemy Trp Cnt: ");
+				ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getTroops(),c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \nEnemy Morale: ");
+				ltoa((long)(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getMorale()*100),c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \nEnemy Roll: ");
+				ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getDie(),c_hlder,10);
+				UI.append(c_hlder);
+			}
 
 			m_pD3DFontSmall->DrawTextA(0, UI.c_str(), -1, &rect,
 				DT_TOP | DT_LEFT | DT_NOCLIP, 

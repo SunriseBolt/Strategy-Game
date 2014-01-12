@@ -59,6 +59,9 @@ public:
 	}
 	void moveTo(int);
 	int getProvID(){return ProvID;};
+	int getTroops(){return NumTroops;};
+	int getDie(){return PreviousDie;};
+	float getMorale(){return m_morale;};
 	//COMBAT
 	//performs a single round of combat against an army
 	void CombatRound(Army*);

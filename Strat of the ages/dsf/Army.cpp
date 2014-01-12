@@ -23,7 +23,13 @@ void Army::CombatRound(Army* Enemy){
 	float DmgMult = (((float)NumTroops/(float)Enemy->NumTroops)+1.0f)/2.0f;
 
 	Enemy->NumTroops -= pow(die,1.5f)*DmgMult*(this->ATK/Enemy->DEF);
-	Enemy->m_morale -= (pow(die,1.5f)*DmgMult*(this->MATK/Enemy->MDEF))/Enemy->NumTroops;
+	float Hld = (pow(die,1.5f));
+	Hld *= DmgMult;
+	Hld *= (this->MATK/Enemy->MDEF);
+	Hld /= Enemy->NumTroops;
+
+	Enemy->m_morale -= Hld;
+	//Enemy->m_morale -= (pow(die,1.5f)*DmgMult*(this->MATK/Enemy->MDEF))/Enemy->NumTroops;
 
 	PreviousDie = die;
 
@@ -43,6 +49,6 @@ void Army::SetCombatVal(int ATK,int DEF,int MATK,int MDEF,float maxMorale){
 	this->ATK = ATK;
 	this->DEF = DEF;
 	this->MATK = MATK;
-	this->MATK = MATK;
+	this->MDEF = MDEF;
 	this->maxMorale = maxMorale;
 }

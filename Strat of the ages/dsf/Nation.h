@@ -33,10 +33,10 @@ struct Nation{
 		m_Name = "NULL";
 		m_Flag = D3DCOLOR_ARGB(255,(rand()%155)+50,(rand()%155)+50,(rand()%155)+50);
 
-		ArmyAtk = 0;
-		ArmyDef = 0;
-		ArmyMAtk = 0;
-		ArmyMDef = 0;
+		ArmyAtk = 1;
+		ArmyDef = 1;
+		ArmyMAtk = 1;
+		ArmyMDef = 1;
 		ArmyMaxMorale = 1.0;
 
 	}
