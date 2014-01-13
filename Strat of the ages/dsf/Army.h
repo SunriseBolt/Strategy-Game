@@ -42,6 +42,7 @@ private:
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
 	float m_morale;
 	DWORD Nation;
+	int NationID;
 	unsigned int NumTroops;
 	unsigned int NumMaxTroops;
 	int ProvID;
@@ -62,6 +63,8 @@ public:
 	int getTroops(){return NumTroops;};
 	int getDie(){return PreviousDie;};
 	float getMorale(){return m_morale;};
+	int getNationID(){return NationID;};
+	void setNationID(int NationID){this->NationID = NationID;};
 	//COMBAT
 	//performs a single round of combat against an army
 	void CombatRound(Army*);
