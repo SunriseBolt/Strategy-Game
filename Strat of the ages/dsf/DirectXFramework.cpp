@@ -800,7 +800,7 @@ void CDirectXFramework::Update(float dt)
 
 			gameTime = 0.0f;
 			bool NotDone = true;
-			bool GoodMove = false;
+			//bool GoodMove = false;
 			int numTries = 0;
 			for(int i = 0; i < 100; ++i)
 			{
@@ -813,22 +813,21 @@ void CDirectXFramework::Update(float dt)
 					numTries++;
 
 
-					if(Test > 0 && Test < Pallette[0]->LocCount)
+					if(Test > 0)
 					{
-						if(World.getProv(Test).m_Nation == Nations[ArmyManager.get(i)->getNationID()]){
-							ArmyManager.get(i)->moveTo(Test);
+						if((World.getProv(Test).m_Nation == Nations[ArmyManager.get(i)->getNationID()])//is the target the same nation as you
+							||//OR
+							(World.getProv(ArmyManager.get(i)->getProvID()).m_Nation != Nations[ArmyManager.get(i)->getNationID()])){//are you not on your own territory anyway
+							ArmyManager.get(i)->moveTo(Test);//then Proceed
 							NotDone = false;
 						}
 					}
 
-					for(int j = 0; j < 6;j++){
-						if(World.getProv(Test).connections[j] > -1){
-							GoodMove = true;
-						}
-					}
-					if(!GoodMove){
-						NotDone = false;
-					}
+					//for(int j = 0; j < 6;j++){
+					//}
+					//if(!GoodMove){
+					//	NotDone = false;
+					//}
 
 				}
 			}

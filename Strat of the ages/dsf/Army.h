@@ -59,11 +59,13 @@ public:
 		return Nation;
 	}
 	void moveTo(int);
-	int getProvID(){return ProvID;};
+	int getProvID(){
+		return ProvID;};
 	int getTroops(){return NumTroops;};
 	int getDie(){return PreviousDie;};
 	float getMorale(){return m_morale;};
-	int getNationID(){return NationID;};
+	int getNationID(){
+		return NationID;};
 	void setNationID(int NationID){this->NationID = NationID;};
 	//COMBAT
 	//performs a single round of combat against an army
