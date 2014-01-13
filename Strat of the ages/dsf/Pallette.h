@@ -86,7 +86,7 @@ struct pallette
 				if(PH[i]->getNation())
 					m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),PH[i]->getNation());
 				else
-					m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR_ARGB(125,255,255,255));
+					m_pD3DSprite->Draw(a_Textures,0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR_ARGB(255,255,255,255));
 			}
 		}
 	}

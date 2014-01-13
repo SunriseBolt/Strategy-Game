@@ -138,7 +138,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// Check device capabilities
 	DWORD deviceBehaviorFlags = 0;
 	m_pD3DObject->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &m_D3DCaps);
-
+	
 	// Determine vertex processing mode
 	if(m_D3DCaps.DevCaps & D3DCREATE_HARDWARE_VERTEXPROCESSING)
 	{
@@ -165,9 +165,9 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		deviceBehaviorFlags,	// behavior flags
 		&D3Dpp,					// presentation parameters
 		&m_pD3DDevice);			// returned device pointer
-
 	//*************************************************************************
-
+	
+	m_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
 	//////////////////////////////////////////////////////////////////////////
 	// Create a Font Object
 	//////////////////////////////////////////////////////////////////////////
@@ -887,6 +887,7 @@ void CDirectXFramework::Render()//RENDER
 	m_pD3DDevice->Clear(0,0,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,D3DCOLOR_ARGB(0,0,0,0), 1,0);
 	// Clear the back buffer, call BeginScene()
 	m_pD3DDevice->BeginScene();
+	
 	std::string UI;
 	char c_hlder[256];
 	switch(State){
@@ -944,7 +945,7 @@ void CDirectXFramework::Render()//RENDER
 
 		break;
 	case 1:
-		m_pD3DSprite->Begin(0);
+		m_pD3DSprite->Begin(D3DXSPRITE_ALPHABLEND);
 		//////////////////////////////////////////////////////////////////////////
 		// Matrix Transformations to control sprite position, scale, and rotate
 		// Set these matrices for each object you want to render to the screen
