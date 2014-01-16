@@ -1,0 +1,5 @@
+War - Advance into enemy territory and attack any nearby armies
+
+Peace - Sit at nation border, maybe move around the border
+
+Retreat - When conditions are met, head back to capital
