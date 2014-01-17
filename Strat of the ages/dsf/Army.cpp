@@ -19,20 +19,24 @@ void Army::moveTo(int prov)
 
 
 void Army::CombatRound(Army* Enemy){
-	unsigned int die = rand()%20;
-	float DmgMult = (((float)NumTroops/(float)Enemy->NumTroops)+1.0f)/2.0f;
+	if(m_State != Retreat){
+		unsigned int die = rand()%20;
+		float DmgMult = (((float)NumTroops/(float)Enemy->NumTroops)+1.0f)/2.0f;
 
-	Enemy->NumTroops -= pow(die,1.5f)*DmgMult*(this->ATK/Enemy->DEF);
-	float Hld = (pow(die,1.5f));
-	Hld *= DmgMult;
-	Hld *= (this->MATK/Enemy->MDEF);
-	Hld /= Enemy->NumTroops;
+		Enemy->NumTroops -= pow(die,1.5f)*DmgMult*(this->ATK/Enemy->DEF);
+		Enemy->m_morale -= (pow(die,1.5f)*DmgMult*(this->MATK/Enemy->MDEF))/Enemy->NumTroops;
 
-	Enemy->m_morale -= Hld;
-	//Enemy->m_morale -= (pow(die,1.5f)*DmgMult*(this->MATK/Enemy->MDEF))/Enemy->NumTroops;
-
-	PreviousDie = die;
-
+		PreviousDie = die;
+		if(Enemy->NumTroops < 1)
+		{
+			Enemy->NumTroops = 1;
+			Enemy->m_State = Retreat;
+		}
+		if(Enemy->m_morale < 0){
+			Enemy->m_State = Retreat;
+			Enemy->m_morale = 0.0f;
+		}
+	}
 
 }
 

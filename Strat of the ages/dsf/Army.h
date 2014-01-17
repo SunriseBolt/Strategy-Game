@@ -40,6 +40,9 @@ class Army
 {
 private:
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
+
+	int m_State;
+
 	float m_morale;
 	DWORD Nation;
 	int NationID;
@@ -53,20 +56,21 @@ private:
 	int PreviousDie;
 	Army* Target;
 public:
+	enum{Peace,War,Retreat};//Used for AI state of an army
 	Army();
 	void setNation(DWORD);
 	DWORD getNation(){
 		return Nation;
 	}
 	void moveTo(int);
-	int getProvID(){
-		return ProvID;};
+	int getProvID(){		return ProvID;};
 	int getTroops(){return NumTroops;};
 	int getDie(){return PreviousDie;};
 	float getMorale(){return m_morale;};
-	int getNationID(){
-		return NationID;};
+	int getNationID(){		return NationID;};
+	int getState(){return m_State;};
 	void setNationID(int NationID){this->NationID = NationID;};
+	void setState(int a_State){this->m_State = a_State;};
 	//COMBAT
 	//performs a single round of combat against an army
 	void CombatRound(Army*);

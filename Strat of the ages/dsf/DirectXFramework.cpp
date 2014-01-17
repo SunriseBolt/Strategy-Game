@@ -296,6 +296,12 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// If not, I need to understand how to get and set Justin's nations better
 	// -------> Christian
 	// ->Justin, moved to map gen to place armies on capital
+	enum{FIR,MID,LAS,Singles};
+	Manager<string> NameGenManager[4];
+
+
+
+
 
 	for(int i = 0; i < Num_Nations; i++){//push Nation Seeds
 		bool done = false;
@@ -309,9 +315,11 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		Army* t_Army = new Army;
 		t_Army->setNation(Nations[i]->m_Flag);
 		t_Army->setNationID(i);
+		t_Army->setState(Army::Peace);
 		t_Army->SetCombatVal(Nations[i]->ArmyAtk,Nations[i]->ArmyDef,Nations[i]->ArmyMAtk,Nations[i]->ArmyMDef,Nations[i]->ArmyMaxMorale);
 		t_Army->moveTo(ProvID);
 		Nations[i]->m_ArmyList[0] = t_Army;
+		Nations[i]->m_CapitalID = ProvID;
 		ArmyManager.Add(t_Army);
 	}
 
@@ -832,6 +840,17 @@ void CDirectXFramework::Update(float dt)
 				}
 			}
 			for(int i = 0; i < ArmyManager.NumHeld; i++){
+				if(ArmyManager.get(i)->getState() == Army::War){//only find targets if at war
+					for(int j = 0; j < ArmyManager.NumHeld;j++){//finding targets
+						if(	i != j &&	//##############################################################//Not the same Army
+							ArmyManager.get(j)->getState() == Army::War && //###########################//Enemy Army is Also at War #TODO Make it check that it's your War Target
+							ArmyManager.get(i)->getNationID() != ArmyManager.get(j)->getNationID() &&	//Not the Same Owner
+							ArmyManager.get(i)->getProvID() == ArmyManager.get(j)->getProvID()){		//BUT you are on the same Province
+								ArmyManager.get(i)->setTarget(ArmyManager.get(j));
+						}
+					}
+				}
+
 				if(ArmyManager.get(i)->getTarget()){
 					if(!ArmyManager.get(i)->getTarget()->getTarget())
 						ArmyManager.get(i)->getTarget()->setTarget(ArmyManager.get(i));
@@ -844,7 +863,7 @@ void CDirectXFramework::Update(float dt)
 				}
 			}
 
-
+			
 
 
 

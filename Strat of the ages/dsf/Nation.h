@@ -13,6 +13,8 @@ using namespace std;
 struct Nation{
 	string m_Name;
 	D3DXCOLOR m_Flag;
+	int m_CapitalID;
+
 	int m_LandTech;
 	int m_SeaTech;
 	int m_EconomyTech;
