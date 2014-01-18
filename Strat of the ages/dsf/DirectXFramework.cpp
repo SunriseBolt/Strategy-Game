@@ -298,6 +298,25 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// ->Justin, moved to map gen to place armies on capital
 	enum{FIR,MID,LAS,Singles};
 	Manager<string> NameGenManager[4];
+	fstream FSTR;
+	FSTR.open("Nation.txt",fstream::in);
+	bool NotDone = true;
+	string* Hld;
+	int f_counter = 0;
+	while(NotDone){
+		Hld = new string;
+		FSTR >> *Hld;
+		if(*Hld == "###"){
+			f_counter++;
+		}
+		else{
+			NameGenManager[f_counter].Add(Hld);
+		}
+
+
+		if(f_counter == 4)
+			NotDone = false;
+	}
 
 
 
@@ -321,6 +340,29 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		Nations[i]->m_ArmyList[0] = t_Army;
 		Nations[i]->m_CapitalID = ProvID;
 		ArmyManager.Add(t_Army);
+		int f_NameRand = rand()%100;
+		if(f_NameRand	< 40){
+			f_NameRand  = rand()%NameGenManager[FIR].NumHeld;
+			Nations[i]->m_Name.append(*NameGenManager[FIR].get(f_NameRand));
+			f_NameRand  = rand()%NameGenManager[MID].NumHeld;
+			Nations[i]->m_Name.append(*NameGenManager[MID].get(f_NameRand));
+			f_NameRand  = rand()%NameGenManager[LAS].NumHeld;
+			Nations[i]->m_Name.append(*NameGenManager[LAS].get(f_NameRand));
+		}
+		else if(f_NameRand < 90){
+			f_NameRand  = rand()%NameGenManager[FIR].NumHeld;
+			Nations[i]->m_Name.append(*NameGenManager[FIR].get(f_NameRand));
+			f_NameRand  = rand()%NameGenManager[LAS].NumHeld;
+			Nations[i]->m_Name.append(*NameGenManager[LAS].get(f_NameRand));
+
+		}
+		else{
+			f_NameRand  = rand()%NameGenManager[Singles].NumHeld;
+			Nations[i]->m_Name = *NameGenManager[Singles].get(f_NameRand);
+		}
+
+
+
 	}
 
 

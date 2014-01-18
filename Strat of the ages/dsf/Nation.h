@@ -32,7 +32,7 @@ struct Nation{
 
 	Nation():m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1){
 
-		m_Name = "NULL";
+		m_Name = "";
 		m_Flag = D3DCOLOR_ARGB(255,(rand()%155)+50,(rand()%155)+50,(rand()%155)+50);
 
 		ArmyAtk = 1;
