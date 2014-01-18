@@ -383,7 +383,8 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	while(!Mapgen.empty())//while map generator not done
 	{
 		if(!World.getProv(Mapgen.front().ProvID).Set){//just incase some stuff gets put on other stuff
-			World.getProv(Mapgen.front().ProvID).m_Nation = Nations[Mapgen.front().Type];
+			World.getProv(Mapgen.front().ProvID).m_NationID = Mapgen.front().Type;
+			Nations[Mapgen.front().Type]->ProvinceList.Add(&World.getProv(Mapgen.front().ProvID));
 			World.getProv(Mapgen.front().ProvID).Set = true;
 			for(int i = 0; i < 6; i++)//push neighbors
 			{
@@ -835,7 +836,7 @@ void CDirectXFramework::Update(float dt)
 				//DO STUFF HERE
 				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
 				if(!m_Player){
-					m_Player = World.getProv(ProvSelect).m_Nation;
+					m_Player = Nations[World.getProv(ProvSelect).m_NationID];
 				}
 				else{//after player select
 
@@ -851,7 +852,7 @@ void CDirectXFramework::Update(float dt)
 				//DO STUFF HERE
 				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
 				if(!m_Player){
-					m_Player->WarManager.Add(World.getProv(ProvSelect).m_Nation);
+					m_Player->WarManager.Add(Nations[World.getProv(ProvSelect).m_NationID]);
 				}
 			}
 		}
@@ -892,9 +893,9 @@ void CDirectXFramework::Update(float dt)
 
 					if(Test > 0)
 					{
-						if((World.getProv(Test).m_Nation == Nations[ArmyManager.get(i)->getNationID()])//is the target the same nation as you
+						if((Nations[World.getProv(Test).m_NationID] == Nations[ArmyManager.get(i)->getNationID()])//is the target the same nation as you
 							||//OR
-							(World.getProv(ArmyManager.get(i)->getProvID()).m_Nation != Nations[ArmyManager.get(i)->getNationID()])){//are you not on your own territory anyway
+							(Nations[World.getProv(ArmyManager.get(i)->getProvID()).m_NationID] != Nations[ArmyManager.get(i)->getNationID()])){//are you not on your own territory anyway
 							ArmyManager.get(i)->moveTo(Test);//then Proceed
 							NotDone = false;
 						}
@@ -1077,8 +1078,8 @@ void CDirectXFramework::Render()//RENDER
 
 
 		for(int i =0; i < 10000;i++){
-			if(World.getProv(i).m_Nation)
-				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype],World.getProv(i).m_Nation->m_Flag);
+			if(Nations[World.getProv(i).m_NationID])
+				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype],Nations[World.getProv(i).m_NationID]->m_Flag);
 			else
 				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype]);
 		}
@@ -1116,9 +1117,9 @@ void CDirectXFramework::Render()//RENDER
 
 
 		if(MouseOnWho >= 0)
-			if(World.getProv(MouseOnWho).m_Nation)
+			if(Nations[World.getProv(MouseOnWho).m_NationID])
 				if(Pallette[0]->IsCursorOnMe(m_Mousex,m_Mousey)){
-					m_pD3DFont->DrawTextA(0, World.getProv(MouseOnWho).m_Nation->m_Name.c_str(), -1, &MouseRect,
+					m_pD3DFont->DrawTextA(0, Nations[World.getProv(MouseOnWho).m_NationID]->m_Name.c_str(), -1, &MouseRect,
 						DT_TOP | DT_LEFT | DT_NOCLIP, 
 						D3DCOLOR_ARGB(255, 255, 255, 255));
 				}

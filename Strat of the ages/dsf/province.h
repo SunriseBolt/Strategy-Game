@@ -1,5 +1,4 @@
 #pragma once
-#include "Nation.h"
 #define NULL 0
 struct Province{
 
@@ -10,8 +9,21 @@ struct Province{
 	long long mID;
 	float mTax;
 	float mManpower;
-	Nation* m_Nation;
-	Province(int atype,long long aID,float aTax, float aManpower):mtype(atype),mID(aID),mTax(aTax),mManpower(aManpower),m_Nation(NULL){//don't try to understand this if you don't want to.
+	int m_NationID;
+	Province(){
+	Set = false;
+
+	mtype = 0;
+	for(int i = 0; i < 6 ;i++)
+		connections[i] = 0;
+	mID = 0;
+	mTax = 0;
+	mManpower = 0;
+	m_NationID = 0;
+
+	}
+
+	Province(int atype,long long aID,float aTax, float aManpower):mtype(atype),mID(aID),mTax(aTax),mManpower(aManpower),m_NationID(-1){//don't try to understand this if you don't want to.
 		Set = false;
 		
 		if(aID%100 == 0)

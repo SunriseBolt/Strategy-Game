@@ -12,7 +12,7 @@ WorldMap::WorldMap(){
 	Province * Prov;
 	for(int i = 0; i < 100; i++)\
 		for(int j = 0; j < 100; j++){
-			Prov = new Province(Land,j+i*100,1.0f,1.0f);
+			Prov = new Province(Land,j+i*100,1.0f,10.0f);
 			Provinces[j+i*100] = Prov;}
 
 	queue<MapGenTile,deque<MapGenTile>> Mapgen;

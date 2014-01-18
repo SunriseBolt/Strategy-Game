@@ -56,12 +56,13 @@ struct Date{
 		return Hld;
 	}
 
-	void Increment(){
+	bool Increment(){
+		bool Hld = false;
 		Day++;
 		if(Day == MonthLengths[Month]){
 			Day = 0;
 			Month++;
-
+			Hld = true;
 
 		}
 		if(Year%4 != 0){
@@ -75,6 +76,7 @@ struct Date{
 			Year++;
 			Month = 0;
 		}
+		return Hld;
 	}
 
 	void operator+= (int a_i){
