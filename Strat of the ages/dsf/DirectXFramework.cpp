@@ -39,7 +39,9 @@ CDirectXFramework::CDirectXFramework(void)
 	RightMouseDown = false;
 
 	Test = -1;
+	ProvSelect = -1;
 	m_PlayerArmyView = 0;
+	MouseOnWho = -1;
 
 }
 CDirectXFramework::~CDirectXFramework(void)
@@ -94,6 +96,11 @@ void CDirectXFramework::EnableFullscreen(bool FullScrn){
 	m_pD3DSprite->OnResetDevice();
 	m_pD3DFont->OnResetDevice();
 	m_pD3DFontLarge->OnResetDevice();
+}
+
+
+bool CDirectXFramework::ShowCursor(bool a_arg){
+	return m_pD3DDevice->ShowCursor(a_arg);
 }
 
 void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
@@ -221,7 +228,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// multiple times, just call that sprite's Draw() with different 
 	// transformation values.
 	Pallette[Map]->m_Textures = new IDirect3DTexture9*[6];
-	Pallette[RightHand]->m_Textures = new IDirect3DTexture9*[1];
+	Pallette[RightHand]->m_Textures = new IDirect3DTexture9*[2];
 	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Land.png", 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
@@ -257,6 +264,11 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
 		&m_imageInfoUI, 0, &m_pTexture);
 	Pallette[RightHand]->m_Textures[0] = m_pTexture;
+	D3DXCreateTextureFromFileEx(m_pD3DDevice, L"Mouse.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 0, 0,
+		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT,
+		D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),
+		&m_imageInfoUI, 0, &m_pTexture);
+	Pallette[RightHand]->m_Textures[1] = m_pTexture;
 	Loc locs;
 	locs.drwmx = 640;
 	locs.drwmy = 0;
@@ -693,8 +705,8 @@ void CDirectXFramework::Update(float dt)
 
 		POINT CursorPos;
 		GetCursorPos(&CursorPos);
-		m_Mousex = CursorPos.x - rect.left - GetSystemMetrics(SM_CXSIZEFRAME);
-		m_Mousey = CursorPos.y - rect.top - GetSystemMetrics(SM_CYCAPTION);
+		m_Mousex = CursorPos.x - rect.left;// - GetSystemMetrics(SM_CXSIZEFRAME);
+		m_Mousey = CursorPos.y - rect.top; //- GetSystemMetrics(SM_CYCAPTION);
 		if(Buffer[DIK_SPACE] & 0x80){
 			if(!m_BoolBuf[DIK_SPACE]){
 				m_BoolBuf[DIK_SPACE] = true;
@@ -820,9 +832,12 @@ void CDirectXFramework::Update(float dt)
 			if(!LeftMouseDown){
 				LeftMouseDown = true;
 				//DO STUFF HERE
-				Test = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
+				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
 				if(!m_Player){
-					m_Player = World.getProv(Test).m_Nation;
+					m_Player = World.getProv(ProvSelect).m_Nation;
+				}
+				else{//after player select
+
 				}
 			}
 		}
@@ -838,6 +853,11 @@ void CDirectXFramework::Update(float dt)
 		else{
 			RightMouseDown = false;
 		}
+
+		//Constant Updates
+		MouseOnWho = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
+
+
 
 		//GAME LOGIC
 		if((gameTime > turnTime)&&m_Player){
@@ -952,7 +972,17 @@ void CDirectXFramework::Render()//RENDER
 	//*************************************************************************
 
 	RECT rect;
-
+	string test;
+	static RECT MouseRect;
+	MouseRect.top = m_Mousey+20;
+	MouseRect.left = m_Mousex;
+	MouseRect.bottom = m_Mousey+40;
+	MouseRect.right = m_Mousex+100;
+	D3DXMATRIX m_Matrix = D3DXMATRIX();
+	D3DXMATRIX m_MatrixRot = D3DXMATRIX();
+	D3DXMATRIX m_MatrixTran = D3DXMATRIX();
+	D3DXMATRIX m_MatrixTran2 = D3DXMATRIX();
+	D3DXMATRIX m_MatrixScale = D3DXMATRIX();
 	//////////////////////////////////////////////////////////////////////////
 	// All draw calls between swap chain's functions, and pre-render and post- 
 	// render functions (Clear and Present, BeginScene and EndScene)
@@ -1016,6 +1046,21 @@ void CDirectXFramework::Render()//RENDER
 				D3DCOLOR_ARGB(255, 255, 255, 255));
 		}
 
+		
+		m_pD3DSprite->Begin(D3DXSPRITE_ALPHABLEND);
+		
+
+		D3DXMatrixTranslation(&m_MatrixTran2,m_Mousex ,m_Mousey ,0);
+		D3DXMatrixRotationZ(&m_MatrixRot, 0.0f);
+		D3DXMatrixScaling(&m_MatrixScale, 1, 1, 0);
+		m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
+
+		m_pD3DSprite->SetTransform(&m_Matrix);
+		m_pD3DSprite->Draw(Pallette[1]->m_Textures[1],0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR_ARGB(255,255,255,255));
+
+
+		m_pD3DSprite->End();
+
 		break;
 	case 1:
 		m_pD3DSprite->Begin(D3DXSPRITE_ALPHABLEND);
@@ -1062,12 +1107,22 @@ void CDirectXFramework::Render()//RENDER
 		rect.right = D3Dpp.BackBufferWidth;
 		rect.bottom = D3Dpp.BackBufferHeight;
 		ltoa(mFPS, fps, 10);
-		ltoa(Test, Spe, 10);
+		ltoa(ProvSelect, Spe, 10);
+		test.append(Spe);
+
+
+		if(MouseOnWho >= 0)
+			if(World.getProv(MouseOnWho).m_Nation)
+				if(Pallette[0]->IsCursorOnMe(m_Mousex,m_Mousey)){
+					m_pD3DFont->DrawTextA(0, World.getProv(MouseOnWho).m_Nation->m_Name.c_str(), -1, &MouseRect,
+						DT_TOP | DT_LEFT | DT_NOCLIP, 
+						D3DCOLOR_ARGB(255, 255, 255, 255));
+				}
 
 		m_pD3DFont->DrawTextA(0, fps, -1, &rect,
 			DT_BOTTOM | DT_LEFT | DT_NOCLIP, 
 			D3DCOLOR_ARGB(255, 255, 255, 255));
-		m_pD3DFont->DrawTextA(0, Spe, -1, &rect,
+		m_pD3DFont->DrawTextA(0, test.c_str(), -1, &rect,
 			DT_TOP | DT_LEFT | DT_NOCLIP, 
 			D3DCOLOR_ARGB(255, 255, 255, 255));
 		m_pD3DFont->DrawTextA(0, x, -1, &rect,
@@ -1083,7 +1138,7 @@ void CDirectXFramework::Render()//RENDER
 		rect.left += 16;
 		rect.right -= 16;
 		if(m_Player){
-			m_pD3DFont->DrawTextA(0, Nations[0]->m_Name.c_str(), -1, &rect,
+			m_pD3DFont->DrawTextA(0, m_Player->m_Name.c_str(), -1, &rect,
 				DT_TOP | DT_LEFT | DT_NOCLIP, 
 				m_Player->m_Flag);
 			UI.append("\n\n\n");
@@ -1147,7 +1202,18 @@ void CDirectXFramework::Render()//RENDER
 				DT_TOP | DT_LEFT | DT_NOCLIP, 
 				D3DCOLOR_ARGB(255, 200, 255, 255));
 		}
+		m_pD3DSprite->Begin(D3DXSPRITE_ALPHABLEND);
 
+		D3DXMatrixTranslation(&m_MatrixTran2,m_Mousex ,m_Mousey ,0);
+		D3DXMatrixRotationZ(&m_MatrixRot, 0.0f);
+		D3DXMatrixScaling(&m_MatrixScale, 1, 1, 0);
+		m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
+
+		m_pD3DSprite->SetTransform(&m_Matrix);
+		m_pD3DSprite->Draw(Pallette[1]->m_Textures[1],0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR_ARGB(255,255,255,255));
+
+
+		m_pD3DSprite->End();
 
 
 		break;

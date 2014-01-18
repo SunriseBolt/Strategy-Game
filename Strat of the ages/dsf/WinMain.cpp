@@ -165,6 +165,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wparam, LPARAM lparam)
 				}
 			}
 		}
+	case(WM_SETCURSOR):
+		{
+			// Turn off window cursor 
+
+			SetCursor( NULL );
+
+			DXObj.ShowCursor( true );
+
+			return TRUE; // prevent Windows from setting cursor to window class cursor
+
+			break;
+		}
 	}
 
 	// pass to default handler
