@@ -89,6 +89,8 @@
     <ClInclude Include="AI.h" />
     <ClInclude Include="Army.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="Date.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="Loc.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="Map.h" />

@@ -867,6 +867,8 @@ void CDirectXFramework::Update(float dt)
 		//GAME LOGIC
 		if((gameTime > turnTime)&&m_Player){
 
+			Calender.Increment();
+
 			if(!m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()){
 				m_Player->m_ArmyList[m_PlayerArmyView]->setTarget(Nations[0]->m_ArmyList[0]);
 			}
@@ -898,11 +900,8 @@ void CDirectXFramework::Update(float dt)
 						}
 					}
 
-					//for(int j = 0; j < 6;j++){
-					//}
-					//if(!GoodMove){
-					//	NotDone = false;
-					//}
+					if(numTries > 20)
+						NotDone = false;
 
 				}
 			}
@@ -1147,6 +1146,8 @@ void CDirectXFramework::Render()//RENDER
 				DT_TOP | DT_LEFT | DT_NOCLIP, 
 				m_Player->m_Flag);
 			UI.append("\n\n\n");
+			UI.append(Calender.PrintDate());
+			UI.append("\n");
 			for(int i = 0; i < TurnTimerSelect+1;i++){
 				UI.append("+");
 			}

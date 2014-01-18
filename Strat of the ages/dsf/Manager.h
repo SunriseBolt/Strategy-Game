@@ -1,4 +1,4 @@
-
+#pragma once
 
 template<class t_Item>
 struct Manager{
