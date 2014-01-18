@@ -11,6 +11,34 @@ struct Manager{
 		NumMax = 0;
 	}
 
+	void Subtract(int a_i){
+		if(NumMax == 0){
+			return;
+		}
+		int Temp = NumMax;
+		t_Item** TempArray = new t_Item*[Temp];
+
+		for(int i = NumMax; i < Temp; i++){
+			TempArray[i] = new t_Item;
+		}
+		delete m_Array[a_i];
+		for(int i = 0;i < NumMax;i++){
+			if(i < a_i)
+				TempArray[i] = m_Array[i];
+			else if(i > a_i)
+				TempArray[i-1] = m_Array[i];
+		}
+
+		m_Array = TempArray;
+
+		
+		NumHeld--;
+		if(NumHeld == 0){
+			NumMax = 0;
+			delete m_Array;
+		}
+	}
+
 	void Add(t_Item* a_Item){
 		if(NumMax == 0){
 			NumMax = 10;

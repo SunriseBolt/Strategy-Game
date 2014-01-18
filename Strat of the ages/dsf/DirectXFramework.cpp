@@ -42,6 +42,7 @@ CDirectXFramework::CDirectXFramework(void)
 	ProvSelect = -1;
 	m_PlayerArmyView = 0;
 	MouseOnWho = -1;
+	PageView = Econ;
 
 }
 CDirectXFramework::~CDirectXFramework(void)
@@ -848,6 +849,10 @@ void CDirectXFramework::Update(float dt)
 			if(!RightMouseDown){
 				RightMouseDown = true;
 				//DO STUFF HERE
+				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
+				if(!m_Player){
+					m_Player->WarManager.Add(World.getProv(ProvSelect).m_Nation);
+				}
 			}
 		}
 		else{
@@ -1145,57 +1150,74 @@ void CDirectXFramework::Render()//RENDER
 			for(int i = 0; i < TurnTimerSelect+1;i++){
 				UI.append("+");
 			}
-			UI.append("\n\nTECHNOLOGY:\n");
-			UI.append("Land Tech: ");
-			ltoa(m_Player->m_LandTech,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \nSea Tech: ");
-			ltoa(m_Player->m_SeaTech,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \nEconomy Tech: ");
-			ltoa(m_Player->m_EconomyTech,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append("\n\n\n\n");
-			UI.append("ARMY:\n");
-			UI.append(" \nAttack: ");
-			ltoa(m_Player->ArmyAtk,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \nDefence: ");
-			ltoa(m_Player->ArmyDef,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \nMorale Attack: ");
-			ltoa(m_Player->ArmyMAtk,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \nMorale Defence: ");
-			ltoa(m_Player->ArmyMDef,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \nMax Morale: ");
-			ltoa(m_Player->ArmyMaxMorale,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \n\nARMIES: ");
-			UI.append(" \nArmy #: ");
-			ltoa(m_PlayerArmyView,c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \nTroop Count: ");
-			ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTroops(),c_hlder,10);
-			UI.append(c_hlder);
-			UI.append(" \nMorale: ");
-			ltoa((long)(m_Player->m_ArmyList[m_PlayerArmyView]->getMorale()*100),c_hlder,10);
-			UI.append(c_hlder);
-			if(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()){
-				UI.append(" \nIN COMBAT");
-				UI.append(" \nRoll: ");
-				ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getDie(),c_hlder,10);
+			switch(PageView){
+			case Econ:
+				break;
+			case Tech: 
+				UI.append("\n\nTECHNOLOGY:\n");
+				UI.append("Land Tech: ");
+				ltoa(m_Player->m_LandTech,c_hlder,10);
 				UI.append(c_hlder);
-				UI.append(" \nEnemy Trp Cnt: ");
-				ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getTroops(),c_hlder,10);
+				UI.append(" \nSea Tech: ");
+				ltoa(m_Player->m_SeaTech,c_hlder,10);
 				UI.append(c_hlder);
-				UI.append(" \nEnemy Morale: ");
-				ltoa((long)(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getMorale()*100),c_hlder,10);
+				UI.append(" \nEconomy Tech: ");
+				ltoa(m_Player->m_EconomyTech,c_hlder,10);
 				UI.append(c_hlder);
-				UI.append(" \nEnemy Roll: ");
-				ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getDie(),c_hlder,10);
+				UI.append("\n\n\n\n");
+				break;
+			case War:
+				UI.append("\n\nWar\n\n");
+				UI.append("At War With:\n");
+				if(m_Player->WarManager.NumHeld != 0)
+					for(int i = 0; i < m_Player->WarManager.NumHeld; i++)
+						UI.append(m_Player->WarManager.get(i)->m_Name.c_str());
+				else
+					UI.append("No One");
+				break;
+			case Military:
+				UI.append("\n\nARMY:\n");
+				UI.append(" \nAttack: ");
+				ltoa(m_Player->ArmyAtk,c_hlder,10);
 				UI.append(c_hlder);
+				UI.append(" \nDefence: ");
+				ltoa(m_Player->ArmyDef,c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \nMorale Attack: ");
+				ltoa(m_Player->ArmyMAtk,c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \nMorale Defence: ");
+				ltoa(m_Player->ArmyMDef,c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \nMax Morale: ");
+				ltoa(m_Player->ArmyMaxMorale,c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \n\nARMIES: ");
+				UI.append(" \nArmy #: ");
+				ltoa(m_PlayerArmyView,c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \nTroop Count: ");
+				ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTroops(),c_hlder,10);
+				UI.append(c_hlder);
+				UI.append(" \nMorale: ");
+				ltoa((long)(m_Player->m_ArmyList[m_PlayerArmyView]->getMorale()*100),c_hlder,10);
+				UI.append(c_hlder);
+				if(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()){
+					UI.append(" \nIN COMBAT");
+					UI.append(" \nRoll: ");
+					ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getDie(),c_hlder,10);
+					UI.append(c_hlder);
+					UI.append(" \nEnemy Trp Cnt: ");
+					ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getTroops(),c_hlder,10);
+					UI.append(c_hlder);
+					UI.append(" \nEnemy Morale: ");
+					ltoa((long)(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getMorale()*100),c_hlder,10);
+					UI.append(c_hlder);
+					UI.append(" \nEnemy Roll: ");
+					ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getDie(),c_hlder,10);
+					UI.append(c_hlder);
+				}
+				break;
 			}
 
 			m_pD3DFontSmall->DrawTextA(0, UI.c_str(), -1, &rect,

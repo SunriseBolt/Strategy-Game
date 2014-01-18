@@ -9,6 +9,7 @@
 #include <string>
 using namespace std;
 #include "Army.h"
+#include "Manager.h"
 
 struct Nation{
 	string m_Name;
@@ -29,6 +30,8 @@ struct Nation{
 	//Army array
 	Army* m_ArmyList[10];
 	short NumMaxArmies;
+
+	Manager<Nation> WarManager;
 
 	Nation():m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1){
 
