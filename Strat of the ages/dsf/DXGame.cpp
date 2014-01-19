@@ -987,8 +987,8 @@ void DXGame::Update(float dt)
 					ArmyManager.get(i)->CombatRound(ArmyManager.get(i)->getTarget());
 				}
 			}
-			if(EventQueue.size())
-				while(EventQueue.top().Time == Calender){
+			if(EventQueue.size() != 0)
+				while(EventQueue.size() != 0 && EventQueue.top().Time == Calender){
 					switch(EventQueue.top().ID){
 					case Event::ArmyMove://move armies on correct dates
 						ArmyManager.get(EventQueue.top().Info[0])->moveTo(EventQueue.top().Info[1]);
@@ -1412,25 +1412,34 @@ void DXGame::Shutdown()
 
 void DXGame::AIProcess(){
 	for(int i =0; i < ArmyManager.NumHeld; i++){
-		if(ArmyManager.get(i)->Orders.ProvQue.NumHeld == 0 && !ArmyManager.get(i)->getMoving()){
-			bool NotDone = true;
-			int Temp = 0;
-			switch(ArmyManager.get(i)->getState()){
-			case Army::Peace:
-				Temp = rand()%6;
-				if(World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID())
-					ArmyManager.get(i)->Orders.ProvQue.Add(&World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]));
-				break;
-			case Army::War:
-				break;
-			case Army::Retreat:
-				break;
+		if(rand()%10 < 3)
+			if(ArmyManager.get(i)->Orders.ProvQue.NumHeld == 0 && !ArmyManager.get(i)->getMoving()){
+				bool NotDone = true;
+				int Temp = 0;
+				Province* ProvHld = 0;
+				switch(ArmyManager.get(i)->getState()){
+				case Army::Peace:
+					Temp = rand()%6;
+					if(World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID()){
+						ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
+						ArmyManager.get(i)->Orders.ProvQue.Add(ProvHld);
+						while(rand()%10 < 7)
+							Temp = rand()%6;
+							if(World.getProv(ProvHld->connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID())
+								ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
+								ArmyManager.get(i)->Orders.ProvQue.Add(ProvHld);
+					}
+					break;
+				case Army::War:
+					break;
+				case Army::Retreat:
+					break;
 
 
 
 
+				}
 			}
-		}
 
 
 
