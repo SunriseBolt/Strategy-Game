@@ -6,7 +6,9 @@ struct Manager{
 	int NumHeld;
 	int NumMax;
 
-	Manager(){
+	bool Delete;
+
+	Manager():Delete(true){
 		m_Array = 0;
 		NumHeld = 0;
 		NumMax = 0;
@@ -22,7 +24,8 @@ struct Manager{
 		for(int i = NumMax; i < Temp; i++){
 			TempArray[i] = new t_Item;
 		}
-		delete m_Array[a_i];
+		if(Delete)
+			delete m_Array[a_i];
 		for(int i = 0;i < NumMax;i++){
 			if(i < a_i)
 				TempArray[i] = m_Array[i];
@@ -36,7 +39,8 @@ struct Manager{
 		NumHeld--;
 		if(NumHeld == 0){
 			NumMax = 0;
-			delete m_Array;
+			if(Delete)
+				delete m_Array;
 			m_Array = 0;
 		}
 	}
@@ -63,7 +67,9 @@ struct Manager{
 			NumMax = Temp;
 			
 		}
-		delete m_Array[NumHeld];
+		
+		if(Delete)
+			delete m_Array[NumHeld];
 		m_Array[NumHeld] = a_Item;
 		NumHeld++;
 	}
@@ -78,7 +84,8 @@ struct Manager{
 
 	~Manager(){
 		if(m_Array && NumMax != 0){
-			delete m_Array;
+			if(Delete)
+				delete m_Array;
 			m_Array = 0;
 		}
 	}

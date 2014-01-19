@@ -935,7 +935,7 @@ void DXGame::Update(float dt)
 
 
 		//GAME LOGIC
-		if(((gameTime > turnTime)&&m_Player) && !Paused){
+		if((gameTime > turnTime) && m_Player && !Paused){
 
 			if(Calender.Increment()){//one day has passed, returns true on months end
 				AIProcess();
@@ -950,16 +950,18 @@ void DXGame::Update(float dt)
 				if(ArmyManager.get(i)->Orders.ProvQue.NumHeld && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
 					Event order;
 					order.SetTime(Calender);
-					if(World.getProv(*ArmyManager.get(i)->Orders.ProvQue.get(0)).mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
-						order.Time += World.Weight[World.getProv(*ArmyManager.get(i)->Orders.ProvQue.get(0)).mtype];
+					if(ArmyManager.get(i)->Orders.ProvQue.get(0)->mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
+						order.Time += World.Weight[ArmyManager.get(i)->Orders.ProvQue.get(0)->mtype];
 					else
 						order.Time += World.Weight[World.WaterLand];
 
 					order.ID = order.ArmyMove;
 					order.Info[0] = i;
-					order.Info[1] = World.getProv(*ArmyManager.get(i)->Orders.ProvQue.get(0)).mID; 
+					order.Info[1] = ArmyManager.get(i)->Orders.ProvQue.get(0)->mID; 
 
 					EventQueue.push(order);
+					ArmyManager.get(i)->Orders.ProvQue.Subtract(0);
+					ArmyManager.get(i)->setMoving(true);
 				}
 			}
 			for(int i = 0; i < ArmyManager.NumHeld; i++){
@@ -1410,14 +1412,14 @@ void DXGame::Shutdown()
 
 void DXGame::AIProcess(){
 	for(int i =0; i < ArmyManager.NumHeld; i++){
-		if(ArmyManager.get(i)->Orders.ProvQue.NumHeld && !ArmyManager.get(i)->getMoving()){
+		if(ArmyManager.get(i)->Orders.ProvQue.NumHeld == 0 && !ArmyManager.get(i)->getMoving()){
 			bool NotDone = true;
 			int Temp = 0;
 			switch(ArmyManager.get(i)->getState()){
 			case Army::Peace:
 				Temp = rand()%6;
 				if(World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID())
-					ArmyManager.get(i)->Orders.ProvQue.Add(&World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
+					ArmyManager.get(i)->Orders.ProvQue.Add(&World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]));
 				break;
 			case Army::War:
 				break;

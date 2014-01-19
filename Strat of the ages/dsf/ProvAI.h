@@ -4,7 +4,7 @@
 
 
 struct ProvAI{
-	Manager<int> ProvQue;
+	Manager<Province> ProvQue;
 	int weight;
 	bool operator < (ProvAI other){
 		if(weight < other.weight)
@@ -16,6 +16,6 @@ struct ProvAI{
 			return true;
 		return false;
 	}
-	ProvAI():weight(0){}
+	ProvAI():weight(0){ProvQue.Delete = false;};
 
 };
