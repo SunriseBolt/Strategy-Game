@@ -85,7 +85,13 @@ struct Date{
 		}
 	}
 
-	bool operator< (Date other){
+	bool operator== (const Date other)const{
+		if(Year == other.Year && Month == other.Month && Day == other.Day)
+			return true;
+		return false;
+	}
+
+	bool operator< (const Date other)const{
 		if(Year < other.Year)
 			return true;
 		if(Year > other.Year)
@@ -100,7 +106,7 @@ struct Date{
 			return false;
 		return false;
 	}
-	bool operator> (Date other){
+	bool operator> (const Date other)const{
 		if(Year < other.Year)
 			return false;
 		if(Year > other.Year)

@@ -8,6 +8,13 @@ using namespace std;
 
 
 WorldMap::WorldMap(){
+	Weight[Land] = LandWeight;
+	Weight[Forest] = ForestWeight;
+	Weight[Desert] = DesertWeight;
+	Weight[Mountain] = MountainWeight;
+	Weight[Water] = WaterWeight;
+	Weight[WaterLand] = WaterLandWeight;
+
 	srand(time(NULL));
 	Province * Prov;
 	for(int i = 0; i < 100; i++)\

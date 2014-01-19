@@ -12,13 +12,12 @@
 //			or information storage and retrieval systems – without the 
 //			prior consent of DeVry Educational Development Corporation.
 //////////////////////////////////////////////////////////////////////////
-#include "DirectXFramework.h"
+#include "DXGame.h"
 #include <queue>
 #include "MapGen.h"
 #include <time.h>
 
-CDirectXFramework::CDirectXFramework(void)
-{
+DXGame::DXGame(void){
 	// Init or NULL objects before use to avoid any undefined behavior
 	m_bVsync		= false;
 	m_pD3DObject	= 0;
@@ -43,16 +42,17 @@ CDirectXFramework::CDirectXFramework(void)
 	m_PlayerArmyView = 0;
 	MouseOnWho = -1;
 	PageView = Econ;
+	Paused = false;
 
 }
-CDirectXFramework::~CDirectXFramework(void)
+DXGame::~DXGame(void)
 {
 	// If Shutdown is not explicitly called correctly, call it when 
 	// this class is destroyed or falls out of scope as an error check.
 	Shutdown();
 }
 
-void CDirectXFramework::EnableFullscreen(bool FullScrn){
+void DXGame::EnableFullscreen(bool FullScrn){
 	if(FullScrn)
 	{
 		if(!D3Dpp.Windowed)
@@ -100,11 +100,11 @@ void CDirectXFramework::EnableFullscreen(bool FullScrn){
 }
 
 
-bool CDirectXFramework::ShowCursor(bool a_arg){
+bool DXGame::ShowCursor(bool a_arg){
 	return m_pD3DDevice->ShowCursor(a_arg);
 }
 
-void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
+void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 {
 	srand(time(NULL));
 	LARGE_INTEGER Timer;
@@ -515,7 +515,7 @@ void CDirectXFramework::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	TurnTimerSelect = 0;
 }
 
-void CDirectXFramework::Update(float dt)
+void DXGame::Update(float dt)
 {
 	// Make static so that their values persist across
 	// function calls.
@@ -822,13 +822,82 @@ void CDirectXFramework::Update(float dt)
 		{
 			m_BoolBuf[DIK_SUBTRACT] = false;
 		}
+		//SPACE BAR TO PAUSE GAME
+		if(Buffer[DIK_SPACE] & 0x80){
+			if(!m_BoolBuf[DIK_SPACE]){
+				m_BoolBuf[DIK_SPACE] = true;
+				//DO STUFF HERE
+				Paused = !Paused;
+			}
+		}
+		else
+		{
+			m_BoolBuf[DIK_SPACE] = false;
+		}
+		//Buttons to change the views
+		if(Buffer[DIK_COMMA] & 0x80){
+			if(!m_BoolBuf[DIK_COMMA]){
+				m_BoolBuf[DIK_COMMA] = true;
+				//DO STUFF HERE
+				if(m_PlayerArmyView == 0)
+					m_PlayerArmyView = m_Player->NumMaxArmies-1;
+				else
+					m_PlayerArmyView--;
+				
+			}
+		}
+		else
+		{
+			m_BoolBuf[DIK_COMMA] = false;
+		}
+		if(Buffer[DIK_PERIOD] & 0x80){
+			if(!m_BoolBuf[DIK_PERIOD]){
+				m_BoolBuf[DIK_PERIOD] = true;
+				//DO STUFF HERE
+				if(m_PlayerArmyView == m_Player->NumMaxArmies-1)
+					m_PlayerArmyView = 0;
+				else
+					m_PlayerArmyView++;
+				
+			}
+		}
+		else
+		{
+			m_BoolBuf[DIK_PERIOD] = false;
+		}
+		if(Buffer[DIK_L] & 0x80){
+			if(!m_BoolBuf[DIK_L]){
+				m_BoolBuf[DIK_L] = true;
+				//DO STUFF HERE
+				if(PageView == 0)
+					PageView = 3;
+				else
+					PageView--;
+				
+			}
+		}
+		else
+		{
+			m_BoolBuf[DIK_L] = false;
+		}
+		if(Buffer[DIK_SEMICOLON] & 0x80){
+			if(!m_BoolBuf[DIK_SEMICOLON]){
+				m_BoolBuf[DIK_SEMICOLON] = true;
+				//DO STUFF HERE
+				if(PageView == 3)
+					PageView = 0;
+				else
+					PageView++;
+				
+			}
+		}
+		else
+		{
+			m_BoolBuf[DIK_SEMICOLON] = false;
+		}
 
 
-
-
-
-
-
+		//MOUSE
 		system->update();	
 		if(mouseState.rgbButtons[0] ){
 			if(!LeftMouseDown){
@@ -866,44 +935,31 @@ void CDirectXFramework::Update(float dt)
 
 
 		//GAME LOGIC
-		if((gameTime > turnTime)&&m_Player){
+		if(((gameTime > turnTime)&&m_Player) && !Paused){
 
-			Calender.Increment();
-
-			if(!m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()){
-				m_Player->m_ArmyList[m_PlayerArmyView]->setTarget(Nations[0]->m_ArmyList[0]);
+			if(Calender.Increment()){//one day has passed, returns true on months end
+				AIProcess();
 			}
-
-
 
 			gameTime = 0.0f;
 			bool NotDone = true;
 			//bool GoodMove = false;
 			int numTries = 0;
-			for(int i = 0; i < 100; ++i)
+			for(int i = 0; i < ArmyManager.NumHeld; ++i)
 			{
-				numTries = 0;
-				NotDone = true;
-				while(NotDone){
-					Roll = rand()%6;
-					Test = ArmyManager.get(i)->getProvID();
-					Test = World.getProv(Test).connections[Roll];
-					numTries++;
+				if(ArmyManager.get(i)->Orders.ProvQue.NumHeld && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
+					Event order;
+					order.SetTime(Calender);
+					if(World.getProv(*ArmyManager.get(i)->Orders.ProvQue.get(0)).mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
+						order.Time += World.Weight[World.getProv(*ArmyManager.get(i)->Orders.ProvQue.get(0)).mtype];
+					else
+						order.Time += World.Weight[World.WaterLand];
 
+					order.ID = order.ArmyMove;
+					order.Info[0] = i;
+					order.Info[1] = World.getProv(*ArmyManager.get(i)->Orders.ProvQue.get(0)).mID; 
 
-					if(Test > 0)
-					{
-						if((Nations[World.getProv(Test).m_NationID] == Nations[ArmyManager.get(i)->getNationID()])//is the target the same nation as you
-							||//OR
-							(Nations[World.getProv(ArmyManager.get(i)->getProvID()).m_NationID] != Nations[ArmyManager.get(i)->getNationID()])){//are you not on your own territory anyway
-							ArmyManager.get(i)->moveTo(Test);//then Proceed
-							NotDone = false;
-						}
-					}
-
-					if(numTries > 20)
-						NotDone = false;
-
+					EventQueue.push(order);
 				}
 			}
 			for(int i = 0; i < ArmyManager.NumHeld; i++){
@@ -929,12 +985,24 @@ void CDirectXFramework::Update(float dt)
 					ArmyManager.get(i)->CombatRound(ArmyManager.get(i)->getTarget());
 				}
 			}
+			if(EventQueue.size())
+				while(EventQueue.top().Time == Calender){
+					switch(EventQueue.top().ID){
+					case Event::ArmyMove://move armies on correct dates
+						ArmyManager.get(EventQueue.top().Info[0])->moveTo(EventQueue.top().Info[1]);
 
-			
+						break;
+					case Event::ProvinceFlip:
+						break;
 
 
 
+					}
 
+
+
+					EventQueue.pop();
+				}
 		}
 		
 
@@ -969,7 +1037,7 @@ void CDirectXFramework::Update(float dt)
 	}
 }
 
-void CDirectXFramework::Render()//RENDER
+void DXGame::Render()//RENDER
 {
 	// If the device was not created successfully, return
 	if(!m_pD3DDevice)
@@ -1078,7 +1146,7 @@ void CDirectXFramework::Render()//RENDER
 
 
 		for(int i =0; i < 10000;i++){
-			if(Nations[World.getProv(i).m_NationID])
+			if(Nations[World.getProv(i).m_NationID] && World.getProv(i).m_NationID > -1)
 				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype],Nations[World.getProv(i).m_NationID]->m_Flag);
 			else
 				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype]);
@@ -1117,7 +1185,7 @@ void CDirectXFramework::Render()//RENDER
 
 
 		if(MouseOnWho >= 0)
-			if(Nations[World.getProv(MouseOnWho).m_NationID])
+			if(Nations[World.getProv(MouseOnWho).m_NationID] && World.getProv(MouseOnWho).m_NationID > -1)
 				if(Pallette[0]->IsCursorOnMe(m_Mousex,m_Mousey)){
 					m_pD3DFont->DrawTextA(0, Nations[World.getProv(MouseOnWho).m_NationID]->m_Name.c_str(), -1, &MouseRect,
 						DT_TOP | DT_LEFT | DT_NOCLIP, 
@@ -1149,11 +1217,21 @@ void CDirectXFramework::Render()//RENDER
 			UI.append("\n\n\n");
 			UI.append(Calender.PrintDate());
 			UI.append("\n");
-			for(int i = 0; i < TurnTimerSelect+1;i++){
-				UI.append("+");
-			}
+			if(!Paused)
+				for(int i = 0; i < TurnTimerSelect+1;i++){
+					UI.append("+");
+				}
+			else
+				UI.append("PAUSED");
 			switch(PageView){
 			case Econ:
+				UI.append("\n\nECONOMY:\n");
+				UI.append("Treasury: ");
+				ltoa((int)m_Player->Treasury,c_hlder,10);
+				UI.append(c_hlder);
+				UI.append("\nManpower: ");
+				ltoa((int)m_Player->Manpower,c_hlder,10);
+				UI.append(c_hlder);
 				break;
 			case Tech: 
 				UI.append("\n\nTECHNOLOGY:\n");
@@ -1176,6 +1254,10 @@ void CDirectXFramework::Render()//RENDER
 						UI.append(m_Player->WarManager.get(i)->m_Name.c_str());
 				else
 					UI.append("No One");
+				
+				UI.append(" \n\nWarExhaustion: ");
+				ltoa((int)m_Player->WarExhaustion,c_hlder,10);
+				UI.append(c_hlder);
 				break;
 			case Military:
 				UI.append("\n\nARMY:\n");
@@ -1268,7 +1350,7 @@ void CDirectXFramework::Render()//RENDER
 
 }
 
-void CDirectXFramework::Shutdown()
+void DXGame::Shutdown()
 {
 	//*************************************************************************
 	// Release COM objects in the opposite order they were created in
@@ -1326,3 +1408,29 @@ void CDirectXFramework::Shutdown()
     result = system->release();
 }
 
+void DXGame::AIProcess(){
+	for(int i =0; i < ArmyManager.NumHeld; i++){
+		if(ArmyManager.get(i)->Orders.ProvQue.NumHeld && !ArmyManager.get(i)->getMoving()){
+			bool NotDone = true;
+			int Temp = 0;
+			switch(ArmyManager.get(i)->getState()){
+			case Army::Peace:
+				Temp = rand()%6;
+				if(World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID())
+					ArmyManager.get(i)->Orders.ProvQue.Add(&World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
+				break;
+			case Army::War:
+				break;
+			case Army::Retreat:
+				break;
+
+
+
+
+			}
+		}
+
+
+
+	}
+}

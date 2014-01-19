@@ -21,19 +21,19 @@ HWND				g_hWnd;			// Handle to the window
 HINSTANCE			g_hInstance;	// Handle to the application instance
 bool				g_bWindowed;	// Boolean for windowed or full-screen
 
-#include "DirectXFramework.h"
+#include "DXGame.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Global Variables
 //////////////////////////////////////////////////////////////////////////
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
-#define WINDOW_TITLE L"GSP 381 - DirectX Framework"
+#define WINDOW_TITLE L"Strategy"
 
 
 //*************************************************************************
 // This is where you declare the instance of your DirectXFramework Class
-CDirectXFramework DXObj;
+DXGame DXObj;
 //*************************************************************************
 
 // Entry point for the game or application.

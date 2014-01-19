@@ -80,7 +80,7 @@
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
     <ClCompile Include="Army.cpp" />
-    <ClCompile Include="DirectXFramework.cpp" />
+    <ClCompile Include="DXGame.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Pathfinding.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -96,8 +96,9 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="Nation.h" />
     <ClInclude Include="pallette.h" />
-    <ClInclude Include="DirectXFramework.h" />
+    <ClInclude Include="DXGame.h" />
     <ClInclude Include="Pathfinding.h" />
+    <ClInclude Include="ProvAI.h" />
     <ClInclude Include="province.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>

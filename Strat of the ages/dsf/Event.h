@@ -16,12 +16,12 @@ struct Event{
 		Time = a_Time;
 	}
 
-	bool operator< (Event other){
+	bool operator< (const Event other)const{
 		if(Time < other.Time)
 			return true;
 		return false;
 	}
-		bool operator> (Event other){
+	bool operator> (const Event other)const{
 		if(Time > other.Time)
 			return true;
 		return false;

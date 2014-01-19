@@ -1,44 +1,20 @@
 #pragma once
 #include "Loc.h"
+#include "ProvAI.h"
 
 #include <d3d9.h>
 #include <d3dx9.h>
 
 const int INFANTRY = 0, CAVALIER = 1, ARTILLERY = 2;
 
-struct Soldier
-{
-	int m_type;
-	int ATK, DEF, m_ATK, m_DEF;
-	float maxMorale;
-	void setCombatVals(int m_type)
-	{
-		//Mostly placeholder values
-		if(m_type == INFANTRY)
-		{
-			ATK = 2;
-			DEF = 2;
-		}
-		else if(m_type == CAVALIER)
-		{
-			ATK = 3;
-			DEF = 1;
-		}
-		else if(m_type == ARTILLERY)
-		{
-			ATK = 1;
-			DEF = 3;
-		}
-	}
-	void setType(int a_type)
-	{
-		m_type = a_type;
-	}
-};
+
 
 class Army
 {
 private:
+	bool Moving;
+
+
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
 
 	int m_State;
@@ -56,6 +32,9 @@ private:
 	int PreviousDie;
 	Army* Target;
 public:
+
+	ProvAI Orders;
+
 	enum{Peace,War,Retreat};//Used for AI state of an army
 	Army();
 	void setNation(DWORD);
@@ -63,7 +42,9 @@ public:
 		return Nation;
 	}
 	void moveTo(int);
-	int getProvID(){		return ProvID;};
+	void setMoving(bool a_Moving){Moving = a_Moving;};
+	bool getMoving(){return Moving;};
+	int getProvID(){return ProvID;};
 	int getTroops(){return NumTroops;};
 	int getDie(){return PreviousDie;};
 	float getMorale(){return m_morale;};

@@ -7,6 +7,7 @@ struct Manager{
 	int NumMax;
 
 	Manager(){
+		m_Array = 0;
 		NumHeld = 0;
 		NumMax = 0;
 	}
@@ -36,6 +37,7 @@ struct Manager{
 		if(NumHeld == 0){
 			NumMax = 0;
 			delete m_Array;
+			m_Array = 0;
 		}
 	}
 
@@ -75,6 +77,9 @@ struct Manager{
 	}
 
 	~Manager(){
-		delete[] m_Array;
+		if(m_Array && NumMax != 0){
+			delete m_Array;
+			m_Array = 0;
+		}
 	}
 };
