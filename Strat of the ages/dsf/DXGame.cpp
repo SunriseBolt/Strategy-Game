@@ -297,6 +297,7 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 
 	for(int i = 0; i < 100; i++){//TODO get names and such from files.
 		Nations[i] = new Nation;
+		Nations[i]->NationalID = i;
 	}	
 	
 	queue<MapGenTile,deque<MapGenTile>> Mapgen;
@@ -350,7 +351,7 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		t_Army->setState(Army::Peace);
 		t_Army->SetCombatVal(Nations[i]->ArmyAtk,Nations[i]->ArmyDef,Nations[i]->ArmyMAtk,Nations[i]->ArmyMDef,Nations[i]->ArmyMaxMorale);
 		t_Army->moveTo(ProvID);
-		Nations[i]->m_ArmyList[0] = t_Army;
+		Nations[i]->m_ArmyList.Add(t_Army);
 		Nations[i]->m_CapitalID = ProvID;
 		ArmyManager.Add(t_Army);
 		int f_NameRand = rand()%100;
@@ -922,15 +923,7 @@ void DXGame::Update(float dt)
 				//DO STUFF HERE
 				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
 				if(m_Player){
-					for(int i = 0; i < m_Player->WarManager.NumHeld;i++){
-						if(m_Player->WarManager.get(i) == Nations[World.getProv(ProvSelect).m_NationID])
-							Check = true;
-					}
-					if(!Check)
-						m_Player->WarManager.Add(Nations[World.getProv(ProvSelect).m_NationID]);
-					else
-						Check = false;
-					
+					DeclareWar(m_Player->NationalID,World.getProv(ProvSelect).m_NationID);
 				}
 			}
 		}
@@ -1019,7 +1012,7 @@ void DXGame::Update(float dt)
 
 
 		break;
-	case 2://Between turns (which this game doesn't have)#############################################
+	case 2://#############################################
 		if(Buffer[DIK_SPACE] & 0x80 || mouseState.rgbButtons[0]){
 			if(!m_BoolBuf[DIK_SPACE]){
 				m_BoolBuf[DIK_SPACE] = true;
@@ -1293,24 +1286,24 @@ void DXGame::Render()//RENDER
 				ltoa(m_PlayerArmyView,c_hlder,10);
 				UI.append(c_hlder);
 				UI.append(" \nTroop Count: ");
-				ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTroops(),c_hlder,10);
+				ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTroops(),c_hlder,10);
 				UI.append(c_hlder);
 				UI.append(" \nMorale: ");
-				ltoa((long)(m_Player->m_ArmyList[m_PlayerArmyView]->getMorale()*100),c_hlder,10);
+				ltoa((long)(m_Player->m_ArmyList.get(m_PlayerArmyView)->getMorale()*100),c_hlder,10);
 				UI.append(c_hlder);
-				if(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()){
+				if(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()){
 					UI.append(" \nIN COMBAT");
 					UI.append(" \nRoll: ");
-					ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getDie(),c_hlder,10);
+					ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getDie(),c_hlder,10);
 					UI.append(c_hlder);
 					UI.append(" \nEnemy Trp Cnt: ");
-					ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getTroops(),c_hlder,10);
+					ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getTroops(),c_hlder,10);
 					UI.append(c_hlder);
 					UI.append(" \nEnemy Morale: ");
-					ltoa((long)(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getMorale()*100),c_hlder,10);
+					ltoa((long)(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getMorale()*100),c_hlder,10);
 					UI.append(c_hlder);
 					UI.append(" \nEnemy Roll: ");
-					ltoa(m_Player->m_ArmyList[m_PlayerArmyView]->getTarget()->getDie(),c_hlder,10);
+					ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getDie(),c_hlder,10);
 					UI.append(c_hlder);
 				}
 				break;
@@ -1422,36 +1415,85 @@ void DXGame::Shutdown()
 
 void DXGame::AIProcess(){
 	for(int i =0; i < ArmyManager.NumHeld; i++){
-		if(rand()%10 < 3)
-			if(ArmyManager.get(i)->Orders.ProvQue.NumHeld == 0 && !ArmyManager.get(i)->getMoving()){
-				bool NotDone = true;
-				int Temp = 0;
-				Province* ProvHld = 0;
-				switch(ArmyManager.get(i)->getState()){
-				case Army::Peace:
-					Temp = rand()%6;
-					if(World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID()){
-						ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
-						ArmyManager.get(i)->Orders.ProvQue.Add(ProvHld);
-						while(rand()%10 < 7)
-							Temp = rand()%6;
-							if(World.getProv(ProvHld->connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID())
-								ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
-								ArmyManager.get(i)->Orders.ProvQue.Add(ProvHld);
+		if(ArmyManager.get(i)->Orders.ProvQue.NumHeld == 0 && !ArmyManager.get(i)->getMoving() && !ArmyManager.get(i)->getTarget()){
+			bool NotDone = true;
+			int Temp = 0;
+			Province* ProvHld = 0;
+			switch(ArmyManager.get(i)->getState()){
+			case Army::Peace:
+				Temp = rand()%6;
+				if(World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID()){
+					ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
+					ArmyManager.get(i)->Orders.ProvQue.Add(ProvHld);
+					while(rand()%10 < 7){
+						Temp = rand()%6;
+						if(ProvHld->connections[Temp] != -1)
+							if(World.getProv(ProvHld->connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID()){
+								ProvHld = &World.getProv(ProvHld->connections[Temp]);
+								ArmyManager.get(i)->Orders.ProvQue.Add(ProvHld);}
 					}
-					break;
-				case Army::War:
-					break;
-				case Army::Retreat:
-					break;
-
-
-
-
 				}
-			}
+				break;
+			case Army::War:
+				ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
+				ProvAI* PAIT;
+				for(int i = 0; i < 6; i ++){
+					PAIT = new ProvAI;
+					PAIT->ProvQue.Add(&World.getProv(ProvHld->connections[i]));
+					MovementQueue.push(*PAIT);
+				}
+				while(Nations[ProvHld->m_NationID] == Nations[ProvHld->m_NationID]->WarManager.get(0))
+					for(int j = 0; j < 6; j++){
+						if(World.getProv(ProvHld->connections[j]).m_NationID == ArmyManager.get(j)->getNationID()){
+							ProvHld = &World.getProv(ProvHld->connections[j]);
+							ArmyManager.get(j)->Orders.ProvQue.Add(ProvHld);
+						}
+						if(Nations[World.getProv(ProvHld->connections[j]).m_NationID] == Nations[ArmyManager.get(j)->getNationID()]->WarManager.get(0)){
+							ProvHld = &World.getProv(ProvHld->connections[j]);
+							ArmyManager.get(j)->Orders.ProvQue.Add(ProvHld);
+						}
+					}
+			
+			break;
+	case Army::Retreat:
+		break;
 
 
 
+
+		}
 	}
+
+
+
+}
+}
+void DXGame::DeclareWar(int Me,int Target){
+	bool Check = false;
+	for(int i = 0; i < Nations[Me]->WarManager.NumHeld;i++){
+		if(Nations[Me]->WarManager.get(i) == Nations[Target])
+			Check = true;
+	}
+	if(!Check){
+		Nations[Me]->WarManager.Add(Nations[Target]);
+		for(int i = 0; i < Nations[Me]->m_ArmyList.NumHeld; i++){
+			Nations[Me]->m_ArmyList.get(i)->setState(Army::War);
+		}
+	}
+	else
+		Check = false;
+
+	
+	for(int i = 0; i < Nations[Target]->WarManager.NumHeld;i++){
+		if(Nations[Target]->WarManager.get(i) == Nations[Me])
+			Check = true;
+	}
+	if(!Check){
+		Nations[Target]->WarManager.Add(Nations[Me]);
+		for(int i = 0; i < Nations[Me]->m_ArmyList.NumHeld; i++){
+			Nations[Target]->m_ArmyList.get(i)->setState(Army::War);
+		}
+	}
+	else
+		Check = false;
 }

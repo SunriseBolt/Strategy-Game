@@ -22,7 +22,7 @@ struct Nation{
 
 	Manager<Province> ProvinceList;
 
-
+	int NationalID;
 	int m_CapitalID;
 
 	int m_LandTech;
@@ -37,12 +37,12 @@ struct Nation{
 	float ArmyMaxMorale;
 
 	//Army array
-	Army* m_ArmyList[10];
+	Manager<Army> m_ArmyList;
 	short NumMaxArmies;
 
 	Manager<Nation> WarManager;
 
-	Nation():m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1),Treasury(100.0f),Manpower(1000.0f),WarExhaustion(0.0f){
+	Nation():m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1),Treasury(100.0f),Manpower(1000.0f),WarExhaustion(0.0f),NationalID(0){
 
 		m_Name = "";
 		m_Flag = D3DCOLOR_ARGB(255,(rand()%155)+50,(rand()%155)+50,(rand()%155)+50);
@@ -55,7 +55,7 @@ struct Nation{
 
 	}
 	
-	Nation(string a_Name,int A, int R, int G,int B):m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1),Treasury(100.0f),Manpower(1000.0f){
+	Nation(string a_Name,int A, int R, int G,int B):m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1),Treasury(100.0f),Manpower(1000.0f),NationalID(0){
 
 		m_Name = a_Name;
 		m_Flag = D3DCOLOR_ARGB(A,R,G,B);
