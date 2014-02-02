@@ -525,6 +525,7 @@ void DXGame::Update(float dt)
 	static float timeElapsed = 0.0f;
 	static float Timer = 0.0f;
 	bool Turn = true;
+	bool Check = false;
 	// Increment the frame count.
 	numFrames += 1.0f;
 	gameTime += dt;
@@ -920,8 +921,16 @@ void DXGame::Update(float dt)
 				RightMouseDown = true;
 				//DO STUFF HERE
 				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
-				if(!m_Player){
-					m_Player->WarManager.Add(Nations[World.getProv(ProvSelect).m_NationID]);
+				if(m_Player){
+					for(int i = 0; i < m_Player->WarManager.NumHeld;i++){
+						if(m_Player->WarManager.get(i) == Nations[World.getProv(ProvSelect).m_NationID])
+							Check = true;
+					}
+					if(!Check)
+						m_Player->WarManager.Add(Nations[World.getProv(ProvSelect).m_NationID]);
+					else
+						Check = false;
+					
 				}
 			}
 		}
@@ -1252,8 +1261,9 @@ void DXGame::Render()//RENDER
 				UI.append("\n\nWar\n\n");
 				UI.append("At War With:\n");
 				if(m_Player->WarManager.NumHeld != 0)
-					for(int i = 0; i < m_Player->WarManager.NumHeld; i++)
+					for(int i = 0; i < m_Player->WarManager.NumHeld; i++){
 						UI.append(m_Player->WarManager.get(i)->m_Name.c_str());
+						UI.append("\n");}
 				else
 					UI.append("No One");
 				
