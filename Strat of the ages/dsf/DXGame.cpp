@@ -293,7 +293,6 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 
 		}
 
-	//MapSize defined in Map.h
 
 	for(int i = 0; i < 100; i++){//TODO get names and such from files.
 		Nations[i] = new Nation;
@@ -400,6 +399,31 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		}
 		Mapgen.pop();
 	}
+	//Setting each provinces tax(monetary) value and manpower increase
+	for(int i = 0; i < 10000; ++i)
+	{
+		if(World.getProv(i).mtype == Land)
+		{
+			World.getProv(i).mTax = 5;
+			World.getProv(i).mManpower = 10;
+		}
+		if(World.getProv(i).mtype == Forest)
+		{
+			World.getProv(i).mTax = 10;
+			World.getProv(i).mManpower = 10;
+		}
+		if(World.getProv(i).mtype == Desert)
+		{
+			World.getProv(i).mTax = 10;
+			World.getProv(i).mManpower = 5;
+		}
+		if(World.getProv(i).mtype == Mountain)
+		{
+			World.getProv(i).mTax = 5;
+			World.getProv(i).mManpower = 5;
+		}
+	}
+
 
 	// Quick test for pathfinding using Justin's Map.
 	// It works.  Variables in DirectXFramework.h
@@ -941,6 +965,18 @@ void DXGame::Update(float dt)
 
 			if(Calender.Increment()){//one day has passed, returns true on months end
 				AIProcess();
+				//For each province
+				for(int i = 0; i < 10000; ++i)
+				{
+					//For each nation
+					for(int j = 0; j < 100; ++j)
+					{
+						//If the province ownership is the same as the current nation
+						if(j == World.getProv(i).m_NationID)
+							//Increment by the provinces tax value
+							Nations[j]->Treasury+=World.getProv(i).mTax;
+					}
+				}
 			}
 
 			gameTime = 0.0f;
