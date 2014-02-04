@@ -4,14 +4,19 @@
 
 
 struct ProvAI{
+
+
 	Manager<Province> ProvQue;
 	int weight;
-	bool operator < (ProvAI other){
+
+
+
+	bool operator < (const ProvAI other)const{
 		if(weight < other.weight)
 			return true;
 		return false;
 	}
-	bool operator > (ProvAI other){
+	bool operator > (const ProvAI other)const{
 		if(weight > other.weight)
 			return true;
 		return false;

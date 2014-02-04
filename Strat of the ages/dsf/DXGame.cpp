@@ -1435,25 +1435,40 @@ void DXGame::AIProcess(){
 				}
 				break;
 			case Army::War:
-				ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
-				ProvAI* PAIT;
+				ProvHld = &World.getProv(ArmyManager.get(i)->getProvID());//set province
+				World.getProv(ArmyManager.get(i)->getProvID()).Set = true;
+				ProvAI* PAIT;//holder for temp ProvAIs for queue
 				for(int i = 0; i < 6; i ++){
-					PAIT = new ProvAI;
-					PAIT->ProvQue.Add(&World.getProv(ProvHld->connections[i]));
-					MovementQueue.push(*PAIT);
+					PAIT = new ProvAI;//create new
+					PAIT->ProvQue.Add(&World.getProv(ProvHld->connections[i]));//add connect to it
+					MovementQueue.push(*PAIT);//push to priority que
 				}
-				while(Nations[ProvHld->m_NationID] == Nations[ProvHld->m_NationID]->WarManager.get(0))
-					for(int j = 0; j < 6; j++){
-						if(World.getProv(ProvHld->connections[j]).m_NationID == ArmyManager.get(j)->getNationID()){
-							ProvHld = &World.getProv(ProvHld->connections[j]);
-							ArmyManager.get(j)->Orders.ProvQue.Add(ProvHld);
-						}
-						if(Nations[World.getProv(ProvHld->connections[j]).m_NationID] == Nations[ArmyManager.get(j)->getNationID()]->WarManager.get(0)){
-							ProvHld = &World.getProv(ProvHld->connections[j]);
-							ArmyManager.get(j)->Orders.ProvQue.Add(ProvHld);
-						}
+				while(Nations[ProvHld->m_NationID] == Nations[ProvHld->m_NationID]->WarManager.get(0))//while prov is not foreign at war, earliest declaration
+					for(int j = 0; j < 6; j++){//cycle neighbors
+						if(ProvHld->connections[j] != -1)//is not off map
+							if(World.getProv(ProvHld->connections[j]).Set == false){//has not been here yet
+								if(World.getProv(ProvHld->connections[j]).m_NationID == ArmyManager.get(j)->getNationID()){//if my nation i can walk on it
+									ProvHld = &World.getProv(ProvHld->connections[j]);
+									ProvHld->Set = true;
+									//add next step to current ProvAI, push to end of MovementQueue
+									MovementQueue.top().ProvQue.Add(ProvHld);
+									PAIT = new ProvAI;
+									for(int i = 0; i < MovementQueue.top().ProvQue.NumHeld; i++)
+										PAIT->ProvQue.Add(MovementQueue.top().ProvQue.get(i));
+									MovementQueue.push(*PAIT);
+									MovementQueue.pop();
+								}
+								if(Nations[World.getProv(ProvHld->connections[j]).m_NationID] == Nations[ArmyManager.get(j)->getNationID()]->WarManager.get(0)){//is finally on nation at war
+									//must set ProvAI hand off to unit, then clean out MovementQueue
+									ProvHld = &World.getProv(ProvHld->connections[j]);
+									MovementQueue.top().ProvQue.Add(ProvHld);
+									for(int i = 0; i < MovementQueue.top().ProvQue.NumHeld; i++)
+										ArmyManager.get(j)->Orders.ProvQue.Add(MovementQueue.top().ProvQue.get(i));
+									MovementQueue.empty();
+								}
+							}
 					}
-			
+				World.Reset();
 			break;
 	case Army::Retreat:
 		break;
