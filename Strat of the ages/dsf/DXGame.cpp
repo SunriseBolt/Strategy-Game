@@ -1188,7 +1188,10 @@ void DXGame::Render()//RENDER
 
 		for(int i =0; i < 10000;i++){
 			if(Nations[World.getProv(i).m_NationID] && World.getProv(i).m_NationID > -1)
-				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype],Nations[World.getProv(i).m_NationID]->m_Flag);
+				if(!World.getProv(i).Set)
+					Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype],Nations[World.getProv(i).m_NationID]->m_Flag);
+				else
+					Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype]);
 			else
 				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype]);
 		}
@@ -1468,7 +1471,7 @@ void DXGame::AIProcess(){
 				}
 				break;
 			case Army::War:
-				World.Reset();
+				//World.Reset();
 				ProvHld = &World.getProv(ArmyManager.get(i)->getProvID());
 				//set up all the ProvAIs and pass them off to Queue
 					//use initial ProbHld capture later for direction
@@ -1497,7 +1500,7 @@ void DXGame::AIProcess(){
 								if(World.getProv(MovementQueue.front().Prov->connections[j]).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
 									
 									//give to army and pop Movement Queue
-									ArmyManager.get(i)->Orders.Prov = &World.getProv(MovementQueue.front().Prov->connections[j]);
+									ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[MovementQueue.front().Direction]);
 									ArmyManager.get(i)->Orders.Direction = MovementQueue.front().Direction;
 									while(!MovementQueue.empty())
 										MovementQueue.pop();
@@ -1508,7 +1511,7 @@ void DXGame::AIProcess(){
 					if(!MovementQueue.empty())
 						MovementQueue.pop();
 				}
-				World.Reset();
+				//World.Reset();
 			break;
 	case Army::Retreat:
 		break;
