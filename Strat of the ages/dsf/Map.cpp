@@ -19,7 +19,7 @@ WorldMap::WorldMap(){
 	Province * Prov;
 	for(int i = 0; i < 100; i++)\
 		for(int j = 0; j < 100; j++){
-			Prov = new Province(Land,j+i*100,1.0f,10.0f);
+			Prov = new Province(Land,j+i*100,1.0f,10.0f,j,i);
 			Provinces[j+i*100] = Prov;}
 
 	queue<MapGenTile,deque<MapGenTile>> Mapgen;
@@ -50,8 +50,36 @@ WorldMap::WorldMap(){
 		}
 		Mapgen.pop();
 	}
-	
-
+	//Province* herp = Provinces[505];
+	//for(int i = 0; i < 6; i++){
+	//	herp->mtype = Mountain;
+	//	herp = Provinces[herp->connections[0]];
+	//}
+	//herp = Provinces[505];
+	//for(int i = 0; i < 6; i++){
+	//	herp->mtype = Mountain;
+	//	herp = Provinces[herp->connections[1]];
+	//}
+	//herp = Provinces[505];
+	//for(int i = 0; i < 6; i++){
+	//	herp->mtype = Mountain;
+	//	herp = Provinces[herp->connections[2]];
+	//}
+	//herp = Provinces[505];
+	//for(int i = 0; i < 6; i++){
+	//	herp->mtype = Mountain;
+	//	herp = Provinces[herp->connections[3]];
+	//}
+	//herp = Provinces[505];
+	//for(int i = 0; i < 6; i++){
+	//	herp->mtype = Mountain;
+	//	herp = Provinces[herp->connections[4]];
+	//}
+	//herp = Provinces[505];
+	//for(int i = 0; i < 6; i++){
+	//	herp->mtype = Mountain;
+	//	herp = Provinces[herp->connections[5]];
+	//}
 
 }
 

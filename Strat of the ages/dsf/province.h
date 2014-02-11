@@ -10,8 +10,10 @@ struct Province{
 	float mTax;
 	float mManpower;
 	int m_NationID;
+	int x,y;
 	Province(){
 	Set = false;
+
 
 	mtype = 0;
 	for(int i = 0; i < 6 ;i++)
@@ -23,7 +25,7 @@ struct Province{
 
 	}
 
-	Province(int atype,long long aID,float aTax, float aManpower):mtype(atype),mID(aID),mTax(aTax),mManpower(aManpower),m_NationID(-1){//don't try to understand this if you don't want to.
+	Province(int atype,long long aID,float aTax, float aManpower,int a_x,int a_y):mtype(atype),mID(aID),mTax(aTax),mManpower(aManpower),m_NationID(-1),x(a_x),y(a_y){//don't try to understand this if you don't want to.
 		Set = false;
 		
 		if(aID%100 == 0)
