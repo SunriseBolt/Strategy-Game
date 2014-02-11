@@ -1471,7 +1471,7 @@ void DXGame::AIProcess(){
 				}
 				break;
 			case Army::War:
-				//World.Reset();
+				World.Reset();
 				ProvHld = &World.getProv(ArmyManager.get(i)->getProvID());
 				//set up all the ProvAIs and pass them off to Queue
 					//use initial ProbHld capture later for direction
@@ -1480,9 +1480,27 @@ void DXGame::AIProcess(){
 					PRAI = new ProvAI();
 					PRAI->Prov = &World.getProv(ProvHld->connections[j]);
 					PRAI->Direction = j;
+					
+
+
 					MovementQueue.push(*PRAI);
 					delete PRAI;
 				}
+
+				for(int j = 0; j < 6; j++){
+					if(World.getProv(MovementQueue.front().Prov->mID).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
+
+						//give to army and pop Movement Queue
+						ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[MovementQueue.front().Direction]);
+						ArmyManager.get(i)->Orders.Direction = MovementQueue.front().Direction;
+						while(!MovementQueue.empty())
+							MovementQueue.pop();
+						break;
+					}
+					MovementQueue.push(MovementQueue.front());
+					MovementQueue.pop();
+				}
+
 					//while loop should instead get first Queue's ProvAI and use that/should do while not empty
 				while(!MovementQueue.empty()){
 					for(int j = 0; j < 6; j++){//cycle neighbors
@@ -1492,7 +1510,7 @@ void DXGame::AIProcess(){
 									//push onto queue as new ProvAI with same direction
 									PRAI = new ProvAI();
 									PRAI->Direction = MovementQueue.front().Direction;
-									PRAI->Prov = &World.getProv(ProvHld->connections[j]);
+									PRAI->Prov = &World.getProv(MovementQueue.front().Prov->connections[j]);
 									MovementQueue.push(*PRAI);
 									delete PRAI;
 									World.getProv(MovementQueue.front().Prov->connections[j]).Set = true;
@@ -1511,7 +1529,7 @@ void DXGame::AIProcess(){
 					if(!MovementQueue.empty())
 						MovementQueue.pop();
 				}
-				//World.Reset();
+				World.Reset();
 			break;
 	case Army::Retreat:
 		break;
