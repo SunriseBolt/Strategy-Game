@@ -1482,12 +1482,12 @@ void DXGame::AIProcess(){
 					PRAI->Direction = j;
 					
 
-
-					MovementQueue.push(*PRAI);
+					if(PRAI->Prov->mID > -1)
+						MovementQueue.push(*PRAI);
 					delete PRAI;
 				}
 
-				for(int j = 0; j < 6; j++){
+				for(int j = 0; j < MovementQueue.size(); j++){
 					if(World.getProv(MovementQueue.front().Prov->mID).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
 
 						//give to army and pop Movement Queue
