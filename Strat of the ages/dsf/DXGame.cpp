@@ -1462,6 +1462,7 @@ void DXGame::AIProcess(){
 			int Temp = 0;
 			Province* ProvHld = 0;
 			ProvAI* PRAI = 0;
+			int Going;
 			switch(ArmyManager.get(i)->getState()){
 			case Army::Peace:
 				Temp = rand()%6;
@@ -1532,6 +1533,9 @@ void DXGame::AIProcess(){
 				World.Reset();
 			break;
 	case Army::Retreat:
+
+		if((Going = PathToTarget(ArmyManager.get(i)->getProvID(),Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID)) > -1)
+			ArmyManager.get(i)->Orders.Prov = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Going]);
 		break;
 
 
@@ -1544,6 +1548,72 @@ void DXGame::AIProcess(){
 
 }
 }
+
+int DXGame::PathToTarget(int Start,int Target){
+	Province* ProvHld = 0;
+	ProvAI* PRAI = 0;
+	World.Reset();
+	ProvHld = &World.getProv(Start);
+	//set up all the ProvAIs and pass them off to Queue
+	//use initial ProbHld capture later for direction
+	//for loop through neighbors giving them initial direction
+	for(int j = 0; j < 6 ; j++){
+		PRAI = new ProvAI();
+		PRAI->Prov = &World.getProv(ProvHld->connections[j]);
+		PRAI->Direction = j;
+
+
+		if(PRAI->Prov->mID > -1)
+			MovementQueue.push(*PRAI);
+		delete PRAI;
+	}
+
+	for(int j = 0; j < MovementQueue.size(); j++){
+		if(World.getProv(MovementQueue.front().Prov->mID).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
+
+			//give to army and pop Movement Queue
+			ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[MovementQueue.front().Direction]);
+			ArmyManager.get(i)->Orders.Direction = MovementQueue.front().Direction;
+			while(!MovementQueue.empty())
+				MovementQueue.pop();
+			break;
+		}
+		MovementQueue.push(MovementQueue.front());
+		MovementQueue.pop();
+	}
+
+	//while loop should instead get first Queue's ProvAI and use that/should do while not empty
+	while(!MovementQueue.empty()){
+		for(int j = 0; j < 6; j++){//cycle neighbors
+			if(MovementQueue.front().Prov->connections[j] != -1)//is not off map
+				if(World.getProv(MovementQueue.front().Prov->connections[j]).Set == false){//has not been here yet
+					if(World.getProv(ProvHld->connections[j]).m_NationID == ArmyManager.get(i)->getNationID()){//if my nation i can walk on it
+						//push onto queue as new ProvAI with same direction
+						PRAI = new ProvAI();
+						PRAI->Direction = MovementQueue.front().Direction;
+						PRAI->Prov = &World.getProv(MovementQueue.front().Prov->connections[j]);
+						MovementQueue.push(*PRAI);
+						delete PRAI;
+						World.getProv(MovementQueue.front().Prov->connections[j]).Set = true;
+					}
+					if(World.getProv(MovementQueue.front().Prov->connections[j]).mID == Target){
+
+						//give to army and pop Movement Queue
+						return PRAI->Direction;
+						break;
+					}
+				}
+		}
+		if(!MovementQueue.empty())
+			MovementQueue.pop();
+	}
+	World.Reset();
+
+}
+
+
+
+
 void DXGame::DeclareWar(int Me,int Target){
 	bool Check = false;
 	for(int i = 0; i < Nations[Me]->WarManager.NumHeld;i++){
