@@ -13,7 +13,7 @@ class Army
 {
 private:
 	bool Moving;
-
+	bool isPlayers;
 
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
 
