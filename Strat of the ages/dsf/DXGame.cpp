@@ -1006,9 +1006,9 @@ void DXGame::Update(float dt)
 
 		//GAME LOGIC
 		if((gameTime > turnTime) && m_Player && !Paused){
-
+			AIProcess();
 			if(Calender.Increment()){//one day has passed, returns true on months end
-				AIProcess();
+
 				//For each province
 				for(int i = 0; i < 10000; ++i)
 				{
@@ -1608,6 +1608,7 @@ void DXGame::AIProcess(){
 }
 
 int DXGame::PathToTarget(int Start,int Target){
+	int Temp = -1;
 	Province* ProvHld = 0;
 	ProvAI* PRAI = 0;
 	World.Reset();
@@ -1628,7 +1629,8 @@ int DXGame::PathToTarget(int Start,int Target){
 
 	for(int j = 0; j < MovementQueue.size(); j++){
 		if(World.getProv(MovementQueue.front().Prov->mID).mID == Target){
-
+			
+			World.Reset();
 			return MovementQueue.front().Direction;
 		}
 		MovementQueue.push(MovementQueue.front());
@@ -1642,9 +1644,11 @@ int DXGame::PathToTarget(int Start,int Target){
 				if(World.getProv(MovementQueue.front().Prov->connections[j]).Set == false){//has not been here yet
 
 					if(World.getProv(MovementQueue.front().Prov->connections[j]).mID == Target){
-
-						//give to army and pop Movement Queue
-						return PRAI->Direction;
+						Temp = MovementQueue.front().Direction;
+						while(!MovementQueue.empty())
+							MovementQueue.pop();
+						World.Reset();
+						return Temp;
 						break;
 					}
 					else{
