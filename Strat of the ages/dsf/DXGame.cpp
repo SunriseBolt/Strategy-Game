@@ -333,11 +333,12 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 
 
 
-		//Set everyone's initial cost of upgrade to 250 (Increasing them based on size down in a later section)
+		//Set everyone's initial Cost of upgrade to 250 (Increasing them based on size down in a later section)
 		for(int i = 0; i < 100; ++i)
 		{
-			cost[i] = 250;
+			upgradeCost[i] = 250;
 		}
+
 
 
 		for(int i = 0; i < Num_Nations; i++){//push Nation Seeds
@@ -445,17 +446,17 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		pathSize = path.size();
 
 
-		for(int i = 0; i < 10000; ++i)
+		//For each nation
+		for(int j = 0; j < 100; ++j)
 		{
-			//For each nation
-			for(int j = 0; j < 100; ++j)
+			//Find out how big the nation is
+			for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
 			{
-				//If the province ownership is the same as the current nation
-				if(j == World.getProv(i).m_NationID)
-					//Increase this countries cost for upgrading
-						cost[j]+=5;
+				//Increase this countries Cost for upgrading 5 per province
+				upgradeCost[j]+=5;
 			}
 		}
+
 
 
 		//*************************************************************************
@@ -834,13 +835,13 @@ void DXGame::Update(float dt)
 				{
 					if(Nations[i]->isUser)
 					{
-						if(Nations[i]->Treasury >= cost[i])
+						if(Nations[i]->Treasury >= upgradeCost[i])
 						{
-							Nations[i]->Treasury-=cost[i];
+							Nations[i]->Treasury-=upgradeCost[i];
 							Nations[i]->m_EconomyTech++;
 							Nations[i]->m_LandTech++;
 							Nations[i]->m_SeaTech++;
-							cost[i]*=1.1;
+							upgradeCost[i]*=1.1;
 						}
 						Nations[i]->UpdateUnitStats();
 					}
@@ -1009,89 +1010,85 @@ void DXGame::Update(float dt)
 			AIProcess();
 			if(Calender.Increment()){//one day has passed, returns true on months end
 
-				//For each province
-				for(int i = 0; i < 10000; ++i)
+				//For each nation
+				for(int j = 0; j < 100; ++j)
 				{
-					//For each nation
-					for(int j = 0; j < 100; ++j)
+					//Find the size of the nation
+					for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
 					{
-						//If the province ownership is the same as the current nation
-						if(j == World.getProv(i).m_NationID)
-						{
-							//Increment by the provinces tax value
-							Nations[j]->Treasury+=World.getProv(i).mTax;
-							Nations[j]->Manpower+=World.getProv(i).mManpower;
+						//Increment by the provinces tax and manpower value
+						Nations[j]->Treasury+=Nations[j]->ProvinceList.get(i)->mTax;
+						Nations[j]->Manpower+=Nations[j]->ProvinceList.get(i)->mManpower;
+
+					}
+				}
+
+				gameTime = 0.0f;
+				bool NotDone = true;
+				//bool GoodMove = false;
+				int numTries = 0;
+				for(int i = 0; i < ArmyManager.NumHeld; ++i)
+				{
+					if(ArmyManager.get(i)->Orders.Prov && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
+						Event order;
+						order.SetTime(Calender);
+						if(ArmyManager.get(i)->Orders.Prov->mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
+							order.Time += World.Weight[ArmyManager.get(i)->Orders.Prov->mtype];
+						else
+							order.Time += World.Weight[World.WaterLand];
+
+						order.ID = order.ArmyMove;
+						order.Info[0] = i;
+						order.Info[1] = ArmyManager.get(i)->Orders.Prov->mID; 
+
+						EventQueue.push(order);
+						ArmyManager.get(i)->Orders.Prov = 0;
+						ArmyManager.get(i)->setMoving(true);
+					}
+				}
+				for(int i = 0; i < ArmyManager.NumHeld; i++){
+					if(ArmyManager.get(i)->getState() == Army::War){//only find targets if at war
+						for(int j = 0; j < ArmyManager.NumHeld;j++){//finding targets
+							if(	i != j &&	//##############################################################//Not the same Army
+								ArmyManager.get(j)->getState() == Army::War && //###########################//Enemy Army is Also at War #TODO Make it check that it's your War Target
+								ArmyManager.get(i)->getNationID() != ArmyManager.get(j)->getNationID() &&	//Not the Same Owner
+								ArmyManager.get(i)->getProvID() == ArmyManager.get(j)->getProvID()){		//BUT you are on the same Province
+									ArmyManager.get(i)->setTarget(ArmyManager.get(j));
+							}
 						}
 					}
+
+					if(ArmyManager.get(i)->getTarget()){
+						if(!ArmyManager.get(i)->getTarget()->getTarget())
+							ArmyManager.get(i)->getTarget()->setTarget(ArmyManager.get(i));
+					}
 				}
-			}
 
-			gameTime = 0.0f;
-			bool NotDone = true;
-			//bool GoodMove = false;
-			int numTries = 0;
-			for(int i = 0; i < ArmyManager.NumHeld; ++i)
-			{
-				if(ArmyManager.get(i)->Orders.Prov && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
-					Event order;
-					order.SetTime(Calender);
-					if(ArmyManager.get(i)->Orders.Prov->mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
-						order.Time += World.Weight[ArmyManager.get(i)->Orders.Prov->mtype];
-					else
-						order.Time += World.Weight[World.WaterLand];
-
-					order.ID = order.ArmyMove;
-					order.Info[0] = i;
-					order.Info[1] = ArmyManager.get(i)->Orders.Prov->mID; 
-
-					EventQueue.push(order);
-					ArmyManager.get(i)->Orders.Prov = 0;
-					ArmyManager.get(i)->setMoving(true);
+				for(int i = 0; i < ArmyManager.NumHeld; i++){
+					if(ArmyManager.get(i)->getTarget()){
+						ArmyManager.get(i)->CombatRound(ArmyManager.get(i)->getTarget());
+					}
 				}
-			}
-			for(int i = 0; i < ArmyManager.NumHeld; i++){
-				if(ArmyManager.get(i)->getState() == Army::War){//only find targets if at war
-					for(int j = 0; j < ArmyManager.NumHeld;j++){//finding targets
-						if(	i != j &&	//##############################################################//Not the same Army
-							ArmyManager.get(j)->getState() == Army::War && //###########################//Enemy Army is Also at War #TODO Make it check that it's your War Target
-							ArmyManager.get(i)->getNationID() != ArmyManager.get(j)->getNationID() &&	//Not the Same Owner
-							ArmyManager.get(i)->getProvID() == ArmyManager.get(j)->getProvID()){		//BUT you are on the same Province
-								ArmyManager.get(i)->setTarget(ArmyManager.get(j));
+				if(EventQueue.size() != 0)
+					while(EventQueue.size() != 0 && EventQueue.top().Time == Calender){
+						switch(EventQueue.top().ID){
+						case Event::ArmyMove://move armies on correct dates
+							ArmyManager.get(EventQueue.top().Info[0])->moveTo(EventQueue.top().Info[1]);
+
+							break;
+						case Event::ProvinceFlip:
+							break;
+
+
+
 						}
+
+
+
+						EventQueue.pop();
 					}
-				}
-
-				if(ArmyManager.get(i)->getTarget()){
-					if(!ArmyManager.get(i)->getTarget()->getTarget())
-						ArmyManager.get(i)->getTarget()->setTarget(ArmyManager.get(i));
-				}
 			}
-
-			for(int i = 0; i < ArmyManager.NumHeld; i++){
-				if(ArmyManager.get(i)->getTarget()){
-					ArmyManager.get(i)->CombatRound(ArmyManager.get(i)->getTarget());
-				}
-			}
-			if(EventQueue.size() != 0)
-				while(EventQueue.size() != 0 && EventQueue.top().Time == Calender){
-					switch(EventQueue.top().ID){
-					case Event::ArmyMove://move armies on correct dates
-						ArmyManager.get(EventQueue.top().Info[0])->moveTo(EventQueue.top().Info[1]);
-
-						break;
-					case Event::ProvinceFlip:
-						break;
-
-
-
-					}
-
-
-
-					EventQueue.pop();
-				}
 		}
-
 
 
 		break;
