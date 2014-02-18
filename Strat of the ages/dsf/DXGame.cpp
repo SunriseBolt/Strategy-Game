@@ -333,10 +333,10 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 
 
 
-		//Set everyone's initial cost of upgrade to 250 (Increasing them based on size down in a later section)
+		//Set everyone's initial Cost of upgrade to 250 (Increasing them based on size down in a later section)
 		for(int i = 0; i < 100; ++i)
 		{
-			cost[i] = 250;
+			upgradeCost[i] = 250;
 		}
 
 
@@ -445,17 +445,16 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		pathSize = path.size();
 
 
-		for(int i = 0; i < 10000; ++i)
-		{
 			//For each nation
 			for(int j = 0; j < 100; ++j)
 			{
-				//If the province ownership is the same as the current nation
-				if(j == World.getProv(i).m_NationID)
-					//Increase this countries cost for upgrading
-						cost[j]+=5;
+				//Find out how big the nation is
+				for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
+				{
+					//Increase this countries Cost for upgrading 5 per province
+						upgradeCost[j]+=5;
+				}
 			}
-		}
 
 
 		//*************************************************************************
@@ -834,13 +833,13 @@ void DXGame::Update(float dt)
 				{
 					if(Nations[i]->isUser)
 					{
-						if(Nations[i]->Treasury >= cost[i])
+						if(Nations[i]->Treasury >= upgradeCost[i])
 						{
-							Nations[i]->Treasury-=cost[i];
+							Nations[i]->Treasury-=upgradeCost[i];
 							Nations[i]->m_EconomyTech++;
 							Nations[i]->m_LandTech++;
 							Nations[i]->m_SeaTech++;
-							cost[i]*=1.1;
+							upgradeCost[i]*=1.1;
 						}
 						Nations[i]->UpdateUnitStats();
 					}
@@ -1009,21 +1008,17 @@ void DXGame::Update(float dt)
 
 			if(Calender.Increment()){//one day has passed, returns true on months end
 				AIProcess();
-				//For each province
-				for(int i = 0; i < 10000; ++i)
-				{
 					//For each nation
 					for(int j = 0; j < 100; ++j)
 					{
 						//If the province ownership is the same as the current nation
-						if(j == World.getProv(i).m_NationID)
+						for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
 						{
 							//Increment by the provinces tax value
-							Nations[j]->Treasury+=World.getProv(i).mTax;
-							Nations[j]->Manpower+=World.getProv(i).mManpower;
+							Nations[j]->Treasury+=Nations[j]->ProvinceList.get(i)->mTax;
+							Nations[j]->Manpower+=Nations[j]->ProvinceList.get(i)->mManpower;
 						}
 					}
-				}
 			}
 
 			gameTime = 0.0f;
