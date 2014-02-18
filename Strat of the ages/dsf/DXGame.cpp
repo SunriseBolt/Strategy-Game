@@ -333,6 +333,11 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 
 
 
+		//Set everyone's initial cost of upgrade to 250 (Increasing them based on size down in a later section)
+		for(int i = 0; i < 100; ++i)
+		{
+			cost[i] = 250;
+		}
 
 
 		for(int i = 0; i < Num_Nations; i++){//push Nation Seeds
@@ -440,7 +445,17 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		pathSize = path.size();
 
 
-
+		for(int i = 0; i < 10000; ++i)
+		{
+			//For each nation
+			for(int j = 0; j < 100; ++j)
+			{
+				//If the province ownership is the same as the current nation
+				if(j == World.getProv(i).m_NationID)
+					//Increase this countries cost for upgrading
+						cost[j]+=5;
+			}
+		}
 
 
 		//*************************************************************************
@@ -815,11 +830,37 @@ void DXGame::Update(float dt)
 			if(!m_BoolBuf[DIK_P]){
 				m_BoolBuf[DIK_P] = true;
 				//DO STUFF HERE
+				for(int i = 0; i < 100; ++i)
+				{
+					if(Nations[i]->isUser)
+					{
+						if(Nations[i]->Treasury >= cost[i])
+						{
+							Nations[i]->Treasury-=cost[i];
+							Nations[i]->m_EconomyTech++;
+							Nations[i]->m_LandTech++;
+							Nations[i]->m_SeaTech++;
+							cost[i]*=1.1;
+						}
+						Nations[i]->UpdateUnitStats();
+					}
+				}
+
 			}
 		}
 		else
 		{
 			m_BoolBuf[DIK_P] = false;
+		}
+		if(Buffer[DIK_O] & 0x80){
+			if(!m_BoolBuf[DIK_O]){
+				m_BoolBuf[DIK_O] = true;
+				//DO STUFF HERE
+			}
+		}
+		else
+		{
+			m_BoolBuf[DIK_O] = false;
 		}
 		//####################Keys to change turn progression###########################
 		if(Buffer[DIK_ADD] & 0x80){
@@ -934,6 +975,7 @@ void DXGame::Update(float dt)
 				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
 				if(!m_Player){
 					m_Player = Nations[World.getProv(ProvSelect).m_NationID];
+					Nations[World.getProv(ProvSelect).m_NationID]->isUser = true;
 				}
 				else{//after player select
 
@@ -975,8 +1017,11 @@ void DXGame::Update(float dt)
 					{
 						//If the province ownership is the same as the current nation
 						if(j == World.getProv(i).m_NationID)
+						{
 							//Increment by the provinces tax value
-								Nations[j]->Treasury+=World.getProv(i).mTax;
+							Nations[j]->Treasury+=World.getProv(i).mTax;
+							Nations[j]->Manpower+=World.getProv(i).mManpower;
+						}
 					}
 				}
 			}

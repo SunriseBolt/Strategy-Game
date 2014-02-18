@@ -28,12 +28,13 @@ struct Nation{
 	int m_LandTech;
 	int m_SeaTech;
 	int m_EconomyTech;
+	bool isUser;
 
 	//Unit Stats
-	int ArmyAtk;
-	int ArmyDef;
-	int ArmyMAtk;
-	int ArmyMDef;
+	float ArmyAtk;
+	float ArmyDef;
+	float ArmyMAtk;
+	float ArmyMDef;
 	float ArmyMaxMorale;
 
 	//Army array
@@ -52,6 +53,7 @@ struct Nation{
 		ArmyMAtk = 1;
 		ArmyMDef = 1;
 		ArmyMaxMorale = 1.0;
+		isUser = false;
 
 	}
 	
@@ -65,14 +67,16 @@ struct Nation{
 		ArmyMAtk = 0;
 		ArmyMDef = 0;
 		ArmyMaxMorale = 1.0;
+		isUser = false;
 
 	}
 
 	void UpdateUnitStats(){
-		ArmyAtk = m_LandTech+1;
-		ArmyDef = m_LandTech+1;
-		ArmyMAtk = m_LandTech+1;
-		ArmyMDef = m_LandTech+1;
+		ArmyAtk = pow(((m_LandTech*0.1)+1) , 1.3);
+		ArmyDef = pow(((m_LandTech*0.1)+1) , 1.3);
+		ArmyMAtk = pow(((m_LandTech*0.1)+1) , 1.3);
+		ArmyMDef = pow(((m_LandTech*0.1)+1) , 1.3);
+
 		ArmyMaxMorale = m_LandTech+2;
 	}
 
