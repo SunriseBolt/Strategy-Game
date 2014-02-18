@@ -814,6 +814,20 @@ void DXGame::Update(float dt)
 			if(!m_BoolBuf[DIK_P]){
 				m_BoolBuf[DIK_P] = true;
 				//DO STUFF HERE
+				for(int i = 0; i < 100; ++i)
+				{
+					if(Nations[i]->isUser)
+					{
+						if(Nations[i]->Treasury >= 1000)
+						{
+							Nations[i]->Treasury-=1000;
+							Nations[i]->m_EconomyTech++;
+							Nations[i]->m_LandTech++;
+							Nations[i]->m_SeaTech++;
+						}
+					Nations[i]->UpdateUnitStats();
+					}
+				}
 			}
 		}
 		else
@@ -933,6 +947,7 @@ void DXGame::Update(float dt)
 				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
 				if(!m_Player){
 					m_Player = Nations[World.getProv(ProvSelect).m_NationID];
+					Nations[World.getProv(ProvSelect).m_NationID]->isUser = true;
 				}
 				else{//after player select
 
@@ -974,8 +989,11 @@ void DXGame::Update(float dt)
 					{
 						//If the province ownership is the same as the current nation
 						if(j == World.getProv(i).m_NationID)
+						{
 							//Increment by the provinces tax value
 							Nations[j]->Treasury+=World.getProv(i).mTax;
+							Nations[j]->Manpower+=World.getProv(i).mManpower;
+						}
 					}
 				}
 			}
