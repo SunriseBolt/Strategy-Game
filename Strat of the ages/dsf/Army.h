@@ -15,6 +15,8 @@ private:
 	bool Moving;
 	bool isPlayers;
 
+	int NationalID;
+
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
 
 	int m_State;
@@ -49,9 +51,11 @@ public:
 	int getDie(){return PreviousDie;};
 	float getMorale(){return m_morale;};
 	int getNationID(){		return NationID;};
+	int getNationalID(){ return NationalID;};
 	int getState(){return m_State;};
 	void setNationID(int NationID){this->NationID = NationID;};
 	void setState(int a_State){this->m_State = a_State;};
+	void setNationalID(int ID){this->NationalID = ID;};
 	//COMBAT
 	//performs a single round of combat against an army
 	void CombatRound(Army*);

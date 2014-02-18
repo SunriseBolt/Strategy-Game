@@ -146,7 +146,7 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	// Check device capabilities
 	DWORD deviceBehaviorFlags = 0;
 	m_pD3DObject->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &m_D3DCaps);
-	
+
 	// Determine vertex processing mode
 	if(m_D3DCaps.DevCaps & D3DCREATE_HARDWARE_VERTEXPROCESSING)
 	{
@@ -174,7 +174,7 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		&D3Dpp,					// presentation parameters
 		&m_pD3DDevice);			// returned device pointer
 	//*************************************************************************
-	
+
 	m_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
 	//////////////////////////////////////////////////////////////////////////
 	// Create a Font Object
@@ -279,266 +279,267 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 	for(int i = 0; i < 100;i++)
 		for(int j = 0; j < 100;j++){
 			if(i%2){
-			locs.drwmx = j*SpriteSize;
-			locs.drwmy = i*SpriteSize;
-			locs.mx = j*SpriteSize;
-			locs.my = i*SpriteSize;
-			Pallette[Map]->Locs[j+i*100] = locs;}
+				locs.drwmx = j*SpriteSize;
+				locs.drwmy = i*SpriteSize;
+				locs.mx = j*SpriteSize;
+				locs.my = i*SpriteSize;
+				Pallette[Map]->Locs[j+i*100] = locs;}
 			else{
-			locs.drwmx = (j*SpriteSize)-16;
-			locs.drwmy = (i*SpriteSize);
-			locs.mx = (j*SpriteSize)-16;
-			locs.my = (i*SpriteSize);
-			Pallette[Map]->Locs[j+i*100] = locs;}
+				locs.drwmx = (j*SpriteSize)-16;
+				locs.drwmy = (i*SpriteSize);
+				locs.mx = (j*SpriteSize)-16;
+				locs.my = (i*SpriteSize);
+				Pallette[Map]->Locs[j+i*100] = locs;}
 
 		}
 
 
-	for(int i = 0; i < 100; i++){//TODO get names and such from files.
-		Nations[i] = new Nation;
-		Nations[i]->NationalID = i;
-	}	
-	
-	queue<MapGenTile,deque<MapGenTile>> Mapgen;
-	for(int i = 0; i < 10000; i++){
-		World.getProv(i).Set = false;
-	}
+		for(int i = 0; i < 100; i++){//TODO get names and such from files.
+			Nations[i] = new Nation;
+			Nations[i]->NationalID = i;
+		}	
 
-	// Test Army for setting nations.
-	// Use setNation as needed to have it equal whatever nation you need.  Should hopefully work.
-	// If not, I need to understand how to get and set Justin's nations better
-	// -------> Christian
-	// ->Justin, moved to map gen to place armies on capital
-	enum{FIR,MID,LAS,Singles};
-	Manager<string> NameGenManager[4];
-	fstream FSTR;
-	FSTR.open("Nation.txt",fstream::in);
-	bool NotDone = true;
-	string* Hld;
-	int f_counter = 0;
-	while(NotDone){
-		Hld = new string;
-		FSTR >> *Hld;
-		if(*Hld == "###"){
-			f_counter++;
-		}
-		else{
-			NameGenManager[f_counter].Add(Hld);
+		queue<MapGenTile,deque<MapGenTile>> Mapgen;
+		for(int i = 0; i < 10000; i++){
+			World.getProv(i).Set = false;
 		}
 
+		// Test Army for setting nations.
+		// Use setNation as needed to have it equal whatever nation you need.  Should hopefully work.
+		// If not, I need to understand how to get and set Justin's nations better
+		// -------> Christian
+		// ->Justin, moved to map gen to place armies on capital
+		enum{FIR,MID,LAS,Singles};
+		Manager<string> NameGenManager[4];
+		fstream FSTR;
+		FSTR.open("Nation.txt",fstream::in);
+		bool NotDone = true;
+		string* Hld;
+		int f_counter = 0;
+		while(NotDone){
+			Hld = new string;
+			FSTR >> *Hld;
+			if(*Hld == "###"){
+				f_counter++;
+			}
+			else{
+				NameGenManager[f_counter].Add(Hld);
+			}
 
-		if(f_counter == 4)
-			NotDone = false;
-	}
 
-
-
-
-
-	for(int i = 0; i < Num_Nations; i++){//push Nation Seeds
-		bool done = false;
-		int ProvID = 0;
-		while(!done){
-			ProvID = rand()%10000;
-			if(World.getProv(ProvID).mtype != Water)
-				done = true;
-		}
-		Mapgen.push(MapGenTile(ProvID,i));
-		Army* t_Army = new Army;
-		t_Army->setNation(Nations[i]->m_Flag);
-		t_Army->setNationID(i);
-		t_Army->setState(Army::Peace);
-		t_Army->SetCombatVal(Nations[i]->ArmyAtk,Nations[i]->ArmyDef,Nations[i]->ArmyMAtk,Nations[i]->ArmyMDef,Nations[i]->ArmyMaxMorale);
-		t_Army->moveTo(ProvID);
-		Nations[i]->m_ArmyList.Add(t_Army);
-		Nations[i]->m_CapitalID = ProvID;
-		ArmyManager.Add(t_Army);
-		int f_NameRand = rand()%100;
-		if(f_NameRand	< 40){
-			f_NameRand  = rand()%NameGenManager[FIR].NumHeld;
-			Nations[i]->m_Name.append(*NameGenManager[FIR].get(f_NameRand));
-			f_NameRand  = rand()%NameGenManager[MID].NumHeld;
-			Nations[i]->m_Name.append(*NameGenManager[MID].get(f_NameRand));
-			f_NameRand  = rand()%NameGenManager[LAS].NumHeld;
-			Nations[i]->m_Name.append(*NameGenManager[LAS].get(f_NameRand));
-		}
-		else if(f_NameRand < 90){
-			f_NameRand  = rand()%NameGenManager[FIR].NumHeld;
-			Nations[i]->m_Name.append(*NameGenManager[FIR].get(f_NameRand));
-			f_NameRand  = rand()%NameGenManager[LAS].NumHeld;
-			Nations[i]->m_Name.append(*NameGenManager[LAS].get(f_NameRand));
-
-		}
-		else{
-			f_NameRand  = rand()%NameGenManager[Singles].NumHeld;
-			Nations[i]->m_Name = *NameGenManager[Singles].get(f_NameRand);
+			if(f_counter == 4)
+				NotDone = false;
 		}
 
 
 
-	}
+
+
+		for(int i = 0; i < Num_Nations; i++){//push Nation Seeds
+			bool done = false;
+			int ProvID = 0;
+			while(!done){
+				ProvID = rand()%10000;
+				if(World.getProv(ProvID).mtype != Water)
+					done = true;
+			}
+			Mapgen.push(MapGenTile(ProvID,i));
+			Army* t_Army = new Army;
+			t_Army->setNation(Nations[i]->m_Flag);
+			t_Army->setNationID(i);
+			t_Army->setState(Army::Peace);
+			t_Army->SetCombatVal(Nations[i]->ArmyAtk,Nations[i]->ArmyDef,Nations[i]->ArmyMAtk,Nations[i]->ArmyMDef,Nations[i]->ArmyMaxMorale);
+			t_Army->moveTo(ProvID);
+			t_Army->setNationalID(0);
+			Nations[i]->m_ArmyList.Add(t_Army);
+			Nations[i]->m_CapitalID = ProvID;
+			ArmyManager.Add(t_Army);
+			int f_NameRand = rand()%100;
+			if(f_NameRand	< 40){
+				f_NameRand  = rand()%NameGenManager[FIR].NumHeld;
+				Nations[i]->m_Name.append(*NameGenManager[FIR].get(f_NameRand));
+				f_NameRand  = rand()%NameGenManager[MID].NumHeld;
+				Nations[i]->m_Name.append(*NameGenManager[MID].get(f_NameRand));
+				f_NameRand  = rand()%NameGenManager[LAS].NumHeld;
+				Nations[i]->m_Name.append(*NameGenManager[LAS].get(f_NameRand));
+			}
+			else if(f_NameRand < 90){
+				f_NameRand  = rand()%NameGenManager[FIR].NumHeld;
+				Nations[i]->m_Name.append(*NameGenManager[FIR].get(f_NameRand));
+				f_NameRand  = rand()%NameGenManager[LAS].NumHeld;
+				Nations[i]->m_Name.append(*NameGenManager[LAS].get(f_NameRand));
+
+			}
+			else{
+				f_NameRand  = rand()%NameGenManager[Singles].NumHeld;
+				Nations[i]->m_Name = *NameGenManager[Singles].get(f_NameRand);
+			}
 
 
 
-	while(!Mapgen.empty())//while map generator not done
-	{
-		if(!World.getProv(Mapgen.front().ProvID).Set){//just incase some stuff gets put on other stuff
-			World.getProv(Mapgen.front().ProvID).m_NationID = Mapgen.front().Type;
-			Nations[Mapgen.front().Type]->ProvinceList.Add(&World.getProv(Mapgen.front().ProvID));
-			World.getProv(Mapgen.front().ProvID).Set = true;
-			for(int i = 0; i < 6; i++)//push neighbors
+		}
+
+
+
+		while(!Mapgen.empty())//while map generator not done
+		{
+			if(!World.getProv(Mapgen.front().ProvID).Set){//just incase some stuff gets put on other stuff
+				World.getProv(Mapgen.front().ProvID).m_NationID = Mapgen.front().Type;
+				Nations[Mapgen.front().Type]->ProvinceList.Add(&World.getProv(Mapgen.front().ProvID));
+				World.getProv(Mapgen.front().ProvID).Set = true;
+				for(int i = 0; i < 6; i++)//push neighbors
+				{
+					if(World.getProv(Mapgen.front().ProvID).connections[i] != -1)
+						if( World.getProv(World.getProv(Mapgen.front().ProvID).connections[i]).Set == false
+							&& 
+							World.getProv(World.getProv(Mapgen.front().ProvID).connections[i]).mtype != Water)
+						{
+							Mapgen.push(MapGenTile(World.getProv(Mapgen.front().ProvID).connections[i],Mapgen.front().Type));
+						}
+				}
+			}
+			Mapgen.pop();
+		}
+		//Setting each provinces tax(monetary) value and manpower increase
+		for(int i = 0; i < 10000; ++i)
+		{
+			if(World.getProv(i).mtype == Land)
 			{
-				if(World.getProv(Mapgen.front().ProvID).connections[i] != -1)
-					if( World.getProv(World.getProv(Mapgen.front().ProvID).connections[i]).Set == false
-						&& 
-						World.getProv(World.getProv(Mapgen.front().ProvID).connections[i]).mtype != Water)
-					{
-						Mapgen.push(MapGenTile(World.getProv(Mapgen.front().ProvID).connections[i],Mapgen.front().Type));
-					}
+				World.getProv(i).mTax = 5;
+				World.getProv(i).mManpower = 10;
+			}
+			if(World.getProv(i).mtype == Forest)
+			{
+				World.getProv(i).mTax = 10;
+				World.getProv(i).mManpower = 10;
+			}
+			if(World.getProv(i).mtype == Desert)
+			{
+				World.getProv(i).mTax = 10;
+				World.getProv(i).mManpower = 5;
+			}
+			if(World.getProv(i).mtype == Mountain)
+			{
+				World.getProv(i).mTax = 5;
+				World.getProv(i).mManpower = 5;
 			}
 		}
-		Mapgen.pop();
-	}
-	//Setting each provinces tax(monetary) value and manpower increase
-	for(int i = 0; i < 10000; ++i)
-	{
-		if(World.getProv(i).mtype == Land)
-		{
-			World.getProv(i).mTax = 5;
-			World.getProv(i).mManpower = 10;
-		}
-		if(World.getProv(i).mtype == Forest)
-		{
-			World.getProv(i).mTax = 10;
-			World.getProv(i).mManpower = 10;
-		}
-		if(World.getProv(i).mtype == Desert)
-		{
-			World.getProv(i).mTax = 10;
-			World.getProv(i).mManpower = 5;
-		}
-		if(World.getProv(i).mtype == Mountain)
-		{
-			World.getProv(i).mTax = 5;
-			World.getProv(i).mManpower = 5;
-		}
-	}
 
 
-	// Quick test for pathfinding using Justin's Map.
-	// It works.  Variables in DirectXFramework.h
-	// Nothing needs to be created.  Use what's already there.
-	source = 0;
-	vect graph(10000);
-	g.setWeights(World, graph);
+		// Quick test for pathfinding using Justin's Map.
+		// It works.  Variables in DirectXFramework.h
+		// Nothing needs to be created.  Use what's already there.
+		source = 0;
+		vect graph(10000);
+		g.setWeights(World, graph);
 
-	g.ComputePaths(source, graph, min_dist, previous);
-	path = g.GetShortest(1000, previous);
-	// Call this line when wanting to create an array for the path.
-	// This is just a test
-	pathSize = path.size();
+		g.ComputePaths(source, graph, min_dist, previous);
+		path = g.GetShortest(1000, previous);
+		// Call this line when wanting to create an array for the path.
+		// This is just a test
+		pathSize = path.size();
 
 
 
 
 
-	//*************************************************************************
-	DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDIObject, NULL);
+		//*************************************************************************
+		DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDIObject, NULL);
 
-	m_pDIObject->CreateDevice(GUID_SysKeyboard, &m_pDIKeyboard, NULL); 
-	m_pDIObject->CreateDevice(GUID_SysMouse, &m_pDIMouse, NULL);
+		m_pDIObject->CreateDevice(GUID_SysKeyboard, &m_pDIKeyboard, NULL); 
+		m_pDIObject->CreateDevice(GUID_SysMouse, &m_pDIMouse, NULL);
 
-	m_pDIKeyboard->SetDataFormat(&c_dfDIKeyboard); 
-	m_pDIMouse->SetDataFormat(&c_dfDIMouse);
+		m_pDIKeyboard->SetDataFormat(&c_dfDIKeyboard); 
+		m_pDIMouse->SetDataFormat(&c_dfDIMouse);
 
-	m_pDIKeyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE); 
-	m_pDIMouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-	//##########################################SPEAKERS#############################
-	/*
-	Create a System object and initialize.
-	*/
-	result = FMOD::System_Create(&system);
-	result = system->getVersion(&version);
-	result = system->getNumDrivers(&numdrivers);
-	if (numdrivers == 0)
-	{
-		result = system->setOutput(FMOD_OUTPUTTYPE_NOSOUND);
-	}
-	else
-	{
-		result = system->getDriverCaps(0, &caps, 0, &speakermode);
+		m_pDIKeyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE); 
+		m_pDIMouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		//##########################################SPEAKERS#############################
 		/*
-		Set the user selected speaker mode.
+		Create a System object and initialize.
 		*/
-		if (caps & FMOD_CAPS_HARDWARE_EMULATED)
+		result = FMOD::System_Create(&system);
+		result = system->getVersion(&version);
+		result = system->getNumDrivers(&numdrivers);
+		if (numdrivers == 0)
 		{
+			result = system->setOutput(FMOD_OUTPUTTYPE_NOSOUND);
+		}
+		else
+		{
+			result = system->getDriverCaps(0, &caps, 0, &speakermode);
 			/*
-			The user has the 'Acceleration' slider set to off! This is really bad
-			for latency! You might want to warn the user about this.
+			Set the user selected speaker mode.
 			*/
-			result = system->setDSPBufferSize(1024, 10);
+			if (caps & FMOD_CAPS_HARDWARE_EMULATED)
+			{
+				/*
+				The user has the 'Acceleration' slider set to off! This is really bad
+				for latency! You might want to warn the user about this.
+				*/
+				result = system->setDSPBufferSize(1024, 10);
+			}
+			result = system->getDriverInfo(0, name, 256, 0);
+			if (strstr(name, "SigmaTel"))
+			{
+				/*
+				Sigmatel sound devices crackle for some reason if the format is PCM 16bit.
+				PCM floating point output seems to solve it.
+				*/
+				result = system->setSoftwareFormat(48000, FMOD_SOUND_FORMAT_PCMFLOAT, 0,0,
+					FMOD_DSP_RESAMPLER_LINEAR);
+			}
 		}
-		result = system->getDriverInfo(0, name, 256, 0);
-		if (strstr(name, "SigmaTel"))
-		{
-			/*
-			Sigmatel sound devices crackle for some reason if the format is PCM 16bit.
-			PCM floating point output seems to solve it.
-			*/
-			result = system->setSoftwareFormat(48000, FMOD_SOUND_FORMAT_PCMFLOAT, 0,0,
-				FMOD_DSP_RESAMPLER_LINEAR);
-		}
-	}
-	result = system->init(100, FMOD_INIT_NORMAL, 0);
-	if (result == FMOD_ERR_OUTPUT_CREATEBUFFER)
-	{
-		/*
-		Ok, the speaker mode selected isn't supported by this soundcard. Switch it
-		back to stereo...
-		*/
-		result = system->setSpeakerMode(FMOD_SPEAKERMODE_STEREO);
-		/*
-		... and re-init.
-		*/
 		result = system->init(100, FMOD_INIT_NORMAL, 0);
-	}
+		if (result == FMOD_ERR_OUTPUT_CREATEBUFFER)
+		{
+			/*
+			Ok, the speaker mode selected isn't supported by this soundcard. Switch it
+			back to stereo...
+			*/
+			result = system->setSpeakerMode(FMOD_SPEAKERMODE_STEREO);
+			/*
+			... and re-init.
+			*/
+			result = system->init(100, FMOD_INIT_NORMAL, 0);
+		}
 
-	result = system->createSound("drop.wav", FMOD_LOOP_OFF, 0, &Sounds[0]);
-	result = system->createSound("bomb.wav", FMOD_LOOP_OFF, 0, &Sounds[1]);
-	result = system->createSound("nope.wav", FMOD_LOOP_OFF, 0, &Sounds[2]);
-	result = system->createSound("play.wav", FMOD_LOOP_OFF, 0, &Sounds[3]);
-	result = system->createSound("select.wav", FMOD_LOOP_OFF, 0, &Sounds[4]);
-	result = system->createStream("song.wav", FMOD_LOOP_NORMAL | FMOD_2D, 0, &Sounds[5]);
+		result = system->createSound("drop.wav", FMOD_LOOP_OFF, 0, &Sounds[0]);
+		result = system->createSound("bomb.wav", FMOD_LOOP_OFF, 0, &Sounds[1]);
+		result = system->createSound("nope.wav", FMOD_LOOP_OFF, 0, &Sounds[2]);
+		result = system->createSound("play.wav", FMOD_LOOP_OFF, 0, &Sounds[3]);
+		result = system->createSound("select.wav", FMOD_LOOP_OFF, 0, &Sounds[4]);
+		result = system->createStream("song.wav", FMOD_LOOP_NORMAL | FMOD_2D, 0, &Sounds[5]);
 
-	system->playSound(FMOD_CHANNEL_FREE, Sounds[5], false, &SChannel[1]);
+		system->playSound(FMOD_CHANNEL_FREE, Sounds[5], false, &SChannel[1]);
 
-	for(int i = 0; i < 3; i++)
-		Buttons[i] = new Button;
+		for(int i = 0; i < 3; i++)
+			Buttons[i] = new Button;
 
-	Buttons[0]->Y = (D3Dpp.BackBufferHeight/2);
-	Buttons[0]->X = (D3Dpp.BackBufferWidth/2)-160;
-	Buttons[0]->Height = 32;
-	Buttons[0]->Width = 320;
-	Buttons[0]->CalcRECT();
-	Buttons[1]->Y = (D3Dpp.BackBufferHeight/2)+48;
-	Buttons[1]->X = (D3Dpp.BackBufferWidth/2)-160;
-	Buttons[1]->Height = 32;
-	Buttons[1]->Width = 320;
-	Buttons[1]->CalcRECT();
-	Buttons[2]->Y = (D3Dpp.BackBufferHeight/2)+88;
-	Buttons[2]->X = (D3Dpp.BackBufferWidth/2)-160;
-	Buttons[2]->Height = 32;
-	Buttons[2]->Width = 320;
-	Buttons[2]->CalcRECT();
+		Buttons[0]->Y = (D3Dpp.BackBufferHeight/2);
+		Buttons[0]->X = (D3Dpp.BackBufferWidth/2)-160;
+		Buttons[0]->Height = 32;
+		Buttons[0]->Width = 320;
+		Buttons[0]->CalcRECT();
+		Buttons[1]->Y = (D3Dpp.BackBufferHeight/2)+48;
+		Buttons[1]->X = (D3Dpp.BackBufferWidth/2)-160;
+		Buttons[1]->Height = 32;
+		Buttons[1]->Width = 320;
+		Buttons[1]->CalcRECT();
+		Buttons[2]->Y = (D3Dpp.BackBufferHeight/2)+88;
+		Buttons[2]->X = (D3Dpp.BackBufferWidth/2)-160;
+		Buttons[2]->Height = 32;
+		Buttons[2]->Width = 320;
+		Buttons[2]->CalcRECT();
 
 
-	TurnTimers[0] = 6.0f;
-	TurnTimers[1] = 3.0f;
-	TurnTimers[2] = 1.0f;
-	TurnTimers[3] = 0.5f;
-	TurnTimers[4] = 0.1f;
-	TurnTimerSelect = 0;
-	World.Reset();
+		TurnTimers[0] = 6.0f;
+		TurnTimers[1] = 3.0f;
+		TurnTimers[2] = 1.0f;
+		TurnTimers[3] = 0.5f;
+		TurnTimers[4] = 0.1f;
+		TurnTimerSelect = 0;
+		World.Reset();
 }
 
 void DXGame::Update(float dt)
@@ -724,7 +725,7 @@ void DXGame::Update(float dt)
 			options[2] = true;
 		}
 		LeftMouseDown = true;
-		
+
 		break;
 	case 1://#################################################################################################
 		RECT rect;
@@ -747,44 +748,44 @@ void DXGame::Update(float dt)
 			m_BoolBuf[DIK_SPACE] = false;
 		}	
 		if(Buffer[DIK_W] & 0x80){
-		//	if(!m_BoolBuf[DIK_W] ){
-				m_BoolBuf[DIK_W] = true;
-				//DO STUFF HERE
-				Pallette[0]->DeltaY += (32.0f*6)/mFPS;
-		//	}
+			//	if(!m_BoolBuf[DIK_W] ){
+			m_BoolBuf[DIK_W] = true;
+			//DO STUFF HERE
+			Pallette[0]->DeltaY += (32.0f*6)/mFPS;
+			//	}
 		}
 		//else
 		//{
 		//	m_BoolBuf[DIK_W] = false;
 		//}	
 		if(Buffer[DIK_S] & 0x80){
-		//	if(!m_BoolBuf[DIK_S] ){
-		//		m_BoolBuf[DIK_S] = true;
-				//DO STUFF HERE
-				Pallette[0]->DeltaY -= (32.0f*6)/mFPS;
-		//	}
+			//	if(!m_BoolBuf[DIK_S] ){
+			//		m_BoolBuf[DIK_S] = true;
+			//DO STUFF HERE
+			Pallette[0]->DeltaY -= (32.0f*6)/mFPS;
+			//	}
 		}
 		//else
 		//{
 		//	m_BoolBuf[DIK_S] = false;
 		//}
 		if(Buffer[DIK_A] & 0x80){
-		//	if(!m_BoolBuf[DIK_A] ){
-		//		m_BoolBuf[DIK_A] = true;
-				//DO STUFF HERE
-				Pallette[0]->DeltaX += (32.0f*6)/mFPS;
-		//	}
+			//	if(!m_BoolBuf[DIK_A] ){
+			//		m_BoolBuf[DIK_A] = true;
+			//DO STUFF HERE
+			Pallette[0]->DeltaX += (32.0f*6)/mFPS;
+			//	}
 		}
 		//else
 		//{
 		//	m_BoolBuf[DIK_A] = false;
 		//}
 		if(Buffer[DIK_D] & 0x80 ){
-		//	if(!m_BoolBuf[DIK_D]){
-		//		m_BoolBuf[DIK_D] = true;
-				//DO STUFF HERE
-				Pallette[0]->DeltaX -= (32.0f*6)/mFPS;
-		//	}
+			//	if(!m_BoolBuf[DIK_D]){
+			//		m_BoolBuf[DIK_D] = true;
+			//DO STUFF HERE
+			Pallette[0]->DeltaX -= (32.0f*6)/mFPS;
+			//	}
 		}
 		//else
 		//{
@@ -870,7 +871,7 @@ void DXGame::Update(float dt)
 					m_PlayerArmyView = m_Player->NumMaxArmies-1;
 				else
 					m_PlayerArmyView--;
-				
+
 			}
 		}
 		else
@@ -885,7 +886,7 @@ void DXGame::Update(float dt)
 					m_PlayerArmyView = 0;
 				else
 					m_PlayerArmyView++;
-				
+
 			}
 		}
 		else
@@ -900,7 +901,7 @@ void DXGame::Update(float dt)
 					PageView = 3;
 				else
 					PageView--;
-				
+
 			}
 		}
 		else
@@ -915,7 +916,7 @@ void DXGame::Update(float dt)
 					PageView = 0;
 				else
 					PageView++;
-				
+
 			}
 		}
 		else
@@ -975,7 +976,7 @@ void DXGame::Update(float dt)
 						//If the province ownership is the same as the current nation
 						if(j == World.getProv(i).m_NationID)
 							//Increment by the provinces tax value
-							Nations[j]->Treasury+=World.getProv(i).mTax;
+								Nations[j]->Treasury+=World.getProv(i).mTax;
 					}
 				}
 			}
@@ -1045,7 +1046,7 @@ void DXGame::Update(float dt)
 					EventQueue.pop();
 				}
 		}
-		
+
 
 
 		break;
@@ -1104,7 +1105,7 @@ void DXGame::Render()//RENDER
 	m_pD3DDevice->Clear(0,0,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,D3DCOLOR_ARGB(0,0,0,0), 1,0);
 	// Clear the back buffer, call BeginScene()
 	m_pD3DDevice->BeginScene();
-	
+
 	std::string UI;
 	char c_hlder[256];
 	switch(State){
@@ -1160,9 +1161,9 @@ void DXGame::Render()//RENDER
 				D3DCOLOR_ARGB(255, 255, 255, 255));
 		}
 
-		
+
 		m_pD3DSprite->Begin(D3DXSPRITE_ALPHABLEND);
-		
+
 
 		D3DXMatrixTranslation(&m_MatrixTran2,m_Mousex ,m_Mousey ,0);
 		D3DXMatrixRotationZ(&m_MatrixRot, 0.0f);
@@ -1182,7 +1183,7 @@ void DXGame::Render()//RENDER
 		// Matrix Transformations to control sprite position, scale, and rotate
 		// Set these matrices for each object you want to render to the screen
 		//////////////////////////////////////////////////////////////////////////
-		
+
 
 
 
@@ -1238,145 +1239,145 @@ void DXGame::Render()//RENDER
 					ltoa(World.getProv(MouseOnWho).y,x,10);
 				}
 
-		m_pD3DFont->DrawTextA(0, fps, -1, &rect,
-			DT_BOTTOM | DT_LEFT | DT_NOCLIP, 
-			D3DCOLOR_ARGB(255, 255, 255, 255));
-		m_pD3DFont->DrawTextA(0, test.c_str(), -1, &rect,
-			DT_TOP | DT_LEFT | DT_NOCLIP, 
-			D3DCOLOR_ARGB(255, 255, 255, 255));
-		m_pD3DFont->DrawTextA(0, x, -1, &rect,
-			DT_BOTTOM | DT_RIGHT | DT_NOCLIP, 
-			D3DCOLOR_ARGB(255, 255, 255, 255));
-		m_pD3DFont->DrawTextA(0, y, -1, &rect,
-			DT_TOP | DT_RIGHT | DT_NOCLIP, 
-			D3DCOLOR_ARGB(255, 255, 255, 255));
+				m_pD3DFont->DrawTextA(0, fps, -1, &rect,
+					DT_BOTTOM | DT_LEFT | DT_NOCLIP, 
+					D3DCOLOR_ARGB(255, 255, 255, 255));
+				m_pD3DFont->DrawTextA(0, test.c_str(), -1, &rect,
+					DT_TOP | DT_LEFT | DT_NOCLIP, 
+					D3DCOLOR_ARGB(255, 255, 255, 255));
+				m_pD3DFont->DrawTextA(0, x, -1, &rect,
+					DT_BOTTOM | DT_RIGHT | DT_NOCLIP, 
+					D3DCOLOR_ARGB(255, 255, 255, 255));
+				m_pD3DFont->DrawTextA(0, y, -1, &rect,
+					DT_TOP | DT_RIGHT | DT_NOCLIP, 
+					D3DCOLOR_ARGB(255, 255, 255, 255));
 
-		rect = Pallette[1]->Me;
-		rect.bottom -= 16;
-		rect.top += 16;
-		rect.left += 16;
-		rect.right -= 16;
-		if(m_Player){
-			m_pD3DFont->DrawTextA(0, m_Player->m_Name.c_str(), -1, &rect,
-				DT_TOP | DT_LEFT | DT_NOCLIP, 
-				m_Player->m_Flag);
-			UI.append("\n\n\n");
-			UI.append(Calender.PrintDate());
-			UI.append("\n");
-			if(!Paused)
-				for(int i = 0; i < TurnTimerSelect+1;i++){
-					UI.append("+");
+				rect = Pallette[1]->Me;
+				rect.bottom -= 16;
+				rect.top += 16;
+				rect.left += 16;
+				rect.right -= 16;
+				if(m_Player){
+					m_pD3DFont->DrawTextA(0, m_Player->m_Name.c_str(), -1, &rect,
+						DT_TOP | DT_LEFT | DT_NOCLIP, 
+						m_Player->m_Flag);
+					UI.append("\n\n\n");
+					UI.append(Calender.PrintDate());
+					UI.append("\n");
+					if(!Paused)
+						for(int i = 0; i < TurnTimerSelect+1;i++){
+							UI.append("+");
+						}
+					else
+						UI.append("PAUSED");
+					switch(PageView){
+					case Econ:
+						UI.append("\n\nECONOMY:\n");
+						UI.append("Treasury: ");
+						ltoa((int)m_Player->Treasury,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append("\nManpower: ");
+						ltoa((int)m_Player->Manpower,c_hlder,10);
+						UI.append(c_hlder);
+						break;
+					case Tech: 
+						UI.append("\n\nTECHNOLOGY:\n");
+						UI.append("Land Tech: ");
+						ltoa(m_Player->m_LandTech,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \nSea Tech: ");
+						ltoa(m_Player->m_SeaTech,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \nEconomy Tech: ");
+						ltoa(m_Player->m_EconomyTech,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append("\n\n\n\n");
+						break;
+					case War:
+						UI.append("\n\nWar\n\n");
+						UI.append("At War With:\n");
+						if(m_Player->WarManager.NumHeld != 0)
+							for(int i = 0; i < m_Player->WarManager.NumHeld; i++){
+								UI.append(m_Player->WarManager.get(i)->m_Name.c_str());
+								UI.append("\n");}
+						else
+							UI.append("No One");
+
+						UI.append(" \n\nWarExhaustion: ");
+						ltoa((int)m_Player->WarExhaustion,c_hlder,10);
+						UI.append(c_hlder);
+						break;
+					case Military:
+						UI.append("\n\nARMY:\n");
+						UI.append(" \nAttack: ");
+						ltoa(m_Player->ArmyAtk,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \nDefence: ");
+						ltoa(m_Player->ArmyDef,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \nMorale Attack: ");
+						ltoa(m_Player->ArmyMAtk,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \nMorale Defence: ");
+						ltoa(m_Player->ArmyMDef,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \nMax Morale: ");
+						ltoa(m_Player->ArmyMaxMorale,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \n\nARMIES: ");
+						UI.append(" \nArmy #: ");
+						ltoa(m_PlayerArmyView,c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \nTroop Count: ");
+						ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTroops(),c_hlder,10);
+						UI.append(c_hlder);
+						UI.append(" \nMorale: ");
+						ltoa((long)(m_Player->m_ArmyList.get(m_PlayerArmyView)->getMorale()*100),c_hlder,10);
+						UI.append(c_hlder);
+						if(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()){
+							UI.append(" \nIN COMBAT");
+							UI.append(" \nRoll: ");
+							ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getDie(),c_hlder,10);
+							UI.append(c_hlder);
+							UI.append(" \nEnemy Trp Cnt: ");
+							ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getTroops(),c_hlder,10);
+							UI.append(c_hlder);
+							UI.append(" \nEnemy Morale: ");
+							ltoa((long)(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getMorale()*100),c_hlder,10);
+							UI.append(c_hlder);
+							UI.append(" \nEnemy Roll: ");
+							ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getDie(),c_hlder,10);
+							UI.append(c_hlder);
+						}
+						break;
+					}
+
+					m_pD3DFontSmall->DrawTextA(0, UI.c_str(), -1, &rect,
+						DT_TOP | DT_LEFT | DT_NOCLIP, 
+						D3DCOLOR_ARGB(255, 200, 255, 255));
 				}
-			else
-				UI.append("PAUSED");
-			switch(PageView){
-			case Econ:
-				UI.append("\n\nECONOMY:\n");
-				UI.append("Treasury: ");
-				ltoa((int)m_Player->Treasury,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append("\nManpower: ");
-				ltoa((int)m_Player->Manpower,c_hlder,10);
-				UI.append(c_hlder);
+				m_pD3DSprite->Begin(D3DXSPRITE_ALPHABLEND);
+
+				D3DXMatrixTranslation(&m_MatrixTran2,m_Mousex ,m_Mousey ,0);
+				D3DXMatrixRotationZ(&m_MatrixRot, 0.0f);
+				D3DXMatrixScaling(&m_MatrixScale, 1, 1, 0);
+				m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
+
+				m_pD3DSprite->SetTransform(&m_Matrix);
+				m_pD3DSprite->Draw(Pallette[1]->m_Textures[1],0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR_ARGB(255,255,255,255));
+
+
+				m_pD3DSprite->End();
+
+
 				break;
-			case Tech: 
-				UI.append("\n\nTECHNOLOGY:\n");
-				UI.append("Land Tech: ");
-				ltoa(m_Player->m_LandTech,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \nSea Tech: ");
-				ltoa(m_Player->m_SeaTech,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \nEconomy Tech: ");
-				ltoa(m_Player->m_EconomyTech,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append("\n\n\n\n");
-				break;
-			case War:
-				UI.append("\n\nWar\n\n");
-				UI.append("At War With:\n");
-				if(m_Player->WarManager.NumHeld != 0)
-					for(int i = 0; i < m_Player->WarManager.NumHeld; i++){
-						UI.append(m_Player->WarManager.get(i)->m_Name.c_str());
-						UI.append("\n");}
-				else
-					UI.append("No One");
-				
-				UI.append(" \n\nWarExhaustion: ");
-				ltoa((int)m_Player->WarExhaustion,c_hlder,10);
-				UI.append(c_hlder);
-				break;
-			case Military:
-				UI.append("\n\nARMY:\n");
-				UI.append(" \nAttack: ");
-				ltoa(m_Player->ArmyAtk,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \nDefence: ");
-				ltoa(m_Player->ArmyDef,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \nMorale Attack: ");
-				ltoa(m_Player->ArmyMAtk,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \nMorale Defence: ");
-				ltoa(m_Player->ArmyMDef,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \nMax Morale: ");
-				ltoa(m_Player->ArmyMaxMorale,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \n\nARMIES: ");
-				UI.append(" \nArmy #: ");
-				ltoa(m_PlayerArmyView,c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \nTroop Count: ");
-				ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTroops(),c_hlder,10);
-				UI.append(c_hlder);
-				UI.append(" \nMorale: ");
-				ltoa((long)(m_Player->m_ArmyList.get(m_PlayerArmyView)->getMorale()*100),c_hlder,10);
-				UI.append(c_hlder);
-				if(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()){
-					UI.append(" \nIN COMBAT");
-					UI.append(" \nRoll: ");
-					ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getDie(),c_hlder,10);
-					UI.append(c_hlder);
-					UI.append(" \nEnemy Trp Cnt: ");
-					ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getTroops(),c_hlder,10);
-					UI.append(c_hlder);
-					UI.append(" \nEnemy Morale: ");
-					ltoa((long)(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getMorale()*100),c_hlder,10);
-					UI.append(c_hlder);
-					UI.append(" \nEnemy Roll: ");
-					ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getTarget()->getDie(),c_hlder,10);
-					UI.append(c_hlder);
-				}
-				break;
-			}
-
-			m_pD3DFontSmall->DrawTextA(0, UI.c_str(), -1, &rect,
-				DT_TOP | DT_LEFT | DT_NOCLIP, 
-				D3DCOLOR_ARGB(255, 200, 255, 255));
-		}
-		m_pD3DSprite->Begin(D3DXSPRITE_ALPHABLEND);
-
-		D3DXMatrixTranslation(&m_MatrixTran2,m_Mousex ,m_Mousey ,0);
-		D3DXMatrixRotationZ(&m_MatrixRot, 0.0f);
-		D3DXMatrixScaling(&m_MatrixScale, 1, 1, 0);
-		m_Matrix = (m_MatrixScale*m_MatrixRot*m_MatrixTran2);
-
-		m_pD3DSprite->SetTransform(&m_Matrix);
-		m_pD3DSprite->Draw(Pallette[1]->m_Textures[1],0,&D3DXVECTOR3(0,0,0),&D3DXVECTOR3(0,0,0),D3DCOLOR_ARGB(255,255,255,255));
-
-
-		m_pD3DSprite->End();
-
-
-		break;
 	case 2:
 		GetWindowRect(m_hWnd, &rect);
 		rect.top = 0;
 		rect.left = 0;
 		rect.right = D3Dpp.BackBufferWidth;
 		rect.bottom = D3Dpp.BackBufferHeight;
-		
+
 		break;
 	case 3:
 		GetWindowRect(m_hWnd, &rect);
@@ -1443,16 +1444,16 @@ void DXGame::Shutdown()
 		if(Pallette[i]){
 			delete Pallette[i];
 			Pallette[i]=0;}
-	//*************************************************************************
-	//Sound
-	World.~WorldMap();
-	for(int i =0; i < 6; i++)
-		if(Sounds[i]){
-			result = Sounds[i]->release();
-			Sounds[i] = 0;
-		}
-    result = system->close();
-    result = system->release();
+		//*************************************************************************
+		//Sound
+		World.~WorldMap();
+		for(int i =0; i < 6; i++)
+			if(Sounds[i]){
+				result = Sounds[i]->release();
+				Sounds[i] = 0;
+			}
+			result = system->close();
+			result = system->release();
 }
 
 void DXGame::AIProcess(){
@@ -1475,78 +1476,90 @@ void DXGame::AIProcess(){
 				World.Reset();
 				ProvHld = &World.getProv(ArmyManager.get(i)->getProvID());
 				//set up all the ProvAIs and pass them off to Queue
-					//use initial ProbHld capture later for direction
-					//for loop through neighbors giving them initial direction
-				for(int j = 0; j < 6 ; j++){
-					PRAI = new ProvAI();
-					PRAI->Prov = &World.getProv(ProvHld->connections[j]);
-					PRAI->Direction = j;
+				//use initial ProbHld capture later for direction
+				//for loop through neighbors giving them initial direction
+				if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getState() == Army::War){
 					
-
-					if(PRAI->Prov->mID > -1)
-						MovementQueue.push(*PRAI);
-					delete PRAI;
+					Temp = PathToTarget(ArmyManager.get(i)->getProvID(),Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getProvID());
+					
+					ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[Temp]);
+					ArmyManager.get(i)->Orders.Direction = Temp;
+					while(!MovementQueue.empty())
+						MovementQueue.pop();
+					break;
 				}
+				else{
+					for(int j = 0; j < 6 ; j++){
+						PRAI = new ProvAI();
+						PRAI->Prov = &World.getProv(ProvHld->connections[j]);
+						PRAI->Direction = j;
 
-				for(int j = 0; j < MovementQueue.size(); j++){
-					if(World.getProv(MovementQueue.front().Prov->mID).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
 
-						//give to army and pop Movement Queue
-						ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[MovementQueue.front().Direction]);
-						ArmyManager.get(i)->Orders.Direction = MovementQueue.front().Direction;
-						while(!MovementQueue.empty())
-							MovementQueue.pop();
-						break;
+						if(PRAI->Prov->mID > -1)
+							MovementQueue.push(*PRAI);
+						delete PRAI;
 					}
-					MovementQueue.push(MovementQueue.front());
-					MovementQueue.pop();
-				}
+
+					for(int j = 0; j < MovementQueue.size(); j++){
+						if(World.getProv(MovementQueue.front().Prov->mID).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
+
+							//give to army and pop Movement Queue
+							ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[MovementQueue.front().Direction]);
+							ArmyManager.get(i)->Orders.Direction = MovementQueue.front().Direction;
+							while(!MovementQueue.empty())
+								MovementQueue.pop();
+							break;
+						}
+						MovementQueue.push(MovementQueue.front());
+						MovementQueue.pop();
+					}
 
 					//while loop should instead get first Queue's ProvAI and use that/should do while not empty
-				while(!MovementQueue.empty()){
-					for(int j = 0; j < 6; j++){//cycle neighbors
-						if(MovementQueue.front().Prov->connections[j] != -1)//is not off map
-							if(World.getProv(MovementQueue.front().Prov->connections[j]).Set == false){//has not been here yet
-								if(World.getProv(ProvHld->connections[j]).m_NationID == ArmyManager.get(i)->getNationID()){//if my nation i can walk on it
-									//push onto queue as new ProvAI with same direction
-									PRAI = new ProvAI();
-									PRAI->Direction = MovementQueue.front().Direction;
-									PRAI->Prov = &World.getProv(MovementQueue.front().Prov->connections[j]);
-									MovementQueue.push(*PRAI);
-									delete PRAI;
-									World.getProv(MovementQueue.front().Prov->connections[j]).Set = true;
+					while(!MovementQueue.empty()){
+						for(int j = 0; j < 6; j++){//cycle neighbors
+							if(MovementQueue.front().Prov->connections[j] != -1)//is not off map
+								if(World.getProv(MovementQueue.front().Prov->connections[j]).Set == false){//has not been here yet
+									if(World.getProv(ProvHld->connections[j]).m_NationID == ArmyManager.get(i)->getNationID()){//if my nation i can walk on it
+										//push onto queue as new ProvAI with same direction
+										PRAI = new ProvAI();
+										PRAI->Direction = MovementQueue.front().Direction;
+										PRAI->Prov = &World.getProv(MovementQueue.front().Prov->connections[j]);
+										MovementQueue.push(*PRAI);
+										delete PRAI;
+										World.getProv(MovementQueue.front().Prov->connections[j]).Set = true;
+									}
+									if(World.getProv(MovementQueue.front().Prov->connections[j]).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
+
+										//give to army and pop Movement Queue
+										ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[MovementQueue.front().Direction]);
+										ArmyManager.get(i)->Orders.Direction = MovementQueue.front().Direction;
+										while(!MovementQueue.empty())
+											MovementQueue.pop();
+										break;
+									}
 								}
-								if(World.getProv(MovementQueue.front().Prov->connections[j]).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
-									
-									//give to army and pop Movement Queue
-									ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[MovementQueue.front().Direction]);
-									ArmyManager.get(i)->Orders.Direction = MovementQueue.front().Direction;
-									while(!MovementQueue.empty())
-										MovementQueue.pop();
-									break;
-								}
-							}
+						}
+						if(!MovementQueue.empty())
+							MovementQueue.pop();
 					}
-					if(!MovementQueue.empty())
-						MovementQueue.pop();
+					World.Reset();
 				}
-				World.Reset();
-			break;
-	case Army::Retreat:
+				break;
+			case Army::Retreat:
 
-		if((Going = PathToTarget(ArmyManager.get(i)->getProvID(),Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID)) > -1)
-			ArmyManager.get(i)->Orders.Prov = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Going]);
-		break;
-
+				if((Going = PathToTarget(ArmyManager.get(i)->getProvID(),Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID)) > -1)
+					ArmyManager.get(i)->Orders.Prov = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Going]);
+				break;
 
 
 
+
+			}
 		}
+
+
+
 	}
-
-
-
-}
 }
 
 int DXGame::PathToTarget(int Start,int Target){
@@ -1569,14 +1582,9 @@ int DXGame::PathToTarget(int Start,int Target){
 	}
 
 	for(int j = 0; j < MovementQueue.size(); j++){
-		if(World.getProv(MovementQueue.front().Prov->mID).m_NationID == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->NationalID){//is finally on nation at war
+		if(World.getProv(MovementQueue.front().Prov->mID).mID == Target){
 
-			//give to army and pop Movement Queue
-			ArmyManager.get(i)->Orders.Prov = &World.getProv(ProvHld->connections[MovementQueue.front().Direction]);
-			ArmyManager.get(i)->Orders.Direction = MovementQueue.front().Direction;
-			while(!MovementQueue.empty())
-				MovementQueue.pop();
-			break;
+			return MovementQueue.front().Direction;
 		}
 		MovementQueue.push(MovementQueue.front());
 		MovementQueue.pop();
@@ -1587,7 +1595,14 @@ int DXGame::PathToTarget(int Start,int Target){
 		for(int j = 0; j < 6; j++){//cycle neighbors
 			if(MovementQueue.front().Prov->connections[j] != -1)//is not off map
 				if(World.getProv(MovementQueue.front().Prov->connections[j]).Set == false){//has not been here yet
-					if(World.getProv(ProvHld->connections[j]).m_NationID == ArmyManager.get(i)->getNationID()){//if my nation i can walk on it
+
+					if(World.getProv(MovementQueue.front().Prov->connections[j]).mID == Target){
+
+						//give to army and pop Movement Queue
+						return PRAI->Direction;
+						break;
+					}
+					else{
 						//push onto queue as new ProvAI with same direction
 						PRAI = new ProvAI();
 						PRAI->Direction = MovementQueue.front().Direction;
@@ -1595,12 +1610,6 @@ int DXGame::PathToTarget(int Start,int Target){
 						MovementQueue.push(*PRAI);
 						delete PRAI;
 						World.getProv(MovementQueue.front().Prov->connections[j]).Set = true;
-					}
-					if(World.getProv(MovementQueue.front().Prov->connections[j]).mID == Target){
-
-						//give to army and pop Movement Queue
-						return PRAI->Direction;
-						break;
 					}
 				}
 		}
