@@ -15,6 +15,8 @@ private:
 	bool Moving;
 	bool isPlayers;
 
+	int PlayerProvTarget;
+
 	int NationalID;
 
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
@@ -53,9 +55,13 @@ public:
 	int getNationID(){		return NationID;};
 	int getNationalID(){ return NationalID;};
 	int getState(){return m_State;};
+	int getPlayerProvTarget(){return PlayerProvTarget;};
+	bool getisPlayers(){return isPlayers;};
 	void setNationID(int NationID){this->NationID = NationID;};
 	void setState(int a_State){this->m_State = a_State;};
 	void setNationalID(int ID){this->NationalID = ID;};
+	void setisPlayers(bool is){this->isPlayers = is;};
+	void setPlayerProvTarget(int tar){this->PlayerProvTarget = tar;};
 	//COMBAT
 	//performs a single round of combat against an army
 	void CombatRound(Army*);

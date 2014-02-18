@@ -5,6 +5,8 @@ Army::Army():m_techLvl(0),m_numInf(3), m_numCav(2), m_numArt(1),m_morale(1.0),Nu
 {
 	Target = NULL;
 	ProvID = 0;
+	PlayerProvTarget = -1;
+	isPlayers = false;
 }
 
 void Army::setNation(DWORD n)
