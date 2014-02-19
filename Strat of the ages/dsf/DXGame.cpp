@@ -827,6 +827,7 @@ void DXGame::Update(float dt)
 		{
 			m_BoolBuf[DIK_BACKSPACE] = false;
 		}
+		// To purchase tech upgrades
 		if(Buffer[DIK_P] & 0x80){
 			if(!m_BoolBuf[DIK_P]){
 				m_BoolBuf[DIK_P] = true;
@@ -1034,7 +1035,34 @@ void DXGame::Update(float dt)
 						//Increment by the provinces tax and manpower value
 						Nations[j]->Treasury+=Nations[j]->ProvinceList.get(i)->mTax;
 						Nations[j]->Manpower+=Nations[j]->ProvinceList.get(i)->mManpower;
-
+					}
+					//#################Reduction of Treasury and Manpower#####################
+					// Manpower gets reduced by 10% base per month with a chance based on each of its armies' morale (base 15%, lower with higher morale than 1, higher with lower morale than 1)
+					// to get reduced by an extra 20%
+					// Bonus Calculation done below to save computation time
+					Nations[j]->Manpower*=0.9;
+					// Treasury gets reduced based on armies
+					for(int i = 0; i < ArmyManager.NumHeld; ++i)
+					{
+						// Reduced cost of ownership for a smaller sized nation than a higher one.
+						if(ArmyManager.get(i)->getNationID() == Nations[j]->NationalID)
+						{
+							if(Nations[j]->ProvinceList.NumHeld < 100)
+							{
+								Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.3);
+							}
+							else
+							{
+								Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.4);
+							}
+							if(ArmyManager.get(i)->getMorale() >= 0)
+							{
+								if(rand()%100 < (15*(1/ArmyManager.get(i)->getMorale())))
+								{
+									Nations[j]->Manpower*=0.8;
+								}
+							}
+						}
 					}
 				}
 			}
