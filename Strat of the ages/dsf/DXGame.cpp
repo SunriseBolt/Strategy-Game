@@ -525,9 +525,11 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		result = system->createSound("nope.wav", FMOD_LOOP_OFF, 0, &Sounds[2]);
 		result = system->createSound("play.wav", FMOD_LOOP_OFF, 0, &Sounds[3]);
 		result = system->createSound("select.wav", FMOD_LOOP_OFF, 0, &Sounds[4]);
-		result = system->createStream("song.wav", FMOD_LOOP_NORMAL | FMOD_2D, 0, &Sounds[5]);
+		result = system->createStream("DST-BattleLands.mp3", FMOD_LOOP_NORMAL | FMOD_2D, 0, &Sounds[5]);
 
 		system->playSound(FMOD_CHANNEL_FREE, Sounds[5], false, &SChannel[1]);
+
+		SChannel[1]->setVolume(0.15f);
 
 		for(int i = 0; i < 3; i++)
 			Buttons[i] = new Button;
