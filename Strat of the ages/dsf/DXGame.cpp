@@ -1795,3 +1795,15 @@ void DXGame::ArmyBuy(int a_nation)
 	}
 	Nations[a_nation]->m_ArmyList.Add(t_Army);
 }
+
+void DXGame::SwapProvince(int Prov, int Target){
+	Province* TarProv = &World.getProv(Prov);
+	for(int i = 0; i < Nations[TarProv->m_NationID]->ProvinceList.NumHeld; i++){
+		if(Nations[TarProv->m_NationID]->ProvinceList.get(i) == TarProv)
+			Nations[TarProv->m_NationID]->ProvinceList.Subtract(i);
+	}
+
+	Nations[Target]->ProvinceList.Add(TarProv);
+	TarProv->m_NationID = Target;
+	
+}
