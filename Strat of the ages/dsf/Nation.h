@@ -21,7 +21,6 @@ struct Nation{
 	float WarExhaustion;
 
 	Manager<Province> ProvinceList;
-	int upgradeCost;
 	int NationalID;
 	int m_CapitalID;
 
@@ -29,6 +28,17 @@ struct Nation{
 	int m_SeaTech;
 	int m_EconomyTech;
 	bool isUser;
+
+	//Monetary Costs
+	int upgradeCost;
+	int ArmyCostMoney;
+	int ArmyCostMen;
+	int InfCostMoney;
+	int InfCostMen;
+	int CavCostMoney;
+	int CavCostMen;
+	int ArtCostMoney;
+	int ArtCostMen;
 
 	//Unit Stats
 	float ArmyAtk;
@@ -54,7 +64,14 @@ struct Nation{
 		ArmyMDef = 1;
 		ArmyMaxMorale = 1.0;
 		isUser = false;
-
+		ArmyCostMoney = 10000;
+		ArmyCostMen = 1000;
+		InfCostMoney = 50;
+		InfCostMen = 100;
+		CavCostMoney = 200;
+		CavCostMen = 200;
+		ArtCostMoney = 200;
+		ArtCostMen = 50;
 	}
 	
 	Nation(string a_Name,int A, int R, int G,int B):m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1),Treasury(100.0f),Manpower(1000.0f),NationalID(0){
@@ -68,7 +85,8 @@ struct Nation{
 		ArmyMDef = 0;
 		ArmyMaxMorale = 1.0;
 		isUser = false;
-
+		ArmyCostMoney = 10000;
+		ArmyCostMen = 1000;
 	}
 
 	void UpdateUnitStats(){
