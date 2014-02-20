@@ -16,7 +16,7 @@ void Army::setNation(DWORD n)
 
 bool Army::moveTo(int prov)
 {
-	if(ProvID > -1){
+	if(prov > -1 && prov < 10000){
 		ProvID = prov;
 		Moving = false;
 		return false;}
@@ -62,6 +62,14 @@ void Army::CombatRound(Army* Enemy){
 	if(this->m_morale < 0){
 		this->m_State = Retreat;
 		this->m_morale = 0.0f;
+	}
+	if(Enemy->NumTroops > Enemy->NumMaxTroops)
+	{
+		this->NumTroops = Enemy->NumMaxTroops;
+	}
+	if(this->NumTroops > NumMaxTroops)
+	{
+		this->NumTroops = NumMaxTroops;
 	}
 
 }

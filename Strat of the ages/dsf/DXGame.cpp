@@ -1160,8 +1160,6 @@ void DXGame::Update(float dt)
 							ArmyManager.get(i)->setMoving(true);
 						}
 
-				}
-				for(int i = 0; i < ArmyManager.NumHeld; i++){
 					if(ArmyManager.get(i)->getState() == Army::War){//only find targets if at war
 						for(int j = 0; j < ArmyManager.NumHeld;j++){//finding targets
 							if(	i != j &&	//##############################################################//Not the same Army
@@ -1181,8 +1179,8 @@ void DXGame::Update(float dt)
 					if(ArmyManager.get(i)->getTarget()){
 						ArmyManager.get(i)->CombatRound(ArmyManager.get(i)->getTarget());
 					}
-				//resetting after retreating to capital
-					if(ArmyManager.get(i)->getState() == Army::Retreat && ArmyManager.get(i)->getProvID() == Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID)
+					//resetting after retreating to capital
+					if(ArmyManager.get(i)->getState() == Army::Retreat && ArmyManager.get(i)->getProvID() == Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID  && ArmyManager.get(i)->getTroops() > (ArmyManager.get(i)->getMax()/2.0f))
 					{
 						if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.NumHeld != 0)
 							ArmyManager.get(i)->setState(Army::War);
@@ -1190,8 +1188,9 @@ void DXGame::Update(float dt)
 							ArmyManager.get(i)->setState(Army::Peace);
 					}
 
-
-
+					if(!(rand()%10))//1 in 10 chance
+						if(!ArmyManager.get(i)->getisPlayers())
+							TroopBuy(ArmyManager.get(i));
 					
 				}
 
@@ -1218,6 +1217,22 @@ void DXGame::Update(float dt)
 
 						EventQueue.pop();
 					}
+
+
+					for(int i = 0; i < 100; i++){
+						for(int j = 0; j < ArmyManager.NumHeld;j++){
+							if(Nations[i]->NationalID != ArmyManager.get(j)->getNationID() && Nations[i]->m_CapitalID == ArmyManager.get(j)->getProvID() && rand()%Nations[i]->ProvinceList.NumHeld)
+								Nations[i]->m_CapitalID = Nations[i]->ProvinceList.get(rand()%Nations[i]->ProvinceList.NumHeld)->mID;
+						}
+
+						if(!Nations[i]->isUser){
+							ArmyBuy(Nations[i]->NationalID);
+						}
+
+					}
+
+
+
 			}
 
 
