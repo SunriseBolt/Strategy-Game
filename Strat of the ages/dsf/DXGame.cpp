@@ -822,7 +822,7 @@ void DXGame::Update(float dt)
 		{
 			m_BoolBuf[DIK_BACKSPACE] = false;
 		}
-		// To purchase tech upgrades
+		// To purchase tech upgrades (Player side)
 		if(Buffer[DIK_P] & 0x80){
 			if(!m_BoolBuf[DIK_P]){
 				m_BoolBuf[DIK_P] = true;
@@ -851,10 +851,25 @@ void DXGame::Update(float dt)
 		{
 			m_BoolBuf[DIK_P] = false;
 		}
+		// Buying new armies (Player side)
 		if(Buffer[DIK_O] & 0x80){
 			if(!m_BoolBuf[DIK_O]){
 				m_BoolBuf[DIK_O] = true;
+				for(int i = 0; i < 100; ++i)
+				{
+					if(Nations[i]->isUser)
+					{
+						/////////////////////////////////////////////////
+						// TODO: Change army buy cost from a magic number
+						/////////////////////////////////////////////////
+						if(Nations[i]->Treasury >= 10000 && Nations[i]->Manpower >= 1000)
+						{
+							ArmyBuy(Nations[i]->NationalID);
+						}
+					}
+				}
 				//DO STUFF HERE
+
 			}
 		}
 		else
@@ -1034,7 +1049,7 @@ void DXGame::Update(float dt)
 						Nations[j]->Manpower+=Nations[j]->ProvinceList.get(i)->mManpower;
 					}
 					//#################Reduction of Treasury and Manpower#####################
-					// Manpower gets reduced by 10% base per month with a chance based on each of its armies' morale (base 15%, lower with higher morale than 1, higher with lower morale than 1)
+					// Manpower gets reduced by 10% base per month with a chance based on each of its armies' morale (base 12%, lower with higher morale than 1, higher with lower morale than 1)
 					// to get reduced by an extra 20%
 					// Bonus Calculation done below to save computation time
 					Nations[j]->Manpower*=0.9;
@@ -1044,9 +1059,13 @@ void DXGame::Update(float dt)
 						// Reduced cost of ownership for a smaller sized nation than a higher one.
 						if(ArmyManager.get(i)->getNationID() == Nations[j]->NationalID)
 						{
-							if(Nations[j]->ProvinceList.NumHeld < 100)
+							if(Nations[j]->ProvinceList.NumHeld < 50)
 							{
-								Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.3);
+								Nations[j]->Treasury-((ArmyManager.get(i)->getTroops()) * 0.1);
+							}
+							else if(Nations[j]->ProvinceList.NumHeld < 100 && Nations[j]->ProvinceList.NumHeld > 50)
+							{
+								Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.2);
 							}
 							else
 							{
@@ -1760,4 +1779,19 @@ void DXGame::DeclareWar(int Me,int Target){
 	}
 	else
 		Check = false;
+}
+
+void DXGame::ArmyBuy(int a_nation)
+{
+	Army* t_Army = new Army;
+	t_Army->setState(Army::Peace);
+	t_Army->SetCombatVal(Nations[a_nation]->ArmyAtk,Nations[a_nation]->ArmyDef,Nations[a_nation]->ArmyMAtk,Nations[a_nation]->ArmyMDef,Nations[a_nation]->ArmyMaxMorale);
+	t_Army->moveTo(Nations[a_nation]->m_CapitalID);
+	t_Army->setNationID(Nations[a_nation]->NationalID);
+	t_Army->setNationalID(Nations[a_nation]->m_ArmyList.NumHeld);
+	if(Nations[a_nation]->isUser)
+	{
+		t_Army->setisPlayers(true);
+	}
+	Nations[a_nation]->m_ArmyList.Add(t_Army);
 }
