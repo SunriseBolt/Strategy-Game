@@ -36,7 +36,7 @@ DXGame::DXGame(void){
 	MouseOnWho = -1;
 	PageView = Econ;
 	Paused = false;
-
+	initialize = false;
 }
 DXGame::~DXGame(void)
 {
@@ -551,662 +551,659 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		TurnTimers[4] = 0.1f;
 		TurnTimerSelect = 0;
 		World.Reset();
+		initialize = true;
 }
 
 void DXGame::Update(float dt)
 {
-	// Make static so that their values persist across
-	// function calls.
-	static float gameTime = 0.0f;
-	static float turnTime = 6.0f;
-	static float numFrames = 0.0f;
-	static float timeElapsed = 0.0f;
-	static float Timer = 0.0f;
-	bool Turn = true;
-	bool Check = false;
-	// Increment the frame count.
-	numFrames += 1.0f;
-	gameTime += dt;
-	// Accumulate how much time has passed.
-	timeElapsed += dt;
-	// Has one second passed?--we compute the frame statistics once
-	// per second.   Note that the time between frames can vary, so
-	// these stats are averages over a second.
-	if( timeElapsed >= 1.0f )
+	if(initialize)
 	{
-		// Frames Per Second = numFrames / timeElapsed,
-		// but timeElapsed approx. equals 1.0, so
-		// frames per second = numFrames.
-		mFPS = numFrames;
-		// Average time, in milliseconds, it took to render a
-		// single frame.
-		mMilliSecPerFrame = 1000.0f / mFPS;
-		// Reset time counter and frame count to prepare
-		// for computing the average stats over the next second.
-		timeElapsed = 0.0f;
-		numFrames     = 0.0f;
-		Turn = true;
-	}
-	int width, height;
-	//KEYBOARD
-	HRESULT hr;
-	hr = m_pDIKeyboard->GetDeviceState(sizeof(Buffer), &Buffer);
-	if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED){
-		hr = m_pDIKeyboard->Acquire();
-		hr = m_pDIKeyboard->GetDeviceState(sizeof(Buffer), &Buffer);}
-	//mouse
-	hr = m_pDIMouse->GetDeviceState(sizeof(mouseState),&mouseState);
-	if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED){
-		hr = m_pDIMouse->Acquire();
-		hr = m_pDIMouse->GetDeviceState(sizeof(mouseState),&mouseState);}
-	switch(State){
-	case 0:
-		if(options[0])
+		// Make static so that their values persist across
+		// function calls.
+		static float gameTime = 0.0f;
+		static float turnTime = 6.0f;
+		static float numFrames = 0.0f;
+		static float timeElapsed = 0.0f;
+		static float Timer = 0.0f;
+		bool Turn = true;
+		bool Check = false;
+		// Increment the frame count.
+		numFrames += 1.0f;
+		gameTime += dt;
+		// Accumulate how much time has passed.
+		timeElapsed += dt;
+		// Has one second passed?--we compute the frame statistics once
+		// per second.   Note that the time between frames can vary, so
+		// these stats are averages over a second.
+		if( timeElapsed >= 1.0f )
 		{
-			if(Buffer[DIK_UP] & 0x80){//PRESS UP KEY, WHILE ON START
-				if(!m_BoolBuf[DIK_UP]){//FIRST DOWN PRESS, SET PRESSED
-					m_BoolBuf[DIK_UP] = true;
-					options[0] = false;
-					options[2] = true;
+			// Frames Per Second = numFrames / timeElapsed,
+			// but timeElapsed approx. equals 1.0, so
+			// frames per second = numFrames.
+			mFPS = numFrames;
+			// Average time, in milliseconds, it took to render a
+			// single frame.
+			mMilliSecPerFrame = 1000.0f / mFPS;
+			// Reset time counter and frame count to prepare
+			// for computing the average stats over the next second.
+			timeElapsed = 0.0f;
+			numFrames     = 0.0f;
+			Turn = true;
+		}
+		int width, height;
+		//KEYBOARD
+		HRESULT hr;
+		hr = m_pDIKeyboard->GetDeviceState(sizeof(Buffer), &Buffer);
+		if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED){
+			hr = m_pDIKeyboard->Acquire();
+			hr = m_pDIKeyboard->GetDeviceState(sizeof(Buffer), &Buffer);}
+		//mouse
+		hr = m_pDIMouse->GetDeviceState(sizeof(mouseState),&mouseState);
+		if(hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED){
+			hr = m_pDIMouse->Acquire();
+			hr = m_pDIMouse->GetDeviceState(sizeof(mouseState),&mouseState);}
+		switch(State){
+		case 0:
+			if(options[0])
+			{
+				if(Buffer[DIK_UP] & 0x80){//PRESS UP KEY, WHILE ON START
+					if(!m_BoolBuf[DIK_UP]){//FIRST DOWN PRESS, SET PRESSED
+						m_BoolBuf[DIK_UP] = true;
+						options[0] = false;
+						options[2] = true;
+					}
+				}
+				else
+				{
+					m_BoolBuf[DIK_UP] = false;
+				}
+				//DOWN
+				if(Buffer[DIK_DOWN] & 0x80){
+					if(!m_BoolBuf[DIK_DOWN]){
+						m_BoolBuf[DIK_DOWN] = true;
+						options[0] = false;
+						options[1] = true;
+					}
+				}
+				else
+				{
+					m_BoolBuf[DIK_DOWN] = false;
+				}
+				//RETURN
+				if(Buffer[DIK_RETURN] & 0x80 || mouseState.rgbButtons[0]){
+					if(!m_BoolBuf[DIK_RETURN]){
+						m_BoolBuf[DIK_RETURN] = true;
+						State = 2;
+					}
+				}
+				else
+				{
+					m_BoolBuf[DIK_RETURN] = false;
+				}
+			}
+			if(options[1])
+			{
+				//UP
+				if(Buffer[DIK_UP] & 0x80){
+					if(!m_BoolBuf[DIK_UP]){
+						m_BoolBuf[DIK_UP] = true;
+						options[1] = false;
+						options[0] = true;
+					}
+				}
+				else
+				{
+					m_BoolBuf[DIK_UP] = false;
+				}
+				//DOWN
+				if(Buffer[DIK_DOWN] & 0x80){
+					if(!m_BoolBuf[DIK_DOWN]){
+						m_BoolBuf[DIK_DOWN] = true;
+						options[1] = false;
+						options[2] = true;
+					}
+				}
+				else
+				{
+					m_BoolBuf[DIK_DOWN] = false;
+				}
+				//RETURN
+				if(Buffer[DIK_RETURN] & 0x80 || mouseState.rgbButtons[0]){
+					PostQuitMessage(0);
+				}
+			}
+			if(options[2]){
+				//UP
+				if(Buffer[DIK_UP] & 0x80){
+					if(!m_BoolBuf[DIK_UP]){
+						m_BoolBuf[DIK_UP] = true;
+						options[2] = false;
+						options[1] = true;
+					}
+				}
+				else
+				{
+					m_BoolBuf[DIK_UP] = false;
+				}
+				//DOWN
+				if(Buffer[DIK_DOWN] & 0x80){
+					if(!m_BoolBuf[DIK_DOWN]){
+						m_BoolBuf[DIK_DOWN] = true;
+						options[2] = false;
+						options[0] = true;
+					}
+				}
+				else
+				{
+					m_BoolBuf[DIK_DOWN] = false;
+				}
+				//RETURN
+				if((Buffer[DIK_RETURN] & 0x80) || mouseState.rgbButtons[0]){
+					if(!m_BoolBuf[DIK_RETURN]){
+						m_BoolBuf[DIK_RETURN] = true;
+						LeftMouseDown = true;
+						EnableFullscreen(D3Dpp.Windowed);
+					}
+				}
+				else{
+					m_BoolBuf[DIK_RETURN] = false;
+					LeftMouseDown = false;
+				}
+			}
+			RECT recta;
+			GetWindowRect(m_hWnd, &recta);
+			width = recta.right - recta.left;
+			height = recta.bottom - recta.top;	
+
+			POINT CursorPosa;
+			GetCursorPos(&CursorPosa);
+			m_Mousex = CursorPosa.x - recta.left;
+			m_Mousey = CursorPosa.y - recta.top;
+
+
+
+
+			if(Buttons[0]->IsCursorOnMe(m_Mousex,m_Mousey)){
+				options[0] = true;
+				options[1] = false;
+				options[2] = false;
+			}
+			if(Buttons[1]->IsCursorOnMe(m_Mousex,m_Mousey)){
+				options[0] = false;
+				options[1] = true;
+				options[2] = false;
+			}
+			if(Buttons[2]->IsCursorOnMe(m_Mousex,m_Mousey)){
+				options[0] = false;
+				options[1] = false;
+				options[2] = true;
+			}
+			LeftMouseDown = true;
+
+			break;
+		case 1://#################################################################################################
+			RECT rect;
+			GetWindowRect(m_hWnd, &rect);
+			width = rect.right - rect.left;
+			height = rect.bottom - rect.top;	
+
+			POINT CursorPos;
+			GetCursorPos(&CursorPos);
+			m_Mousex = CursorPos.x - rect.left;// - GetSystemMetrics(SM_CXSIZEFRAME);
+			m_Mousey = CursorPos.y - rect.top; //- GetSystemMetrics(SM_CYCAPTION);
+			if(Buffer[DIK_SPACE] & 0x80){
+				if(!m_BoolBuf[DIK_SPACE]){
+					m_BoolBuf[DIK_SPACE] = true;
+					//DO STUFF HERE
 				}
 			}
 			else
 			{
-				m_BoolBuf[DIK_UP] = false;
+				m_BoolBuf[DIK_SPACE] = false;
+			}	
+			if(Buffer[DIK_W] & 0x80){
+				//	if(!m_BoolBuf[DIK_W] ){
+				m_BoolBuf[DIK_W] = true;
+				//DO STUFF HERE
+				Pallette[0]->DeltaY += (32.0f*6)/mFPS;
+				//	}
 			}
-			//DOWN
-			if(Buffer[DIK_DOWN] & 0x80){
-				if(!m_BoolBuf[DIK_DOWN]){
-					m_BoolBuf[DIK_DOWN] = true;
-					options[0] = false;
-					options[1] = true;
-				}
+			//else
+			//{
+			//	m_BoolBuf[DIK_W] = false;
+			//}	
+			if(Buffer[DIK_S] & 0x80){
+				//	if(!m_BoolBuf[DIK_S] ){
+				//		m_BoolBuf[DIK_S] = true;
+				//DO STUFF HERE
+				Pallette[0]->DeltaY -= (32.0f*6)/mFPS;
+				//	}
 			}
-			else
-			{
-				m_BoolBuf[DIK_DOWN] = false;
+			//else
+			//{
+			//	m_BoolBuf[DIK_S] = false;
+			//}
+			if(Buffer[DIK_A] & 0x80){
+				//	if(!m_BoolBuf[DIK_A] ){
+				//		m_BoolBuf[DIK_A] = true;
+				//DO STUFF HERE
+				Pallette[0]->DeltaX += (32.0f*6)/mFPS;
+				//	}
 			}
-			//RETURN
-			if(Buffer[DIK_RETURN] & 0x80 || mouseState.rgbButtons[0]){
+			//else
+			//{
+			//	m_BoolBuf[DIK_A] = false;
+			//}
+			if(Buffer[DIK_D] & 0x80 ){
+				//	if(!m_BoolBuf[DIK_D]){
+				//		m_BoolBuf[DIK_D] = true;
+				//DO STUFF HERE
+				Pallette[0]->DeltaX -= (32.0f*6)/mFPS;
+				//	}
+			}
+			//else
+			//{
+			//	m_BoolBuf[DIK_D] = false;
+			//}
+			if(Buffer[DIK_RETURN] & 0x80){
 				if(!m_BoolBuf[DIK_RETURN]){
 					m_BoolBuf[DIK_RETURN] = true;
-					State = 2;
+					//DO STUFF HERE
 				}
 			}
 			else
 			{
 				m_BoolBuf[DIK_RETURN] = false;
 			}
-		}
-		if(options[1])
-		{
-			//UP
-			if(Buffer[DIK_UP] & 0x80){
-				if(!m_BoolBuf[DIK_UP]){
-					m_BoolBuf[DIK_UP] = true;
-					options[1] = false;
-					options[0] = true;
+			if(Buffer[DIK_BACKSPACE] & 0x80){
+				if(!m_BoolBuf[DIK_BACKSPACE]){
+					m_BoolBuf[DIK_BACKSPACE] = true;
+					//DO STUFF HERE
 				}
 			}
 			else
 			{
-				m_BoolBuf[DIK_UP] = false;
+				m_BoolBuf[DIK_BACKSPACE] = false;
 			}
-			//DOWN
-			if(Buffer[DIK_DOWN] & 0x80){
-				if(!m_BoolBuf[DIK_DOWN]){
-					m_BoolBuf[DIK_DOWN] = true;
-					options[1] = false;
-					options[2] = true;
+			// To purchase tech upgrades (Player side)
+			if(Buffer[DIK_P] & 0x80){
+				if(!m_BoolBuf[DIK_P]){
+					m_BoolBuf[DIK_P] = true;
+					//DO STUFF HERE
+					for(int i = 0; i < 100; ++i)
+					{
+						if(i == m_Player->NationalID)
+						{
+							if(m_Player->Treasury >= m_Player->upgradeCost)
+							{
+								m_Player->Treasury-=m_Player->upgradeCost;
+								m_Player->m_EconomyTech++;
+								m_Player->m_LandTech++;
+								m_Player->m_SeaTech++;
+								m_Player->upgradeCost*=1.1;
+								if(m_Player->m_LandTech%10 == 0)
+									m_Player->m_ArmyList.NumMax++;
+							}
+							m_Player->UpdateUnitStats();
+						}
+					}
 				}
 			}
 			else
 			{
-				m_BoolBuf[DIK_DOWN] = false;
+				m_BoolBuf[DIK_P] = false;
 			}
-			//RETURN
-			if(Buffer[DIK_RETURN] & 0x80 || mouseState.rgbButtons[0]){
-				PostQuitMessage(0);
-			}
-		}
-		if(options[2]){
-			//UP
-			if(Buffer[DIK_UP] & 0x80){
-				if(!m_BoolBuf[DIK_UP]){
-					m_BoolBuf[DIK_UP] = true;
-					options[2] = false;
-					options[1] = true;
+			// Buying new armies (Player side)
+			if(Buffer[DIK_O] & 0x80){
+				if(!m_BoolBuf[DIK_O]){
+					m_BoolBuf[DIK_O] = true;
+					for(int i = 0; i < 100; ++i)
+					{
+						if(i == m_Player->NationalID)
+						{
+							ArmyBuy(m_Player->NationalID);
+						}
+					}
+					//DO STUFF HERE
+
 				}
 			}
 			else
 			{
-				m_BoolBuf[DIK_UP] = false;
+				m_BoolBuf[DIK_O] = false;
 			}
-			//DOWN
-			if(Buffer[DIK_DOWN] & 0x80){
-				if(!m_BoolBuf[DIK_DOWN]){
-					m_BoolBuf[DIK_DOWN] = true;
-					options[2] = false;
-					options[0] = true;
+			//####################Keys to change turn progression###########################
+			if(Buffer[DIK_ADD] & 0x80){
+				if(!m_BoolBuf[DIK_ADD]){
+					m_BoolBuf[DIK_ADD] = true;
+					//DO STUFF HERE
+					if(TurnTimerSelect != 4){
+						TurnTimerSelect++;
+						turnTime = TurnTimers[TurnTimerSelect];
+					}
 				}
 			}
 			else
 			{
-				m_BoolBuf[DIK_DOWN] = false;
+				m_BoolBuf[DIK_ADD] = false;
 			}
-			//RETURN
-			if((Buffer[DIK_RETURN] & 0x80) || mouseState.rgbButtons[0]){
-				if(!m_BoolBuf[DIK_RETURN]){
-					m_BoolBuf[DIK_RETURN] = true;
+			if(Buffer[DIK_SUBTRACT] & 0x80){
+				if(!m_BoolBuf[DIK_SUBTRACT]){
+					m_BoolBuf[DIK_SUBTRACT] = true;
+					//DO STUFF HERE
+					if(TurnTimerSelect != 0){
+						TurnTimerSelect--;
+						turnTime = TurnTimers[TurnTimerSelect];
+					}
+				}
+			}
+			else
+			{
+				m_BoolBuf[DIK_SUBTRACT] = false;
+			}
+			//SPACE BAR TO PAUSE GAME
+			if(Buffer[DIK_SPACE] & 0x80){
+				if(!m_BoolBuf[DIK_SPACE]){
+					m_BoolBuf[DIK_SPACE] = true;
+					//DO STUFF HERE
+					Paused = !Paused;
+				}
+			}
+			else
+			{
+				m_BoolBuf[DIK_SPACE] = false;
+			}
+			//Buttons to change the views
+			if(Buffer[DIK_COMMA] & 0x80){
+				if(!m_BoolBuf[DIK_COMMA]){
+					m_BoolBuf[DIK_COMMA] = true;
+					//DO STUFF HERE
+					if(m_PlayerArmyView == 0)
+						m_PlayerArmyView = m_Player->NumMaxArmies-1;
+					else
+						m_PlayerArmyView--;
+
+				}
+			}
+			else
+			{
+				m_BoolBuf[DIK_COMMA] = false;
+			}
+			if(Buffer[DIK_PERIOD] & 0x80){
+				if(!m_BoolBuf[DIK_PERIOD]){
+					m_BoolBuf[DIK_PERIOD] = true;
+					//DO STUFF HERE
+					if(m_PlayerArmyView == m_Player->NumMaxArmies-1)
+						m_PlayerArmyView = 0;
+					else
+						m_PlayerArmyView++;
+
+				}
+			}
+			else
+			{
+				m_BoolBuf[DIK_PERIOD] = false;
+			}
+			if(Buffer[DIK_L] & 0x80){
+				if(!m_BoolBuf[DIK_L]){
+					m_BoolBuf[DIK_L] = true;
+					//DO STUFF HERE
+					if(PageView == 0)
+						PageView = 3;
+					else
+						PageView--;
+
+				}
+			}
+			else
+			{
+				m_BoolBuf[DIK_L] = false;
+			}
+			if(Buffer[DIK_SEMICOLON] & 0x80){
+				if(!m_BoolBuf[DIK_SEMICOLON]){
+					m_BoolBuf[DIK_SEMICOLON] = true;
+					//DO STUFF HERE
+					if(PageView == 3)
+						PageView = 0;
+					else
+						PageView++;
+
+				}
+			}
+			else
+			{
+				m_BoolBuf[DIK_SEMICOLON] = false;
+			}
+
+
+			//MOUSE
+			system->update();	
+			if(mouseState.rgbButtons[0] ){
+				if(!LeftMouseDown){
 					LeftMouseDown = true;
-					EnableFullscreen(D3Dpp.Windowed);
+					//DO STUFF HERE
+					ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
+					if(!m_Player){
+						m_Player = Nations[World.getProv(ProvSelect).m_NationID];
+						Nations[World.getProv(ProvSelect).m_NationID]->isUser = true;
+						for(int i = 0; i < Nations[World.getProv(ProvSelect).m_NationID]->m_ArmyList.NumHeld; i++)
+						{
+							Nations[World.getProv(ProvSelect).m_NationID]->m_ArmyList.get(i)->setisPlayers(true);
+						}
+					}
+					else{//after player select
+						switch(PageView){
+						case Econ:
+							break;
+						case Tech:
+							break;
+						case War:
+							break;
+						case Military:
+							m_Player->m_ArmyList.get(m_PlayerArmyView)->setPlayerProvTarget(ProvSelect);
+							break;
+
+						}
+					}
 				}
 			}
 			else{
-				m_BoolBuf[DIK_RETURN] = false;
 				LeftMouseDown = false;
 			}
-		}
-		RECT recta;
-		GetWindowRect(m_hWnd, &recta);
-		width = recta.right - recta.left;
-		height = recta.bottom - recta.top;	
-
-		POINT CursorPosa;
-		GetCursorPos(&CursorPosa);
-		m_Mousex = CursorPosa.x - recta.left;
-		m_Mousey = CursorPosa.y - recta.top;
-
-
-
-
-		if(Buttons[0]->IsCursorOnMe(m_Mousex,m_Mousey)){
-			options[0] = true;
-			options[1] = false;
-			options[2] = false;
-		}
-		if(Buttons[1]->IsCursorOnMe(m_Mousex,m_Mousey)){
-			options[0] = false;
-			options[1] = true;
-			options[2] = false;
-		}
-		if(Buttons[2]->IsCursorOnMe(m_Mousex,m_Mousey)){
-			options[0] = false;
-			options[1] = false;
-			options[2] = true;
-		}
-		LeftMouseDown = true;
-
-		break;
-	case 1://#################################################################################################
-		RECT rect;
-		GetWindowRect(m_hWnd, &rect);
-		width = rect.right - rect.left;
-		height = rect.bottom - rect.top;	
-
-		POINT CursorPos;
-		GetCursorPos(&CursorPos);
-		m_Mousex = CursorPos.x - rect.left;// - GetSystemMetrics(SM_CXSIZEFRAME);
-		m_Mousey = CursorPos.y - rect.top; //- GetSystemMetrics(SM_CYCAPTION);
-		if(Buffer[DIK_SPACE] & 0x80){
-			if(!m_BoolBuf[DIK_SPACE]){
-				m_BoolBuf[DIK_SPACE] = true;
-				//DO STUFF HERE
+			if(mouseState.rgbButtons[1] ){
+				if(!RightMouseDown){
+					RightMouseDown = true;
+					//DO STUFF HERE
+					ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
+					if(m_Player){
+						DeclareWar(m_Player->NationalID,World.getProv(ProvSelect).m_NationID);
+					}
+				}
 			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_SPACE] = false;
-		}	
-		if(Buffer[DIK_W] & 0x80){
-			//	if(!m_BoolBuf[DIK_W] ){
-			m_BoolBuf[DIK_W] = true;
-			//DO STUFF HERE
-			Pallette[0]->DeltaY += (32.0f*6)/mFPS;
-			//	}
-		}
-		//else
-		//{
-		//	m_BoolBuf[DIK_W] = false;
-		//}	
-		if(Buffer[DIK_S] & 0x80){
-			//	if(!m_BoolBuf[DIK_S] ){
-			//		m_BoolBuf[DIK_S] = true;
-			//DO STUFF HERE
-			Pallette[0]->DeltaY -= (32.0f*6)/mFPS;
-			//	}
-		}
-		//else
-		//{
-		//	m_BoolBuf[DIK_S] = false;
-		//}
-		if(Buffer[DIK_A] & 0x80){
-			//	if(!m_BoolBuf[DIK_A] ){
-			//		m_BoolBuf[DIK_A] = true;
-			//DO STUFF HERE
-			Pallette[0]->DeltaX += (32.0f*6)/mFPS;
-			//	}
-		}
-		//else
-		//{
-		//	m_BoolBuf[DIK_A] = false;
-		//}
-		if(Buffer[DIK_D] & 0x80 ){
-			//	if(!m_BoolBuf[DIK_D]){
-			//		m_BoolBuf[DIK_D] = true;
-			//DO STUFF HERE
-			Pallette[0]->DeltaX -= (32.0f*6)/mFPS;
-			//	}
-		}
-		//else
-		//{
-		//	m_BoolBuf[DIK_D] = false;
-		//}
-		if(Buffer[DIK_RETURN] & 0x80){
-			if(!m_BoolBuf[DIK_RETURN]){
-				m_BoolBuf[DIK_RETURN] = true;
-				//DO STUFF HERE
+			else{
+				RightMouseDown = false;
 			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_RETURN] = false;
-		}
-		if(Buffer[DIK_BACKSPACE] & 0x80){
-			if(!m_BoolBuf[DIK_BACKSPACE]){
-				m_BoolBuf[DIK_BACKSPACE] = true;
-				//DO STUFF HERE
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_BACKSPACE] = false;
-		}
-		// To purchase tech upgrades (Player side)
-		if(Buffer[DIK_P] & 0x80){
-			if(!m_BoolBuf[DIK_P]){
-				m_BoolBuf[DIK_P] = true;
-				//DO STUFF HERE
-				for(int i = 0; i < 100; ++i)
-				{
-					if(Nations[i]->isUser)
+
+			//Constant Updates
+			MouseOnWho = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
+
+
+
+			//GAME LOGIC
+			if((gameTime > turnTime) && m_Player && !Paused){
+				AIProcess();
+				if(Calender.Increment()){//one day has passed, returns true on months end
+
+					//For each nation
+					for(int j = 0; j < 100; ++j)
 					{
-						if(Nations[i]->Treasury >= Nations[i]->upgradeCost)
+						//Find the size of the nation
+						for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
 						{
-							Nations[i]->Treasury-=Nations[i]->upgradeCost;
-							Nations[i]->m_EconomyTech++;
-							Nations[i]->m_LandTech++;
-							Nations[i]->m_SeaTech++;
-							Nations[i]->upgradeCost*=1.1;
-						if(Nations[i]->m_LandTech%10 == 0)
-							Nations[i]->m_ArmyList.NumMax++;
+							//Increment by the provinces tax and manpower value
+							Nations[j]->Treasury+=Nations[j]->ProvinceList.get(i)->mTax;
+							Nations[j]->Manpower+=Nations[j]->ProvinceList.get(i)->mManpower;
 						}
-						Nations[i]->UpdateUnitStats();
-					}
-				}
-
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_P] = false;
-		}
-		// Buying new armies (Player side)
-		if(Buffer[DIK_O] & 0x80){
-			if(!m_BoolBuf[DIK_O]){
-				m_BoolBuf[DIK_O] = true;
-				for(int i = 0; i < 100; ++i)
-				{
-					if(Nations[i]->isUser)
-					{
-						/////////////////////////////////////////////////
-						// TODO: Change army buy cost from a magic number
-						/////////////////////////////////////////////////
-						if(Nations[i]->Treasury >= 10000 && Nations[i]->Manpower >= 1000)
+						//#################Reduction of Treasury and Manpower#####################
+						// Manpower gets reduced by 10% base per month with a chance based on each of its armies' morale (base 12%, lower with higher morale than 1, higher with lower morale than 1)
+						// to get reduced by an extra 20%
+						// Bonus Calculation done below to save computation time
+						Nations[j]->Manpower*=0.9;
+						// Treasury gets reduced based on armies
+						for(int i = 0; i < ArmyManager.NumHeld; ++i)
 						{
-							ArmyBuy(Nations[i]->NationalID);
-						}
-					}
-				}
-				//DO STUFF HERE
-
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_O] = false;
-		}
-		//####################Keys to change turn progression###########################
-		if(Buffer[DIK_ADD] & 0x80){
-			if(!m_BoolBuf[DIK_ADD]){
-				m_BoolBuf[DIK_ADD] = true;
-				//DO STUFF HERE
-				if(TurnTimerSelect != 4){
-					TurnTimerSelect++;
-					turnTime = TurnTimers[TurnTimerSelect];
-				}
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_ADD] = false;
-		}
-		if(Buffer[DIK_SUBTRACT] & 0x80){
-			if(!m_BoolBuf[DIK_SUBTRACT]){
-				m_BoolBuf[DIK_SUBTRACT] = true;
-				//DO STUFF HERE
-				if(TurnTimerSelect != 0){
-					TurnTimerSelect--;
-					turnTime = TurnTimers[TurnTimerSelect];
-				}
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_SUBTRACT] = false;
-		}
-		//SPACE BAR TO PAUSE GAME
-		if(Buffer[DIK_SPACE] & 0x80){
-			if(!m_BoolBuf[DIK_SPACE]){
-				m_BoolBuf[DIK_SPACE] = true;
-				//DO STUFF HERE
-				Paused = !Paused;
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_SPACE] = false;
-		}
-		//Buttons to change the views
-		if(Buffer[DIK_COMMA] & 0x80){
-			if(!m_BoolBuf[DIK_COMMA]){
-				m_BoolBuf[DIK_COMMA] = true;
-				//DO STUFF HERE
-				if(m_PlayerArmyView == 0)
-					m_PlayerArmyView = m_Player->NumMaxArmies-1;
-				else
-					m_PlayerArmyView--;
-
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_COMMA] = false;
-		}
-		if(Buffer[DIK_PERIOD] & 0x80){
-			if(!m_BoolBuf[DIK_PERIOD]){
-				m_BoolBuf[DIK_PERIOD] = true;
-				//DO STUFF HERE
-				if(m_PlayerArmyView == m_Player->NumMaxArmies-1)
-					m_PlayerArmyView = 0;
-				else
-					m_PlayerArmyView++;
-
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_PERIOD] = false;
-		}
-		if(Buffer[DIK_L] & 0x80){
-			if(!m_BoolBuf[DIK_L]){
-				m_BoolBuf[DIK_L] = true;
-				//DO STUFF HERE
-				if(PageView == 0)
-					PageView = 3;
-				else
-					PageView--;
-
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_L] = false;
-		}
-		if(Buffer[DIK_SEMICOLON] & 0x80){
-			if(!m_BoolBuf[DIK_SEMICOLON]){
-				m_BoolBuf[DIK_SEMICOLON] = true;
-				//DO STUFF HERE
-				if(PageView == 3)
-					PageView = 0;
-				else
-					PageView++;
-
-			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_SEMICOLON] = false;
-		}
-
-
-		//MOUSE
-		system->update();	
-		if(mouseState.rgbButtons[0] ){
-			if(!LeftMouseDown){
-				LeftMouseDown = true;
-				//DO STUFF HERE
-				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
-				if(!m_Player){
-					m_Player = Nations[World.getProv(ProvSelect).m_NationID];
-					Nations[World.getProv(ProvSelect).m_NationID]->isUser = true;
-					for(int i = 0; i < Nations[World.getProv(ProvSelect).m_NationID]->m_ArmyList.NumHeld; i++)
-					{
-						Nations[World.getProv(ProvSelect).m_NationID]->m_ArmyList.get(i)->setisPlayers(true);
-					}
-				}
-				else{//after player select
-					switch(PageView){
-					case Econ:
-						break;
-					case Tech:
-						break;
-					case War:
-						break;
-					case Military:
-						m_Player->m_ArmyList.get(m_PlayerArmyView)->setPlayerProvTarget(ProvSelect);
-						break;
-
-					}
-				}
-			}
-		}
-		else{
-			LeftMouseDown = false;
-		}
-		if(mouseState.rgbButtons[1] ){
-			if(!RightMouseDown){
-				RightMouseDown = true;
-				//DO STUFF HERE
-				ProvSelect = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
-				if(m_Player){
-					DeclareWar(m_Player->NationalID,World.getProv(ProvSelect).m_NationID);
-				}
-			}
-		}
-		else{
-			RightMouseDown = false;
-		}
-
-		//Constant Updates
-		MouseOnWho = Pallette[Map]->IsCursorOnWho(m_Mousex,m_Mousey);
-
-
-
-		//GAME LOGIC
-		if((gameTime > turnTime) && m_Player && !Paused){
-			AIProcess();
-			if(Calender.Increment()){//one day has passed, returns true on months end
-
-				//For each nation
-				for(int j = 0; j < 100; ++j)
-				{
-					//Find the size of the nation
-					for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
-					{
-						//Increment by the provinces tax and manpower value
-						Nations[j]->Treasury+=Nations[j]->ProvinceList.get(i)->mTax;
-						Nations[j]->Manpower+=Nations[j]->ProvinceList.get(i)->mManpower;
-					}
-					//#################Reduction of Treasury and Manpower#####################
-					// Manpower gets reduced by 10% base per month with a chance based on each of its armies' morale (base 12%, lower with higher morale than 1, higher with lower morale than 1)
-					// to get reduced by an extra 20%
-					// Bonus Calculation done below to save computation time
-					Nations[j]->Manpower*=0.9;
-					// Treasury gets reduced based on armies
-					for(int i = 0; i < ArmyManager.NumHeld; ++i)
-					{
-						// Reduced cost of ownership for a smaller sized nation than a higher one.
-						if(ArmyManager.get(i)->getNationID() == Nations[j]->NationalID)
-						{
-							if(Nations[j]->ProvinceList.NumHeld < 50)
+							// Reduced cost of ownership for a smaller sized nation than a higher one.
+							if(ArmyManager.get(i)->getNationID() == Nations[j]->NationalID)
 							{
-								Nations[j]->Treasury-((ArmyManager.get(i)->getTroops()) * 0.1);
-							}
-							else if(Nations[j]->ProvinceList.NumHeld < 100 && Nations[j]->ProvinceList.NumHeld > 50)
-							{
-								Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.2);
-							}
-							else
-							{
-								Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.4);
-							}
-							if(ArmyManager.get(i)->getMorale() >= 0)
-							{
-								if(rand()%100 < (15*(1/ArmyManager.get(i)->getMorale())))
+								if(Nations[j]->ProvinceList.NumHeld < 50)
 								{
-									Nations[j]->Manpower*=0.8;
+									Nations[j]->Treasury-((ArmyManager.get(i)->getTroops()) * 0.1);
+								}
+								else if(Nations[j]->ProvinceList.NumHeld < 100 && Nations[j]->ProvinceList.NumHeld > 50)
+								{
+									Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.2);
+								}
+								else
+								{
+									Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.4);
+								}
+								if(ArmyManager.get(i)->getMorale() >= 0)
+								{
+									if(rand()%100 < (15*(1/ArmyManager.get(i)->getMorale())))
+									{
+										Nations[j]->Manpower*=0.8;
+									}
 								}
 							}
 						}
 					}
 				}
-			}
-			gameTime = 0.0f;
-			bool NotDone = true;
-			//bool GoodMove = false;
-			int numTries = 0;
-			for(int i = 0; i < ArmyManager.NumHeld; ++i)
-			{
-				if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getState() != Army::War){
-					if(World.getProv(ArmyManager.get(i)->getProvID()).m_NationID != ArmyManager.get(i)->getNationID()){
+				gameTime = 0.0f;
+				bool NotDone = true;
+				//bool GoodMove = false;
+				int numTries = 0;
+				for(int i = 0; i < ArmyManager.NumHeld; ++i)
+				{
+					if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getState() != Army::War){
+						if(World.getProv(ArmyManager.get(i)->getProvID()).m_NationID != ArmyManager.get(i)->getNationID()){
+							Event order;
+							order.SetTime(Calender);
+							order.Time += 60;
+
+							order.ID = order.ProvinceFlip;
+							order.Info[0] = i;
+							order.Info[1] = ArmyManager.get(i)->getProvID(); 
+
+							EventQueue.push(order);
+							ArmyManager.get(i)->Orders.Prov = 0;
+							ArmyManager.get(i)->setMoving(true);
+						}
+					}
+					if(ArmyManager.get(i)->Orders.Prov && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
 						Event order;
 						order.SetTime(Calender);
-						order.Time += 60;
+						if(ArmyManager.get(i)->Orders.Prov->mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
+							order.Time += World.Weight[ArmyManager.get(i)->Orders.Prov->mtype]+rand()%3;
+						else
+							order.Time += World.Weight[World.WaterLand]+rand()%3;
 
-						order.ID = order.ProvinceFlip;
+						order.ID = order.ArmyMove;
 						order.Info[0] = i;
-						order.Info[1] = ArmyManager.get(i)->getProvID(); 
+						order.Info[1] = ArmyManager.get(i)->Orders.Prov->mID; 
 
 						EventQueue.push(order);
 						ArmyManager.get(i)->Orders.Prov = 0;
 						ArmyManager.get(i)->setMoving(true);
 					}
-				}
-				if(ArmyManager.get(i)->Orders.Prov && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
-					Event order;
-					order.SetTime(Calender);
-					if(ArmyManager.get(i)->Orders.Prov->mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
-						order.Time += World.Weight[ArmyManager.get(i)->Orders.Prov->mtype]+rand()%3;
-					else
-						order.Time += World.Weight[World.WaterLand]+rand()%3;
 
-					order.ID = order.ArmyMove;
-					order.Info[0] = i;
-					order.Info[1] = ArmyManager.get(i)->Orders.Prov->mID; 
-
-					EventQueue.push(order);
-					ArmyManager.get(i)->Orders.Prov = 0;
-					ArmyManager.get(i)->setMoving(true);
 				}
-				
-			}
-			for(int i = 0; i < ArmyManager.NumHeld; i++){
-				if(ArmyManager.get(i)->getState() == Army::War){//only find targets if at war
-					for(int j = 0; j < ArmyManager.NumHeld;j++){//finding targets
-						if(	i != j &&	//##############################################################//Not the same Army
-							ArmyManager.get(j)->getState() == Army::War && //###########################//Enemy Army is Also at War #TODO Make it check that it's your War Target
-							ArmyManager.get(i)->getNationID() != ArmyManager.get(j)->getNationID() &&	//Not the Same Owner
-							ArmyManager.get(i)->getProvID() == ArmyManager.get(j)->getProvID()){		//BUT you are on the same Province
-								ArmyManager.get(i)->setTarget(ArmyManager.get(j));
+				for(int i = 0; i < ArmyManager.NumHeld; i++){
+					if(ArmyManager.get(i)->getState() == Army::War){//only find targets if at war
+						for(int j = 0; j < ArmyManager.NumHeld;j++){//finding targets
+							if(	i != j &&	//##############################################################//Not the same Army
+								ArmyManager.get(j)->getState() == Army::War && //###########################//Enemy Army is Also at War #TODO Make it check that it's your War Target
+								ArmyManager.get(i)->getNationID() != ArmyManager.get(j)->getNationID() &&	//Not the Same Owner
+								ArmyManager.get(i)->getProvID() == ArmyManager.get(j)->getProvID()){		//BUT you are on the same Province
+									ArmyManager.get(i)->setTarget(ArmyManager.get(j));
+							}
 						}
 					}
-				}
 
-				if(ArmyManager.get(i)->getTarget()){
-					if(!ArmyManager.get(i)->getTarget()->getTarget())
-						ArmyManager.get(i)->getTarget()->setTarget(ArmyManager.get(i));
-				}
-			}
-
-			for(int i = 0; i < ArmyManager.NumHeld; i++){
-				if(ArmyManager.get(i)->getTarget()){
-					ArmyManager.get(i)->CombatRound(ArmyManager.get(i)->getTarget());
-				}
-			}
-
-			for(int i = 0; i < ArmyManager.NumHeld;i++){//resetting after retreating to capital
-				if(ArmyManager.get(i)->getState() == Army::Retreat && ArmyManager.get(i)->getProvID() == Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID)
-				{
-					if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.NumHeld != 0)
-						ArmyManager.get(i)->setState(Army::War);
-					else
-						ArmyManager.get(i)->setState(Army::Peace);
-				}
-			}
-
-			
-
-			for(int i = 0; i < m_Player->m_ArmyList.NumHeld;i++){//resetting player commands
-				if(m_Player->m_ArmyList.get(i)->getProvID() == m_Player->m_ArmyList.get(i)->getPlayerProvTarget())
-					m_Player->m_ArmyList.get(i)->setPlayerProvTarget(-1);
-			}
-			if(EventQueue.size() != 0)
-				while(EventQueue.size() != 0 && EventQueue.top().Time == Calender){
-					switch(EventQueue.top().ID){
-					case Event::ArmyMove://move armies on correct dates
-						if(!ArmyManager.get(EventQueue.top().Info[0])->getTarget())
-							ArmyManager.get(EventQueue.top().Info[0])->moveTo(EventQueue.top().Info[1]);
-						break;
-					case Event::ProvinceFlip:
-						if(!ArmyManager.get(EventQueue.top().Info[0])->getTarget())
-							SwapProvince(EventQueue.top().Info[1],EventQueue.top().Info[0]);
-						break;
+					if(ArmyManager.get(i)->getTarget()){
+						if(!ArmyManager.get(i)->getTarget()->getTarget())
+							ArmyManager.get(i)->getTarget()->setTarget(ArmyManager.get(i));
 					}
-					
-					EventQueue.pop();
 				}
-		}
+
+				for(int i = 0; i < ArmyManager.NumHeld; i++){
+					if(ArmyManager.get(i)->getTarget()){
+						ArmyManager.get(i)->CombatRound(ArmyManager.get(i)->getTarget());
+					}
+				}
+
+				for(int i = 0; i < ArmyManager.NumHeld;i++){//resetting after retreating to capital
+					if(ArmyManager.get(i)->getState() == Army::Retreat && ArmyManager.get(i)->getProvID() == Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID)
+					{
+						if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.NumHeld != 0)
+							ArmyManager.get(i)->setState(Army::War);
+						else
+							ArmyManager.get(i)->setState(Army::Peace);
+					}
+				}
 
 
 
-		break;
-	case 2://#############################################
-		if(Buffer[DIK_SPACE] & 0x80 || mouseState.rgbButtons[0]){
-			if(!m_BoolBuf[DIK_SPACE]){
-				m_BoolBuf[DIK_SPACE] = true;
-				//DO STUFF HERE
-				State = 1;
+				for(int i = 0; i < m_Player->m_ArmyList.NumHeld;i++){//resetting player commands
+					if(m_Player->m_ArmyList.get(i)->getProvID() == m_Player->m_ArmyList.get(i)->getPlayerProvTarget())
+						m_Player->m_ArmyList.get(i)->setPlayerProvTarget(-1);
+				}
+				if(EventQueue.size() != 0)
+					while(EventQueue.size() != 0 && EventQueue.top().Time == Calender){
+						switch(EventQueue.top().ID){
+						case Event::ArmyMove://move armies on correct dates
+							if(!ArmyManager.get(EventQueue.top().Info[0])->getTarget())
+								ArmyManager.get(EventQueue.top().Info[0])->moveTo(EventQueue.top().Info[1]);
+							break;
+						case Event::ProvinceFlip:
+							if(!ArmyManager.get(EventQueue.top().Info[0])->getTarget())
+								SwapProvince(EventQueue.top().Info[1],EventQueue.top().Info[0]);
+							break;
+						}
+
+						EventQueue.pop();
+					}
 			}
-		}
-		else
-		{
-			m_BoolBuf[DIK_SPACE] = false;
-		}
-		break;
-	case 3://END GAME#####################################
-		if(Buffer[DIK_SPACE] & 0x80){
-			if(!m_BoolBuf[DIK_SPACE]){
-				m_BoolBuf[DIK_SPACE] = true;
-				//DO STUFF HERE
-				State = 0;
+
+
+
+			break;
+		case 2://#############################################
+			if(Buffer[DIK_SPACE] & 0x80 || mouseState.rgbButtons[0]){
+				if(!m_BoolBuf[DIK_SPACE]){
+					m_BoolBuf[DIK_SPACE] = true;
+					//DO STUFF HERE
+					State = 1;
+				}
 			}
+			else
+			{
+				m_BoolBuf[DIK_SPACE] = false;
+			}
+			break;
+		case 3://END GAME#####################################
+			if(Buffer[DIK_SPACE] & 0x80){
+				if(!m_BoolBuf[DIK_SPACE]){
+					m_BoolBuf[DIK_SPACE] = true;
+					//DO STUFF HERE
+					State = 0;
+				}
+			}
+			else
+			{
+				m_BoolBuf[DIK_SPACE] = false;
+			}
+			break;
 		}
-		else
-		{
-			m_BoolBuf[DIK_SPACE] = false;
-		}
-		break;
 	}
 }
 
@@ -1798,17 +1795,20 @@ void DXGame::DeclareWar(int Me,int Target){
 
 void DXGame::ArmyBuy(int a_nation)
 {
-	Army* t_Army = new Army;
-	t_Army->setState(Army::Peace);
-	t_Army->SetCombatVal(Nations[a_nation]->ArmyAtk,Nations[a_nation]->ArmyDef,Nations[a_nation]->ArmyMAtk,Nations[a_nation]->ArmyMDef,Nations[a_nation]->ArmyMaxMorale);
-	t_Army->moveTo(Nations[a_nation]->m_CapitalID);
-	t_Army->setNationID(Nations[a_nation]->NationalID);
-	t_Army->setNationalID(Nations[a_nation]->m_ArmyList.NumHeld);
-	if(Nations[a_nation]->isUser)
+	if(Nations[a_nation]->Treasury > Nations[a_nation]->ArmyCostMoney && Nations[a_nation]->Manpower > Nations[a_nation]->ArmyCostMen)
 	{
-		t_Army->setisPlayers(true);
+		Army* t_Army = new Army;
+		t_Army->setState(Army::Peace);
+		t_Army->SetCombatVal(Nations[a_nation]->ArmyAtk,Nations[a_nation]->ArmyDef,Nations[a_nation]->ArmyMAtk,Nations[a_nation]->ArmyMDef,Nations[a_nation]->ArmyMaxMorale);
+		t_Army->moveTo(Nations[a_nation]->m_CapitalID);
+		t_Army->setNationID(Nations[a_nation]->NationalID);
+		t_Army->setNationalID(Nations[a_nation]->m_ArmyList.NumHeld);
+		if(Nations[a_nation]->isUser)
+		{
+			t_Army->setisPlayers(true);
+		}
+		Nations[a_nation]->m_ArmyList.Add(t_Army);
 	}
-	Nations[a_nation]->m_ArmyList.Add(t_Army);
 }
 
 void DXGame::SwapProvince(int Prov, int Target){
@@ -1821,4 +1821,11 @@ void DXGame::SwapProvince(int Prov, int Target){
 	Nations[ArmyManager.get(Target)->getNationID()]->ProvinceList.Add(TarProv);
 	ArmyManager.get(Target)->setMoving(false);
 	TarProv->m_NationID = Target;
+}
+
+void DXGame::TroopBuy(Nation a_nation)
+{
+	if(a_nation.Treasury > a_nation.InfCostMoney)
+	{
+	}
 }
