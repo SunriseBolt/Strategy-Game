@@ -20,7 +20,6 @@ private:
 	int NationalID;
 
 	int m_techLvl, m_numCav, m_numInf, m_numArt;
-
 	int m_State;
 
 	float m_morale;
@@ -62,6 +61,9 @@ public:
 	void setNationalID(int ID){this->NationalID = ID;};
 	void setisPlayers(bool is){this->isPlayers = is;};
 	void setPlayerProvTarget(int tar){this->PlayerProvTarget = tar;};
+	int getMax(){	return NumMaxTroops;	};
+	void setMax(int maxSize){this->NumMaxTroops = maxSize;}
+
 	//COMBAT
 	//performs a single round of combat against an army
 	void CombatRound(Army*);

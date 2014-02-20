@@ -873,6 +873,25 @@ void DXGame::Update(float dt)
 			{
 				m_BoolBuf[DIK_O] = false;
 			}
+			//Purchasing units
+			if(Buffer[DIK_I] & 0x80){
+				if(!m_BoolBuf[DIK_I]){
+					m_BoolBuf[DIK_I] = true;
+					for(int i = 0; i < m_Player->m_ArmyList.NumHeld; ++i)
+					{
+						if(m_Player->m_ArmyList.get(i)->getNationalID() == i)
+						{
+							TroopBuy(m_Player->m_ArmyList.get(i));
+						}
+					}
+					//DO STUFF HERE
+
+				}
+			}
+			else
+			{
+				m_BoolBuf[DIK_I] = false;
+			}
 			//####################Keys to change turn progression###########################
 			if(Buffer[DIK_ADD] & 0x80){
 				if(!m_BoolBuf[DIK_ADD]){
@@ -1826,9 +1845,12 @@ void DXGame::SwapProvince(int Prov, int Target){
 	TarProv->m_NationID = Target;
 }
 
-void DXGame::TroopBuy(Nation a_nation)
+void DXGame::TroopBuy(Army* a_army)
 {
-	if(a_nation.Treasury > a_nation.InfCostMoney)
+	if(Nations[a_army->getNationID()]->Treasury >= Nations[a_army->getNationID()]->InfCostMoney && Nations[a_army->getNationID()]->Manpower >= Nations[a_army->getNationID()]->InfCostMen)
 	{
+		m_Player->m_ArmyList.get(a_army->getNationalID())->setMax(a_army->getMax()+100);
+		Nations[a_army->getNationID()]->Treasury-=Nations[a_army->getNationID()]->InfCostMoney;
+		Nations[a_army->getNationID()]->Manpower-=Nations[a_army->getNationID()]->InfCostMen;
 	}
 }
