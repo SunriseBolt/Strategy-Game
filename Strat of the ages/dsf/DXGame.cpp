@@ -1088,6 +1088,21 @@ void DXGame::Update(float dt)
 			int numTries = 0;
 			for(int i = 0; i < ArmyManager.NumHeld; ++i)
 			{
+				if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getState() != Army::War){
+					if(World.getProv(ArmyManager.get(i)->getProvID()).m_NationID != ArmyManager.get(i)->getNationID()){
+						Event order;
+						order.SetTime(Calender);
+						order.Time += 60;
+
+						order.ID = order.ProvinceFlip;
+						order.Info[0] = i;
+						order.Info[1] = ArmyManager.get(i)->getProvID(); 
+
+						EventQueue.push(order);
+						ArmyManager.get(i)->Orders.Prov = 0;
+						ArmyManager.get(i)->setMoving(true);
+					}
+				}
 				if(ArmyManager.get(i)->Orders.Prov && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
 					Event order;
 					order.SetTime(Calender);
@@ -1104,6 +1119,7 @@ void DXGame::Update(float dt)
 					ArmyManager.get(i)->Orders.Prov = 0;
 					ArmyManager.get(i)->setMoving(true);
 				}
+				
 			}
 			for(int i = 0; i < ArmyManager.NumHeld; i++){
 				if(ArmyManager.get(i)->getState() == Army::War){//only find targets if at war
@@ -1139,6 +1155,8 @@ void DXGame::Update(float dt)
 				}
 			}
 
+			
+
 			for(int i = 0; i < m_Player->m_ArmyList.NumHeld;i++){//resetting player commands
 				if(m_Player->m_ArmyList.get(i)->getProvID() == m_Player->m_ArmyList.get(i)->getPlayerProvTarget())
 					m_Player->m_ArmyList.get(i)->setPlayerProvTarget(-1);
@@ -1151,14 +1169,11 @@ void DXGame::Update(float dt)
 							ArmyManager.get(EventQueue.top().Info[0])->moveTo(EventQueue.top().Info[1]);
 						break;
 					case Event::ProvinceFlip:
+						if(!ArmyManager.get(EventQueue.top().Info[0])->getTarget())
+							SwapProvince(EventQueue.top().Info[1],EventQueue.top().Info[0]);
 						break;
-
-
-
 					}
-
-
-
+					
 					EventQueue.pop();
 				}
 		}
@@ -1803,7 +1818,7 @@ void DXGame::SwapProvince(int Prov, int Target){
 			Nations[TarProv->m_NationID]->ProvinceList.Subtract(i);
 	}
 
-	Nations[Target]->ProvinceList.Add(TarProv);
+	Nations[ArmyManager.get(Target)->getNationID()]->ProvinceList.Add(TarProv);
+	ArmyManager.get(Target)->setMoving(false);
 	TarProv->m_NationID = Target;
-	
 }
