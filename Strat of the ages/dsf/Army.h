@@ -44,7 +44,7 @@ public:
 	DWORD getNation(){
 		return Nation;
 	}
-	void moveTo(int);
+	bool moveTo(int);
 	void setMoving(bool a_Moving){Moving = a_Moving;};
 	bool getMoving(){return Moving;};
 	int getProvID(){return ProvID;};
@@ -61,6 +61,8 @@ public:
 	void setNationalID(int ID){this->NationalID = ID;};
 	void setisPlayers(bool is){this->isPlayers = is;};
 	void setPlayerProvTarget(int tar){this->PlayerProvTarget = tar;};
+	void setTroops(int troop){this->NumTroops = troop;};
+	void setMorale(float morale){this->m_morale = morale;};
 	int getMax(){	return NumMaxTroops;	};
 	void setMax(int maxSize){this->NumMaxTroops = maxSize;}
 
@@ -70,4 +72,5 @@ public:
 	Army* getTarget();
 	void setTarget(Army*);
 	void SetCombatVal(int ATK,int DEF,int MATK,int MDEF,float maxMorale);
+
 };

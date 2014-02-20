@@ -14,10 +14,14 @@ void Army::setNation(DWORD n)
 	this->Nation = n;
 }
 
-void Army::moveTo(int prov)
+bool Army::moveTo(int prov)
 {
-	ProvID = prov;
-	Moving = false;
+	if(ProvID > -1){
+		ProvID = prov;
+		Moving = false;
+		return false;}
+	return true;
+	
 }
 
 
@@ -30,25 +34,34 @@ void Army::CombatRound(Army* Enemy){
 		Enemy->m_morale -= (pow(die,1.5f)*DmgMult*(this->MATK/Enemy->MDEF))/Enemy->NumTroops;
 
 		PreviousDie = die;
-		if(Enemy->NumTroops < 1)
-		{
-			Enemy->NumTroops = 1;
-			Enemy->m_State = Retreat;
-			Enemy->setMoving(false);
-		}
-		if(Enemy->m_morale < 0){
-			Enemy->m_State = Retreat;
-			Enemy->m_morale = 0.0f;
-			Enemy->setMoving(false);
-		}
 	}
 	else
 	{
 		if(rand()%4 == 0){
 			Enemy->Target = 0;
 			Target = 0;
+			Enemy->setMoving(false);
+			setMoving(false);
 		}
 
+	}
+	if(Enemy->NumTroops < 1)
+	{
+		Enemy->NumTroops = 1;
+		Enemy->m_State = Retreat;
+	}
+	if(Enemy->m_morale < 0){
+		Enemy->m_State = Retreat;
+		Enemy->m_morale = 0.0f;
+	}
+	if(this->NumTroops < 1)
+	{
+		this->NumTroops = 1;
+		this->m_State = Retreat;
+	}
+	if(this->m_morale < 0){
+		this->m_State = Retreat;
+		this->m_morale = 0.0f;
 	}
 
 }
@@ -69,3 +82,4 @@ void Army::SetCombatVal(int ATK,int DEF,int MATK,int MDEF,float maxMorale){
 	this->MDEF = MDEF;
 	this->maxMorale = maxMorale;
 }
+
