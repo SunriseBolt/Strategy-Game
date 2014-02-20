@@ -352,6 +352,7 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 			t_Army->setNationalID(0);
 			Nations[i]->m_ArmyList.Add(t_Army);
 			Nations[i]->m_CapitalID = ProvID;
+			Nations[i]->ProvinceList.Delete = false;
 			ArmyManager.Add(t_Army);
 			int f_NameRand = rand()%100;
 			if(f_NameRand	< 40){
@@ -1084,37 +1085,38 @@ void DXGame::Update(float dt)
 				int numTries = 0;
 				for(int i = 0; i < ArmyManager.NumHeld; ++i)
 				{
-					if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getState() != Army::War){
-						if(World.getProv(ArmyManager.get(i)->getProvID()).m_NationID != ArmyManager.get(i)->getNationID()){
+					if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.NumHeld > 0)
+						if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getTroops() < 200){
+							if(World.getProv(ArmyManager.get(i)->getProvID()).m_NationID != ArmyManager.get(i)->getNationID()){
+								Event order;
+								order.SetTime(Calender);
+								order.Time += 60;
+
+								order.ID = order.ProvinceFlip;
+								order.Info[0] = i;
+								order.Info[1] = ArmyManager.get(i)->getProvID(); 
+
+								EventQueue.push(order);
+								ArmyManager.get(i)->Orders.Prov = 0;
+								ArmyManager.get(i)->setMoving(true);
+							}
+						}
+						if(ArmyManager.get(i)->Orders.Prov && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
 							Event order;
 							order.SetTime(Calender);
-							order.Time += 60;
+							if(ArmyManager.get(i)->Orders.Prov->mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
+								order.Time += World.Weight[ArmyManager.get(i)->Orders.Prov->mtype]+rand()%3;
+							else
+								order.Time += World.Weight[World.WaterLand]+rand()%3;
 
-							order.ID = order.ProvinceFlip;
+							order.ID = order.ArmyMove;
 							order.Info[0] = i;
-							order.Info[1] = ArmyManager.get(i)->getProvID(); 
+							order.Info[1] = ArmyManager.get(i)->Orders.Prov->mID; 
 
 							EventQueue.push(order);
 							ArmyManager.get(i)->Orders.Prov = 0;
 							ArmyManager.get(i)->setMoving(true);
 						}
-					}
-					if(ArmyManager.get(i)->Orders.Prov && !ArmyManager.get(i)->getMoving()){//check for move orders and then add them to EventQueue
-						Event order;
-						order.SetTime(Calender);
-						if(ArmyManager.get(i)->Orders.Prov->mtype != World.Water || World.getProv(ArmyManager.get(i)->getProvID()).mtype == World.Water)
-							order.Time += World.Weight[ArmyManager.get(i)->Orders.Prov->mtype]+rand()%3;
-						else
-							order.Time += World.Weight[World.WaterLand]+rand()%3;
-
-						order.ID = order.ArmyMove;
-						order.Info[0] = i;
-						order.Info[1] = ArmyManager.get(i)->Orders.Prov->mID; 
-
-						EventQueue.push(order);
-						ArmyManager.get(i)->Orders.Prov = 0;
-						ArmyManager.get(i)->setMoving(true);
-					}
 
 				}
 				for(int i = 0; i < ArmyManager.NumHeld; i++){
@@ -1592,22 +1594,22 @@ void DXGame::AIProcess(){
 			Province* ProvHld = 0;
 			ProvAI* PRAI = 0;
 			int Going;
-			if(!ArmyManager.get(i)->getisPlayers()){
-				switch(ArmyManager.get(i)->getState()){
-				case Army::Peace:
-					Temp = rand()%6;
-					if(World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID()){
-						ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
-						ArmyManager.get(i)->Orders.Prov = ProvHld;
-					}
-					break;
-				case Army::War:
+			switch(ArmyManager.get(i)->getState()){
+			case Army::Peace:
+				Temp = rand()%6;
+				if(World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]).m_NationID == ArmyManager.get(i)->getNationID()){
+					ProvHld = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Temp]);
+					ArmyManager.get(i)->Orders.Prov = ProvHld;
+				}
+				break;
+			case Army::War:
+				if(!ArmyManager.get(i)->getisPlayers()){
 					World.Reset();
 					ProvHld = &World.getProv(ArmyManager.get(i)->getProvID());
 					//set up all the ProvAIs and pass them off to Queue
 					//use initial ProbHld capture later for direction
 					//for loop through neighbors giving them initial direction
-					if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getState() == Army::War){
+					if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getTroops() >= 200){
 
 						Temp = PathToTarget(ArmyManager.get(i)->getProvID(),Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.get(ArmyManager.get(i)->getNationalID()%Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0)->m_ArmyList.NumHeld)->getProvID());
 
@@ -1673,23 +1675,24 @@ void DXGame::AIProcess(){
 						}
 						World.Reset();
 					}
-					break;
-				case Army::Retreat:
-
-					if((Going = PathToTarget(ArmyManager.get(i)->getProvID(),Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID)) > -1)
-						ArmyManager.get(i)->Orders.Prov = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Going]);
-					break;
-
-
-
-
 				}
-			}
-			else
-			{
-				if(ArmyManager.get(i)->getPlayerProvTarget() > -1)
-					if((Going = PathToTarget(ArmyManager.get(i)->getProvID(),ArmyManager.get(i)->getPlayerProvTarget())) > -1)
-						ArmyManager.get(i)->Orders.Prov = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Going]);
+				else
+				{
+					if(ArmyManager.get(i)->getPlayerProvTarget() > -1)
+						if((Going = PathToTarget(ArmyManager.get(i)->getProvID(),ArmyManager.get(i)->getPlayerProvTarget())) > -1)
+							ArmyManager.get(i)->Orders.Prov = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Going]);
+				}
+				break;
+			case Army::Retreat:
+
+				if((Going = PathToTarget(ArmyManager.get(i)->getProvID(),Nations[ArmyManager.get(i)->getNationID()]->m_CapitalID)) > -1)
+					ArmyManager.get(i)->Orders.Prov = &World.getProv(World.getProv(ArmyManager.get(i)->getProvID()).connections[Going]);
+				break;
+
+
+
+
+
 			}
 		}
 	}

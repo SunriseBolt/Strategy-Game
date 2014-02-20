@@ -77,7 +77,7 @@ struct Manager{
 	t_Item* get(int Num){
 		if(Num > NumMax)
 			return NULL;
-		if(m_Array[Num] == NULL)
+		if(!m_Array[Num])
 			return NULL;
 		return m_Array[Num];
 	}

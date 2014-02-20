@@ -34,10 +34,12 @@ void Army::CombatRound(Army* Enemy){
 		{
 			Enemy->NumTroops = 1;
 			Enemy->m_State = Retreat;
+			Enemy->setMoving(false);
 		}
 		if(Enemy->m_morale < 0){
 			Enemy->m_State = Retreat;
 			Enemy->m_morale = 0.0f;
+			Enemy->setMoving(false);
 		}
 	}
 	else
