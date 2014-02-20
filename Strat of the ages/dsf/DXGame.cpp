@@ -329,7 +329,7 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 		//Set everyone's initial Cost of upgrade to 250 (Increasing them based on size down in a later section)
 		for(int i = 0; i < 100; ++i)
 		{
-			upgradeCost[i] = 250;
+			Nations[i]->upgradeCost = 250;
 		}
 
 
