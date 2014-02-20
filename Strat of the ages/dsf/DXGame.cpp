@@ -1056,6 +1056,13 @@ void DXGame::Update(float dt)
 
 			//GAME LOGIC
 			if((gameTime > turnTime) && m_Player && !Paused){
+				
+				for(int i = 0; i < Num_Nations; i++){
+					if(Nations[i]->ProvinceList.NumHeld == 0 && !Nations[i]->isdead){
+						Nations[i]->isdead = true;
+					}
+				}
+				
 				AIProcess();
 				if(Calender.Increment()){//one day has passed, returns true on months end
 
@@ -1126,7 +1133,7 @@ void DXGame::Update(float dt)
 				int numTries = 0;
 				for(int i = 0; i < ArmyManager.NumHeld; ++i)
 				{
-					if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.NumHeld > 0)
+					if(Nations[ArmyManager.get(i)->getNationID()]->WarManager.NumHeld > 0 && !Nations[ArmyManager.get(i)->getNationID()]->isdead)
 						if(ArmyManager.get(i)->getState() != Army::Retreat)
 							if(World.getProv(ArmyManager.get(i)->getProvID()).m_NationID != ArmyManager.get(i)->getNationID()){
 								if(Nations[World.getProv(ArmyManager.get(i)->getProvID()).m_NationID] == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0) && !ArmyManager.get(i)->getMoving()){
@@ -1386,7 +1393,8 @@ void DXGame::Render()//RENDER
 				Pallette[0]->Draw(m_pD3DSprite,m_imageInfoSmall,Pallette[0]->m_Textures[World.getProv(i).mtype]);
 		}
 		for(int i = 0; i < ArmyManager.NumHeld;i++)
-			Pallette[0]->DrawArmy(ArmyManager.get(i),ArmyManager.NumHeld,m_pD3DSprite,m_imageInfoUI,Pallette[0]->m_Textures[5]);
+			if(!Nations[ArmyManager.get(i)->getNationID()]->isdead)
+				Pallette[0]->DrawArmy(ArmyManager.get(i),ArmyManager.NumHeld,m_pD3DSprite,m_imageInfoUI,Pallette[0]->m_Textures[5]);
 
 		Pallette[1]->Draw(m_pD3DSprite,m_imageInfoUI,Pallette[1]->m_Textures[0],D3DCOLOR_ARGB(255,255,255,255),0.0,0.85,0.94);
 		// Scaling
@@ -1647,7 +1655,7 @@ void DXGame::Shutdown()
 
 void DXGame::AIProcess(){
 	for(int i =0; i < ArmyManager.NumHeld; i++){
-		if(ArmyManager.get(i)->Orders.Prov == 0 && !ArmyManager.get(i)->getMoving() && !ArmyManager.get(i)->getTarget()){
+		if(ArmyManager.get(i)->Orders.Prov == 0 && !ArmyManager.get(i)->getMoving() && !ArmyManager.get(i)->getTarget() && !Nations[ArmyManager.get(i)->getNationID()]->isdead){
 			bool NotDone = true;
 			int Temp = 0;
 			Province* ProvHld = 0;

@@ -13,6 +13,7 @@ using namespace std;
 #include "province.h"
 
 struct Nation{
+	bool isdead;
 	string m_Name;
 	D3DXCOLOR m_Flag;
 
@@ -54,7 +55,7 @@ struct Nation{
 	Manager<Nation> WarManager;
 
 	Nation():m_LandTech(0),m_SeaTech(0),m_EconomyTech(0),NumMaxArmies(1),Treasury(100.0f),Manpower(1000.0f),WarExhaustion(0.0f),NationalID(0){
-
+		isdead = false;
 		m_Name = "";
 		m_Flag = D3DCOLOR_ARGB(255,(rand()%155)+50,(rand()%155)+50,(rand()%155)+50);
 
