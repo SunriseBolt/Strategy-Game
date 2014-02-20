@@ -1,17 +1,10 @@
-//////////////////////////////////////////////////////////////////////////
-// Name:	DirectXFramework.cpp
-// Date:	April 2nd, 2010
-// Author:	Kyle Lauing [klauing@devry.edu] or [kylelauing@gmail.com]
-// Purpose: This file is used to create a very simple framework for using
-//			DirectX 9 for the GSP 381 course for DeVry University.
-// Disclaimer:	
-//			Copyright © 2010 by DeVry Educational Development Corporation.
-//			All rights reserved.  No part of this work may be reproduced 
-//			or used in any form or by any means – graphic, electronic, or 
-//			mechanical, including photocopying, recording, Web distribution 
-//			or information storage and retrieval systems – without the 
-//			prior consent of DeVry Educational Development Corporation.
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////
+//
+//
+//  Music used by DST(Night Driver) from www.nosoapradio.us 
+//
+//
+////////////////////////////////////////////
 #include "DXGame.h"
 #include <queue>
 #include "MapGen.h"
@@ -453,7 +446,7 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 			for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
 			{
 				//Increase this countries Cost for upgrading 5 per province
-				upgradeCost[j]+=5;
+				Nations[j]->upgradeCost+=5;
 			}
 		}
 
@@ -838,13 +831,15 @@ void DXGame::Update(float dt)
 				{
 					if(Nations[i]->isUser)
 					{
-						if(Nations[i]->Treasury >= upgradeCost[i])
+						if(Nations[i]->Treasury >= Nations[i]->upgradeCost)
 						{
-							Nations[i]->Treasury-=upgradeCost[i];
+							Nations[i]->Treasury-=Nations[i]->upgradeCost;
 							Nations[i]->m_EconomyTech++;
 							Nations[i]->m_LandTech++;
 							Nations[i]->m_SeaTech++;
-							upgradeCost[i]*=1.1;
+							Nations[i]->upgradeCost*=1.1;
+						if(Nations[i]->m_LandTech%10 == 0)
+							Nations[i]->m_ArmyList.NumMax++;
 						}
 						Nations[i]->UpdateUnitStats();
 					}

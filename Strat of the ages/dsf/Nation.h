@@ -21,7 +21,7 @@ struct Nation{
 	float WarExhaustion;
 
 	Manager<Province> ProvinceList;
-
+	int upgradeCost;
 	int NationalID;
 	int m_CapitalID;
 
@@ -72,12 +72,12 @@ struct Nation{
 	}
 
 	void UpdateUnitStats(){
-		ArmyAtk = pow(((m_LandTech*0.1)+1) , 1.3);
-		ArmyDef = pow(((m_LandTech*0.1)+1) , 1.3);
-		ArmyMAtk = pow(((m_LandTech*0.1)+1) , 1.3);
-		ArmyMDef = pow(((m_LandTech*0.1)+1) , 1.3);
+		ArmyAtk += ArmyAtk * 0.1;
+		ArmyDef += ArmyDef * 0.1;
+		ArmyMAtk += ArmyMAtk * 0.1;
+		ArmyMDef += ArmyMDef * 0.1;
 
-		ArmyMaxMorale = m_LandTech+2;
+		ArmyMaxMorale = 1;
 	}
 
 };
