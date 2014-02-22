@@ -1228,8 +1228,9 @@ void DXGame::Update(float dt)
 
 					for(int i = 0; i < 100; i++){
 						for(int j = 0; j < ArmyManager.NumHeld;j++){
-							if(Nations[i]->NationalID != ArmyManager.get(j)->getNationID() && Nations[i]->m_CapitalID == ArmyManager.get(j)->getProvID() && rand()%Nations[i]->ProvinceList.NumHeld)
-								Nations[i]->m_CapitalID = Nations[i]->ProvinceList.get(rand()%Nations[i]->ProvinceList.NumHeld)->mID;
+							if(Nations[i]->ProvinceList.NumHeld)
+								if(Nations[i]->NationalID != ArmyManager.get(j)->getNationID() && Nations[i]->m_CapitalID == ArmyManager.get(j)->getProvID() && rand()%Nations[i]->ProvinceList.NumHeld)
+									Nations[i]->m_CapitalID = Nations[i]->ProvinceList.get(rand()%Nations[i]->ProvinceList.NumHeld)->mID;
 						}
 
 						if(!Nations[i]->isUser){
@@ -1866,7 +1867,7 @@ void DXGame::DeclareWar(int Me,int Target){
 
 void DXGame::ArmyBuy(int a_nation)
 {
-	if(Nations[a_nation]->Treasury > Nations[a_nation]->ArmyCostMoney && Nations[a_nation]->Manpower > Nations[a_nation]->ArmyCostMen)
+	if(Nations[a_nation]->Treasury >= Nations[a_nation]->ArmyCostMoney && Nations[a_nation]->Manpower >= Nations[a_nation]->ArmyCostMen)
 	{
 		Army* t_Army = new Army;
 		t_Army->setState(Army::Peace);
@@ -1879,7 +1880,10 @@ void DXGame::ArmyBuy(int a_nation)
 			t_Army->setisPlayers(true);
 		}
 		Nations[a_nation]->m_ArmyList.Add(t_Army);
+		ArmyManager.Add(t_Army);
 	}
+	Nations[a_nation]->Treasury-=Nations[a_nation]->ArmyCostMoney;
+	Nations[a_nation]->Manpower-=Nations[a_nation]->ArmyCostMen;
 }
 
 void DXGame::SwapProvince(int Prov, int Target){
