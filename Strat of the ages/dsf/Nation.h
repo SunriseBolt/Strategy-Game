@@ -88,6 +88,12 @@ struct Nation{
 		isUser = false;
 		ArmyCostMoney = 10000;
 		ArmyCostMen = 1000;
+		InfCostMoney = 50;
+		InfCostMen = 100;
+		CavCostMoney = 200;
+		CavCostMen = 200;
+		ArtCostMoney = 200;
+		ArtCostMen = 50;
 	}
 
 	void UpdateUnitStats(){

@@ -447,7 +447,7 @@ void DXGame::Init(HWND& hWnd, HINSTANCE& hInst, bool bWindowed)
 			for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
 			{
 				//Increase this countries Cost for upgrading 5 per province
-				Nations[j]->upgradeCost+=5;
+				Nations[j]->upgradeCost+=10;
 			}
 		}
 
@@ -843,7 +843,13 @@ void DXGame::Update(float dt)
 								m_Player->m_SeaTech++;
 								m_Player->upgradeCost*=1.1;
 								if(m_Player->m_LandTech%10 == 0)
-									m_Player->m_ArmyList.NumMax++;
+								{
+									m_Player->NumMaxArmies++;
+									if(Nations[m_Player->NationalID]->m_ArmyList.NumMax < m_Player->NumMaxArmies)
+									{
+										Nations[m_Player->NationalID]->NumMaxArmies++;
+									}
+								}
 							}
 							m_Player->UpdateUnitStats();
 						}
@@ -857,16 +863,9 @@ void DXGame::Update(float dt)
 			// Buying new armies (Player side)
 			if(Buffer[DIK_O] & 0x80){
 				if(!m_BoolBuf[DIK_O]){
-					m_BoolBuf[DIK_O] = true;
-					for(int i = 0; i < 100; ++i)
-					{
-						if(i == m_Player->NationalID)
-						{
-							ArmyBuy(m_Player->NationalID);
-						}
-					}
+						ArmyBuy(m_Player->NationalID);
 					//DO STUFF HERE
-
+					m_BoolBuf[DIK_O] = true;
 				}
 			}
 			else
@@ -1077,9 +1076,7 @@ void DXGame::Update(float dt)
 							Nations[j]->Manpower+=Nations[j]->ProvinceList.get(i)->mManpower;
 						}
 						//#################Reduction of Treasury and Manpower#####################
-						// Manpower gets reduced by 10% base per month with a chance based on each of its armies' morale (base 12%, lower with higher morale than 1, higher with lower morale than 1)
-						// to get reduced by an extra 20%
-						// Bonus Calculation done below to save computation time
+						// Manpower gets reduced by 10% base per month
 						Nations[j]->Manpower*=0.9;
 						// Treasury gets reduced based on armies
 						for(int i = 0; i < ArmyManager.NumHeld; ++i)
@@ -1099,13 +1096,7 @@ void DXGame::Update(float dt)
 								{
 									Nations[j]->Treasury-=((ArmyManager.get(i)->getTroops()) * 0.4);
 								}
-								if(ArmyManager.get(i)->getMorale() >= 0)
-								{
-									if(rand()%100 < (15*(1/ArmyManager.get(i)->getMorale())))
-									{
-										Nations[j]->Manpower*=0.8;
-									}
-								}
+
 							}
 						}
 
@@ -1867,23 +1858,24 @@ void DXGame::DeclareWar(int Me,int Target){
 
 void DXGame::ArmyBuy(int a_nation)
 {
-	if(Nations[a_nation]->Treasury >= Nations[a_nation]->ArmyCostMoney && Nations[a_nation]->Manpower >= Nations[a_nation]->ArmyCostMen)
+	if(Nations[a_nation]->Treasury >= Nations[a_nation]->ArmyCostMoney && Nations[a_nation]->Manpower >= Nations[a_nation]->ArmyCostMen && Nations[a_nation]->m_ArmyList.NumHeld < Nations[a_nation]->NumMaxArmies)
 	{
 		Army* t_Army = new Army;
-		t_Army->setState(Army::Peace);
+		t_Army->setState(Nations[a_nation]->m_ArmyList.get(0)->getState());
 		t_Army->SetCombatVal(Nations[a_nation]->ArmyAtk,Nations[a_nation]->ArmyDef,Nations[a_nation]->ArmyMAtk,Nations[a_nation]->ArmyMDef,Nations[a_nation]->ArmyMaxMorale);
 		t_Army->moveTo(Nations[a_nation]->m_CapitalID);
 		t_Army->setNationID(Nations[a_nation]->NationalID);
 		t_Army->setNationalID(Nations[a_nation]->m_ArmyList.NumHeld);
+		t_Army->setNation(Nations[a_nation]->m_Flag);
 		if(Nations[a_nation]->isUser)
 		{
 			t_Army->setisPlayers(true);
 		}
 		Nations[a_nation]->m_ArmyList.Add(t_Army);
 		ArmyManager.Add(t_Army);
+		Nations[a_nation]->Treasury-=Nations[a_nation]->ArmyCostMoney;
+		Nations[a_nation]->Manpower-=Nations[a_nation]->ArmyCostMen;
 	}
-	Nations[a_nation]->Treasury-=Nations[a_nation]->ArmyCostMoney;
-	Nations[a_nation]->Manpower-=Nations[a_nation]->ArmyCostMen;
 }
 
 void DXGame::SwapProvince(int Prov, int Target){
@@ -1902,7 +1894,7 @@ void DXGame::TroopBuy(Army* a_army)
 {
 	if(Nations[a_army->getNationID()]->Treasury >= Nations[a_army->getNationID()]->InfCostMoney && Nations[a_army->getNationID()]->Manpower >= Nations[a_army->getNationID()]->InfCostMen)
 	{
-		m_Player->m_ArmyList.get(a_army->getNationalID())->setMax(a_army->getMax()+100);
+		Nations[a_army->getNationID()]->m_ArmyList.get(a_army->getNationalID())->setMax(a_army->getMax()+100);
 		Nations[a_army->getNationID()]->Treasury-=Nations[a_army->getNationID()]->InfCostMoney;
 		Nations[a_army->getNationID()]->Manpower-=Nations[a_army->getNationID()]->InfCostMen;
 	}
