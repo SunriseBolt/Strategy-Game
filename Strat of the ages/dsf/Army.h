@@ -29,7 +29,7 @@ private:
 	unsigned int NumMaxTroops;
 	int ProvID;
 	
-	int ATK, DEF, MATK, MDEF;
+	double ATK, DEF, MATK, MDEF;
 	float maxMorale;	
 
 	int PreviousDie;
@@ -56,6 +56,11 @@ public:
 	int getState(){return m_State;};
 	int getPlayerProvTarget(){return PlayerProvTarget;};
 	bool getisPlayers(){return isPlayers;};
+	float getAttack(){return this->ATK;};
+	float getDefence(){return this->DEF;};
+	float getMAttack(){return this->MATK;};
+	float getMDefence(){return this->MDEF;};
+	float getMMorale(){return this->maxMorale;};
 	void setNationID(int NationID){this->NationID = NationID;};
 	void setState(int a_State){this->m_State = a_State;};
 	void setNationalID(int ID){this->NationalID = ID;};
@@ -71,6 +76,6 @@ public:
 	void CombatRound(Army*);
 	Army* getTarget();
 	void setTarget(Army*);
-	void SetCombatVal(int ATK,int DEF,int MATK,int MDEF,float maxMorale);
+	void SetCombatVal(double ATK,double DEF,double MATK,double MDEF,float maxMorale);
 
 };

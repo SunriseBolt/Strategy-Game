@@ -83,7 +83,7 @@ void Army::setTarget(Army* a_tar){
 }
 
 
-void Army::SetCombatVal(int ATK,int DEF,int MATK,int MDEF,float maxMorale){
+void Army::SetCombatVal(double ATK,double DEF,double MATK,double MDEF,float maxMorale){
 	this->ATK = ATK;
 	this->DEF = DEF;
 	this->MATK = MATK;

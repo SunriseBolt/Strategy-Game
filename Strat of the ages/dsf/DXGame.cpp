@@ -1066,7 +1066,7 @@ void DXGame::Update(float dt)
 				if(Calender.Increment()){//one day has passed, returns true on months end
 
 					//For each nation
-					for(int j = 0; j < 100; ++j)
+					for(int j = 0; j < Num_Nations; ++j)
 					{
 						//Find the size of the nation
 						for(int i = 0; i < Nations[j]->ProvinceList.NumHeld; ++i)
@@ -1098,6 +1098,7 @@ void DXGame::Update(float dt)
 								}
 
 							}
+
 						}
 
 
@@ -1117,6 +1118,25 @@ void DXGame::Update(float dt)
 
 
 					}
+					for(int i = 0; i < Num_Nations;i++){
+						if(Nations[i]->WarManager.NumHeld)
+							for(int j = 0; j < Nations[i]->WarManager.NumHeld; j++){
+								if(Nations[i]->WarManager.get(j)->isdead){
+									while(Nations[i]->WarManager.get(j)->WarManager.NumHeld){
+										Nations[i]->WarManager.get(j)->WarManager.Subtract(0);
+									}
+									Nations[i]->WarManager.get(j)->WarManager.Subtract(j);
+								}
+							}
+					}
+					int NtnHldr = 0;
+					for(int i = 0; i < ArmyManager.NumHeld; ++i){
+						if(World.getProv(ArmyManager.get(i)->getProvID()).m_NationID == ArmyManager.get(i)->getNationID()){
+							NtnHldr = ArmyManager.get(i)->getNationID();
+							ArmyManager.get(i)->SetCombatVal(Nations[NtnHldr]->ArmyAtk,Nations[NtnHldr]->ArmyDef,Nations[NtnHldr]->ArmyMAtk,Nations[NtnHldr]->ArmyMDef,Nations[NtnHldr]->ArmyMaxMorale);
+						}
+					}
+
 				}
 				gameTime = 0.0f;
 				bool NotDone = true;
@@ -1130,7 +1150,7 @@ void DXGame::Update(float dt)
 								if(Nations[World.getProv(ArmyManager.get(i)->getProvID()).m_NationID] == Nations[ArmyManager.get(i)->getNationID()]->WarManager.get(0) && !ArmyManager.get(i)->getMoving()){
 									Event order;
 									order.SetTime(Calender);
-									order.Time += 60;
+									order.Time += 12;
 
 									order.ID = order.ProvinceFlip;
 									order.Info[0] = i;
@@ -1499,19 +1519,19 @@ void DXGame::Render()//RENDER
 					case Military:
 						UI.append("\n\nARMY:\n");
 						UI.append(" \nAttack: ");
-						ltoa(m_Player->ArmyAtk,c_hlder,10);
+						ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getAttack()*10.0f,c_hlder,10);
 						UI.append(c_hlder);
 						UI.append(" \nDefence: ");
-						ltoa(m_Player->ArmyDef,c_hlder,10);
+						ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getDefence()*10.0f,c_hlder,10);
 						UI.append(c_hlder);
 						UI.append(" \nMorale Attack: ");
-						ltoa(m_Player->ArmyMAtk,c_hlder,10);
+						ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getMAttack()*10.0f,c_hlder,10);
 						UI.append(c_hlder);
 						UI.append(" \nMorale Defence: ");
-						ltoa(m_Player->ArmyMDef,c_hlder,10);
+						ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getMDefence()*10.0f,c_hlder,10);
 						UI.append(c_hlder);
 						UI.append(" \nMax Morale: ");
-						ltoa(m_Player->ArmyMaxMorale,c_hlder,10);
+						ltoa(m_Player->m_ArmyList.get(m_PlayerArmyView)->getMMorale()*10.0f,c_hlder,10);
 						UI.append(c_hlder);
 						UI.append(" \n\nARMIES: ");
 						UI.append(" \nArmy #: ");
