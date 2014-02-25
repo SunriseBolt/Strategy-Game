@@ -876,13 +876,7 @@ void DXGame::Update(float dt)
 			if(Buffer[DIK_I] & 0x80){
 				if(!m_BoolBuf[DIK_I]){
 					m_BoolBuf[DIK_I] = true;
-					for(int i = 0; i < m_Player->m_ArmyList.NumHeld; ++i)
-					{
-						if(m_Player->m_ArmyList.get(i)->getNationalID() == i)
-						{
-							TroopBuy(m_Player->m_ArmyList.get(i));
-						}
-					}
+					TroopBuy(m_Player->m_ArmyList.get(m_PlayerArmyView));
 					//DO STUFF HERE
 
 				}
@@ -1907,14 +1901,14 @@ void DXGame::SwapProvince(int Prov, int Target){
 
 	Nations[ArmyManager.get(Target)->getNationID()]->ProvinceList.Add(TarProv);
 	ArmyManager.get(Target)->setMoving(false);
-	TarProv->m_NationID = Target;
+	TarProv->m_NationID = ArmyManager.get(Target)->getNationID();
 }
 
 void DXGame::TroopBuy(Army* a_army)
 {
 	if(Nations[a_army->getNationID()]->Treasury >= Nations[a_army->getNationID()]->InfCostMoney && Nations[a_army->getNationID()]->Manpower >= Nations[a_army->getNationID()]->InfCostMen)
 	{
-		Nations[a_army->getNationID()]->m_ArmyList.get(a_army->getNationalID())->setMax(a_army->getMax()+100);
+		a_army->setMax(a_army->getMax()+100);
 		Nations[a_army->getNationID()]->Treasury-=Nations[a_army->getNationID()]->InfCostMoney;
 		Nations[a_army->getNationID()]->Manpower-=Nations[a_army->getNationID()]->InfCostMen;
 	}

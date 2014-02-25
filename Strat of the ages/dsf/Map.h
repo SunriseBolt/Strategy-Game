@@ -12,12 +12,12 @@ enum {Land,Forest,Desert,Mountain,Water,WaterLand};
 #define Num_Nations 100
 
 //Complete placeholder values
-#define LandWeight 4
-#define ForestWeight 8
-#define DesertWeight 10
-#define MountainWeight 24
-#define WaterWeight 2
-#define WaterLandWeight 24
+#define LandWeight 10
+#define ForestWeight 20
+#define DesertWeight 25
+#define MountainWeight 35
+#define WaterWeight 5
+#define WaterLandWeight 35
 
 class WorldMap{
 	Province* Provinces[10000];
