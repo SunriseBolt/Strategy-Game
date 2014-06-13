@@ -1,0 +1,31 @@
+-------------------HOW TO PLAY---------------------
+W,A,S,D keys - Move the camera around the game map
+
+L key - Swap Right Hand UI views
+
+; key - Swap Right Hand UI views (Reverse)
+
+Left Mouse Button:
+Startup - Choose the different menu options (Middle option disabled)
+After clicking start on main menu - Choose your nation
+During wartime - Choose your movement target location (When viewing armies in the Right Hand UI)
+
+Right Mouse Button - Declare war on the selected nation
+NOTED BUG:  You can declare war on yourself which makes your armies useless for the entire game.
+NOTED FEATURE TO BE CHANGED:  You can only declare war on 1 nation at a time.
+
+NumPad -,+ key - Change game speed (slower, faster respectively)
+
+P key - Purchase tech upgrade
+Cost - Varies per nation size, Initial Cost + (number of Provinces x 10)
+250 + (numProv x 10)
+
+O key - Purchase an additional army
+Only available after every 10 tech levels
+Cost - 10000 Money(Treasury), 1000 Manpower
+
+I key - Purchase troops
+100 troops per purchase
+Cost - 50 Money(Treasury), 100 Manpower
+
+,(<) and .(>) keys - Swap views between controlled armies (Within army view in the Right Hand UI)
